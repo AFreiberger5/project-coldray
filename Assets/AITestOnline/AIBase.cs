@@ -9,6 +9,8 @@ using UnityEngine.Networking;
 
 public abstract class AIBase : NetworkBehaviour 
 {
+    internal const int MAX_PLAYERCOUNT = 4;
+
     /// <summary>
     /// To be executed when NPC is spawned.
     /// </summary>

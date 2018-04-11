@@ -6,15 +6,16 @@
 *                                         *
 ******************************************/
 
-
 [System.Flags]
 public enum AIState
 {
-    DEAD = 0,
-    ALIVE = 1,
-    IDLE = 2,
-    MOVING = 4,
-    ATTACKING = 8,
-    DYING = 16,
+    NONE        = 0,
+    ALIVE       = 1,
+    IDLE        = 2,
+    AWARE       = 4,
+    MOVING      = 8,
+    ATTACKING   = 16,
+    DYING       = 32,
+    DEAD        = 64
 
 }
