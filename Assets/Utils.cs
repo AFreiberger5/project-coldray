@@ -4,55 +4,60 @@ using UnityEngine;
 
 public class Utils {
 
-	static int maxHeight = 16;
-	static float smooth = 0.01f;
-	static int octaves = 4;
-	static float persistence = 0.5f;
+	static int MAXHEIGHT = 48;
+	static float SMOOTH = 0.001f;
+	static int OCTAVES = 1;
+	static float PERSISTENCE = 0.5f;
+    
 
-	public static int GenerateStoneHeight(float x, float z)
-	{
-		float height = Map(0,maxHeight-5, 0, 1, fBM(x*smooth*2,z*smooth*2,octaves+1,persistence));
-		return (int) height;
-	}
-
-	public static int GenerateHeight(float x, float z)
-	{
-		float height = Map(0,maxHeight, 0, 1, fBM(x*smooth,z*smooth,octaves,persistence));
-		return (int) height;
-	}
-
-    public static float fBM3D(float x, float y, float z, float sm, int oct)
+    public static int GenerateCliffHeight(float _x, float _z)
     {
-        float XY = fBM(x*sm,y*sm,oct,0.5f);
-        float YZ = fBM(y*sm,z*sm,oct,0.5f);
-        float XZ = fBM(x*sm,z*sm,oct,0.5f);
+        float height = Map(0, MAXHEIGHT - 24, 0, 1, FBM(_x * SMOOTH * 4, _z * SMOOTH * 4, OCTAVES + 3, PERSISTENCE));
+        return (int)height;
+    }
+    public static int GenerateStoneHeight(float _x, float _z)
+	{
+		float height = Map(0,MAXHEIGHT, 0, 1, FBM(_x*SMOOTH*4,_z*SMOOTH*4,OCTAVES+2,PERSISTENCE));
+		return (int) height;
+	}
 
-        float YX = fBM(y*sm,x*sm,oct,0.5f);
-        float ZY = fBM(z*sm,y*sm,oct,0.5f);
-        float ZX = fBM(z*sm,x*sm,oct,0.5f);
+	public static int GenerateHeight(float _x, float _z)
+	{
+		float height = Map(0,MAXHEIGHT, 0, 1, FBM(_x*SMOOTH,_z*SMOOTH,OCTAVES,PERSISTENCE));
+		return (int) height;
+	}
+
+    public static float FBM3D(float _x, float _y, float _z, float _sm, int _oct)
+    {
+        float XY = FBM(_x*_sm,_y*_sm,_oct,0.5f);
+        float YZ = FBM(_y*_sm,_z*_sm,_oct,0.5f);
+        float XZ = FBM(_x*_sm,_z*_sm,_oct,0.5f);
+
+        float YX = FBM(_y*_sm,_x*_sm,_oct,0.5f);
+        float ZY = FBM(_z*_sm,_y*_sm,_oct,0.5f);
+        float ZX = FBM(_z*_sm,_x*_sm,_oct,0.5f);
 
         return (XY+YZ+XZ+YX+ZY+ZX)/6.0f;
     }
 
-	static float Map(float newmin, float newmax, float origmin, float origmax, float value)
+	static float Map(float _newmin, float _newmax, float _origmin, float _origmax, float _value)
     {
-        return Mathf.Lerp (newmin, newmax, Mathf.InverseLerp (origmin, origmax, value));
+        return Mathf.Lerp (_newmin, _newmax, Mathf.InverseLerp (_origmin, _origmax, _value));
     }
 
-    static float fBM(float x, float z, int oct, float pers)
+    static float FBM(float _x, float _z, int _oct, float _pers)
     {
         float total = 0;
         float frequency = 1;
         float amplitude = 1;
         float maxValue = 0;
         float offset = 32000f;
-        for(int i = 0; i < oct ; i++) 
+        for(int i = 0; i < _oct ; i++) 
         {
-                total += Mathf.PerlinNoise((x+offset) * frequency, (z+offset) * frequency) * amplitude;
+                total += Mathf.PerlinNoise((_x+ offset) * frequency, (_z+offset) * frequency) * amplitude;
 
                 maxValue += amplitude;
-
-                amplitude *= pers;
+                amplitude *= _pers;
                 frequency *= 2;
         }
 
