@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -672,11 +672,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12db7a9985f4eab4c9cf465aab7ad531, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1539176590}
-  textureAtlas: {fileID: 2100000, guid: 2adc05e89e1ac854e91a6f8d9389ba02, type: 2}
-  loadingAmount: {fileID: 1540434900}
-  cam: {fileID: 898988526}
-  playButton: {fileID: 1512543093}
+  m_Player: {fileID: 1539176590}
+  m_TextureAtlas: {fileID: 2100000, guid: 2adc05e89e1ac854e91a6f8d9389ba02, type: 2}
+  m_LoadingAmount: {fileID: 1540434900}
+  m_Cam: {fileID: 898988526}
+  m_PlayButton: {fileID: 1512543093}
 --- !u!4 &1877143191
 Transform:
   m_ObjectHideFlags: 0
