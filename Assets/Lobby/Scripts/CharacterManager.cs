@@ -4,36 +4,44 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEditor;
 
 public class CharacterManager : MonoBehaviour
 {
-    public GameObject m_ScrollContent;
+    public GameObject m_CharacterSelectionScroller;
     public GameObject m_CharacterSlot;
-    // Test
-    public Text m_Text;
-    public GameObject m_CharacterViewer;
+    public GameObject m_CharacterInspector;
     public Button m_ContinueButton;
     public Button m_DeleteButton;
-    // Test
 
     public List<string> m_Files = new List<string>();
 
+    // TEST
+    private CharacterDummy m_dummy;
+    // TEST
+
     private void Start()
     {
+        // TEST
+        m_dummy = FindObjectOfType<CharacterDummy>();
+        // TEST
+
         FindAllCharacters();
     }
 
     private void Update()
     {
-        if (m_Text.text.Length >= 3)
+        if (m_Files.Count != 0
+            &&
+            m_dummy.m_SelectedCharacter != "")
         {
-            m_CharacterViewer.SetActive(true);
+            //m_CharacterInspector.SetActive(true);
             m_ContinueButton.interactable = true;
             m_DeleteButton.interactable = true;
         }
         else
         {
-            m_CharacterViewer.SetActive(false);
+            //m_CharacterInspector.SetActive(false);
             m_ContinueButton.interactable = false;
             m_DeleteButton.interactable = false;
         }
@@ -63,8 +71,23 @@ public class CharacterManager : MonoBehaviour
             else
             {
                 m_Files.Add(fileInfo[i].Name);
+                Debug.Log(fileInfo[i].Name + " found." + "\n");
             }
         }
+
+        if (m_Files.Count == 0)
+        {
+            try
+            {
+                FileUtil.DeleteFileOrDirectory(Application.dataPath + "/Characters/");
+                FileUtil.DeleteFileOrDirectory(Application.dataPath + "/Characters/" + "Characters.meta");
+            }
+            catch (System.Exception)
+            { }
+        }
+
+        // Checks for empty buttons and deletes them
+        m_Files.RemoveAll(o => o.ToString() == "");
 
         // Sort here
         m_Files = m_Files.OrderBy(o => o.ToString()).ToList();
@@ -75,10 +98,15 @@ public class CharacterManager : MonoBehaviour
             string[] splitter = characterName.Split('.');
             characterName = splitter[0];
 
-            GameObject slot = Instantiate(m_CharacterSlot, m_ScrollContent.transform.position, Quaternion.identity);
+            GameObject slot = Instantiate(m_CharacterSlot, m_CharacterSelectionScroller.transform.position, Quaternion.identity);
             slot.name = "Slot: " + characterName;
-            slot.transform.SetParent(m_ScrollContent.transform);
+            slot.transform.SetParent(m_CharacterSelectionScroller.transform);
             slot.GetComponentInChildren<Text>().text = characterName;
+        }
+
+        if (m_Files.Count > 0)
+        {
+            Debug.Log("Characters in List: " + m_Files.Count.ToString() + "\n");
         }
     }
 }

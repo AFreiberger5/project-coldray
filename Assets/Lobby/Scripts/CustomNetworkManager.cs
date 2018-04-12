@@ -1,46 +1,87 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
+using System.Linq;
 
 public class CustomNetworkManager : NetworkManager
 {
-    private GameObject m_Character;
+    public Text m_HostIP;
+    public Text m_JoinIP;
+    public Button m_JoinButton;
+
+    private void Start()
+    {
+        m_HostIP.text = Network.player.ipAddress;// ??????????????????????????
+
+        //m_HostIP.text = "127.0.0.1";
+    }
+
+    private void Update()
+    {
+        if (m_JoinIP.text.Length > 3)
+        {
+            m_JoinButton.interactable = true;
+        }
+        else
+        {
+            m_JoinButton.interactable = false;
+        }
+    }
+
+    public void SoloOnClick()
+    {
+        networkAddress = "localhost";
+
+        maxConnections = 1;
+
+        StartHost();
+    }
 
     public void HostOnClick()
     {
-        //m_Character = FindObjectOfType<Character>().gameObject;
-        //NetworkIdentity ni = m_Character.AddComponent<NetworkIdentity>();
-        //ni.localPlayerAuthority = true;
-        //playerPrefab = CharReady();
+        networkAddress = m_HostIP.text;
 
         StartHost();
-
-        //StartCoroutine(CharReady());
     }
 
     public void JoinOnClick()
     {
-        m_Character = FindObjectOfType<Character>().gameObject;
-        NetworkIdentity ni = m_Character.AddComponent<NetworkIdentity>();
-        ni.localPlayerAuthority = true;
-        //playerPrefab = CharReady();
-
-        //StartClient();
+        string iP;
+        if (CheckIP(m_JoinIP.text,out iP))
+        {
+            networkAddress = iP;
+            StartClient();
+        }
+        else
+        {
+            Debug.Log("Nö");
+        }
     }
 
-    private IEnumerator CharReady()
+    public override void OnServerConnect(NetworkConnection _conn)
     {
-        Debug.Log("lkusagfkuzw");
-        GameObject g = FindObjectOfType<Character>().gameObject;
-        NetworkIdentity ni = g.AddComponent<NetworkIdentity>();
-        ni.localPlayerAuthority = true;
-        spawnPrefabs.Add(g);
-        playerPrefab = g;
+        base.OnServerConnect(_conn);
 
-        //yield return new WaitUntil(() => playerPrefab != null);
-        yield return new WaitForSeconds(2f);
+        print("Player ID: " + _conn.connectionId + "\n");
+    }
 
-        StartHost();
+    private bool CheckIP(string _ip, out string _ckecked)
+    {
+        System.Net.IPAddress iP;
+        if (System.Net.IPAddress.TryParse(_ip, out iP))
+        {
+            //return iP.ToString();
+            _ckecked = iP.ToString();
+            return true;
+        }
+        else
+        {
+            //return "localhost";
+            _ckecked = "localhost";
+            return false;
+        }
     }
 }

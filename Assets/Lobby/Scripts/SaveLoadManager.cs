@@ -4,18 +4,17 @@ using UnityEngine;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
-//TEST
-using System.Linq;
 
 public static class SaveLoadManager
 {
     private static string m_FolderPath = Path.Combine(Application.dataPath, "Characters");
 
-    public static void SaveCharacter(Character _character)
+    public static void SaveCharacter(CharacterStats _stats)
     {
-        string filePath = Path.Combine(m_FolderPath, _character.m_CName + ".sav");
+        string filePath = Path.Combine(m_FolderPath, _stats.m_Name + ".sav");
         BinaryFormatter bf = new BinaryFormatter();
         FileStream stream;
+
 
         try
         {
@@ -29,13 +28,16 @@ public static class SaveLoadManager
             stream = new FileStream(filePath, FileMode.Create);
         }
 
-        CharacterData data = new CharacterData(_character);
+        CharacterStats data = _stats;
 
         bf.Serialize(stream, data);
+
+        stream.Flush();
         stream.Close();
+        stream.Dispose();
     }
 
-    public static void LoadCharacter(string _characterName, out string _name, out int[] _model)
+    public static CharacterStats LoadCharacter(string _characterName)
     {
         string filePath = Path.Combine(m_FolderPath, _characterName + ".sav");
 
@@ -44,34 +46,21 @@ public static class SaveLoadManager
             BinaryFormatter bf = new BinaryFormatter();
             FileStream stream = new FileStream(filePath, FileMode.Open);
 
-            CharacterData data = (CharacterData)bf.Deserialize(stream);
+            CharacterStats data = (CharacterStats)bf.Deserialize(stream);
 
+            stream.Flush();
             stream.Close();
+            stream.Dispose();
 
-            _name = data.m_CharacterName;
-            _model = data.m_CharacterModel;
+            CharacterStats cs = new CharacterStats(data.m_Name, data.m_Model);
+            return cs;
         }
         else
         {
             Debug.LogError("Character could not be loaded.");
-            _name = "ERROR";
-            _model = new int[4];
+
+            CharacterStats cs = new CharacterStats("ERROR", new byte[7]);
+            return cs;
         }
-    }
-}
-
-[Serializable]
-public class CharacterData
-{
-    public string m_CharacterName;
-    public int[] m_CharacterModel = new int[4];
-
-    public CharacterData(Character _character)
-    {
-        m_CharacterName = _character.m_CName;// Name
-        m_CharacterModel[0] = _character.m_CModel[0];// Color
-        m_CharacterModel[1] = _character.m_CModel[1];// Body
-        m_CharacterModel[2] = _character.m_CModel[2];// Face
-        m_CharacterModel[3] = _character.m_CModel[3];// Hair
     }
 }
