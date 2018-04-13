@@ -1060,10 +1060,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d30c539225a9f540b346624e24362b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_aggroDistance: 4
-  m_deAggroDistance: 0
+  m_aggroDistance: 40
+  m_deAggroDistance: 500
   m_head: {fileID: 4639620176373746}
-  m_hitdistance: 0
+  m_hitdistance: 1
 --- !u!135 &135864260437099926
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -1074,7 +1074,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 4
+  m_Radius: 40
   m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!195 &195425013935655024
 NavMeshAgent:

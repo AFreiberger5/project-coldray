@@ -170,7 +170,8 @@ MonoBehaviour:
   m_PlayerSpawnMethod: 1
   m_OfflineScene: AITestLogin
   m_OnlineScene: AITestOnline
-  m_SpawnPrefabs: []
+  m_SpawnPrefabs:
+  - {fileID: 1061507453935134, guid: 9501c8ee6a433a94f827fcfd16ce8cbf, type: 2}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

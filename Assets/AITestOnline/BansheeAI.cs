@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Linq;
 using UnityEngine.AI;
+using System;
 
 public class BansheeAI : AIBase
 {
@@ -18,7 +19,7 @@ public class BansheeAI : AIBase
     public float m_deAggroDistance;
     public Transform m_head;
 
-    
+
     private AIState CurrentState;
     private AIState previousState;
     private List<GameObject> m_TargetPlayers;
@@ -44,19 +45,19 @@ public class BansheeAI : AIBase
         IDmove = Animator.StringToHash("ismoving");
         IDattack = Animator.StringToHash("isattacking");
         IDdeath = Animator.StringToHash("isdied");
-        m_hitdistance = 10;
+        m_hitdistance = 1;
+
     }
-    
+
+    [ServerCallback]
     void Update()
     {
-        CurrentState = AIState.ALIVE | AIState.IDLE;
-        print(isLocalPlayer);
+
         if (!isLocalPlayer)
             NPCDecision();
 
         if (CurrentState != previousState)
             ChangeAnimations();
-
     }
 
     public override void KillNPC()
@@ -64,25 +65,28 @@ public class BansheeAI : AIBase
 
     }
 
-   
+
     public override void NPCDecision()
     {
-        print(m_TargetPlayers);
+
         if (CurrentState.HasFlag(AIState.IDLE) && !CurrentState.HasFlag(AIState.DEAD))
         {
             if (m_PlayerInRange)
             {
                 List<RaycastHit> hits = new List<RaycastHit>();
                 RaycastHit hit;
-                
+
                 foreach (GameObject Player in m_TargetPlayers)
                 {
-                    if (Physics.Raycast(m_head.transform.position, Player.transform.position,
-                        out hit, m_aggroDistance, LayerMask.GetMask(new string[] { "Walls", "Player" }),
-                        QueryTriggerInteraction.Ignore))
+
+                    if (Physics.Raycast(m_head.transform.position, (Player.transform.position - m_head.transform.position).normalized
+                        , out hit, m_aggroDistance * m_aggroDistance, LayerMask.GetMask(new string[] { "Walls", "Player" })
+                        , QueryTriggerInteraction.Ignore))
                     {
-                        float angle = Vector3.SignedAngle((Player.transform.position - m_head.transform.position), m_head.forward, Vector3.up);
-                        if (angle >= -45 && angle <= 45)
+                        Vector3 playerAng = Player.transform.position;
+                        playerAng.y = m_head.transform.position.y;
+                        float angle = Vector3.SignedAngle((playerAng - m_head.transform.position), m_head.forward, Vector3.up);
+                        if (angle >= -90 && angle <= 90)
                         {
                             hits.Add(hit);
                         }
@@ -102,7 +106,8 @@ public class BansheeAI : AIBase
                         }
                     }
                     CurrentState -= AIState.IDLE;
-                    CurrentState = CurrentState | AIState.ATTACKING;
+                    CurrentState = CurrentState | AIState.MOVING;
+
                 }
                 else
                 {
@@ -111,33 +116,44 @@ public class BansheeAI : AIBase
 
             }
         }
-        if (CurrentState.HasFlag(AIState.ATTACKING) && !CurrentState.HasFlag(AIState.DEAD))
+        if (CurrentState.HasFlag(AIState.MOVING) && !CurrentState.HasFlag(AIState.DEAD))
         {
-            if (m_agent.destination == Vector3.zero && m_Target.transform.position != Vector3.zero)
-                m_agent.destination = m_Target.transform.position;
-            else if (m_agent.destination == null)
-                return;
 
-            if (m_agent.isStopped && (m_agent.transform.position - m_Target.transform.position).sqrMagnitude <= m_hitdistance)
+            m_agent.destination = m_Target.transform.position;
+
+
+            if (m_agent.remainingDistance < m_hitdistance
+                && !m_agent.pathPending)
             {
                 Attack();
-                m_agent.destination = m_Target.transform.position;
+
                 return;
             }
-            else if (m_agent.isStopped)
+            else
             {
-                m_agent.destination = m_Target.transform.position;
+                NotAttacking();
             }
 
-            if ((m_agent.transform.position - m_Target.transform.position).sqrMagnitude <= m_deAggroDistance)
+
+            if ((m_agent.transform.position - m_Target.transform.position).sqrMagnitude >= m_deAggroDistance)
             {
-                m_agent.destination = m_agent.transform.position;
-                CurrentState -= AIState.ATTACKING;
+                m_agent.SetDestination(m_Target.transform.position);
+
+                if (CurrentState.HasFlag(AIState.ATTACKING))
+                    CurrentState -= AIState.ATTACKING;
+
+                CurrentState -= AIState.MOVING;
                 CurrentState = CurrentState | AIState.IDLE;
                 return;
             }
 
         }
+    }
+
+    private void NotAttacking()
+    {
+        if (CurrentState.HasFlag(AIState.ATTACKING))
+            CurrentState -= AIState.ATTACKING;
     }
 
     public override void OnNPCDeath()
@@ -151,11 +167,6 @@ public class BansheeAI : AIBase
 
     }
 
-    private void OnDrawGizmos()
-    {
-        if (m_aggroDistance > 0)
-            Gizmos.DrawWireSphere(m_head.transform.position, m_aggroDistance);
-    }
 
     [Server]
     private void OnTriggerEnter(Collider other)
@@ -183,7 +194,8 @@ public class BansheeAI : AIBase
 
     private void Attack()
     {
-
+        if (!CurrentState.HasFlag(AIState.ATTACKING))
+            CurrentState = CurrentState | AIState.ATTACKING;
     }
 
     private void ChangeAnimations()
