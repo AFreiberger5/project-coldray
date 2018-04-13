@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/AITestOnline/AITestLogin.unity
-    guid: 9b56ea7e0c4b32e4e94a328e374f1024
+    path: Assets/Lobby/Scenes/LobbyScene.unity
+    guid: d4c07cd3e0a9c4d43850042d365f247e
   - enabled: 1
-    path: Assets/AITestOnline/AITestOnline.unity
-    guid: 0f4cc0f95bd7acb44b86540575537f03
+    path: Assets/Lobby/Scenes/OnlineScene.unity
+    guid: 52e48a72592161846bbb5badbfdffecc
