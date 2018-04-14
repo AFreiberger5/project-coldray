@@ -44,19 +44,48 @@ public class Inventory : MonoBehaviour
         // The rest, that comes from the amount of items that are over the stacksize
         public int IRest;
 
-        public DataPair(int _ItemCount, int _LootCount, int _StackSize)
+        public DataPair(int _OperationType, int _ItemCount, int _LootCount, int _StackSize)
         {
-            // If the Stacksize is intersected, then split the Data
-            if (_ItemCount + _LootCount > _StackSize)   // (96 + 9 == 105) > 100
+            if (_OperationType == 0)
             {
-                IValue = _StackSize - _ItemCount;   // 100 - 96 = 4
-                IRest = _LootCount - IValue;        // rest = 9 - 4 == 5
+                // If the Stacksize is intersected, then split the Data
+                if (_ItemCount + _LootCount > _StackSize)   // (96 + 9 == 105) > 100
+                {
+                    IValue = _StackSize - _ItemCount;   // 100 - 96 = 4
+                    IRest = _LootCount - IValue;        // rest = 9 - 4 == 5
+                }
+                else
+                {
+                    IValue = _LootCount;
+                    IRest = 0;
+                }
             }
-            else
+            else    // Everything greater than 0!
             {
-                IValue = _LootCount;
-                IRest = 0;
+                // If the Stacksize is intersected, then split the Data
+                if ((_ItemCount - _LootCount) < 0)   // (6 - 9 == -3) < 0
+                {
+                    IValue = _ItemCount;   // 6 (Amount)
+                    IRest = _LootCount - _ItemCount;        // rest = 9 - 6 == 3
+                }
+                else
+                {
+                    IValue = _LootCount;
+                    IRest = 0;
+                }
             }
+        }
+    }
+
+    public struct ItemIndexIdentifier
+    {
+        public int IdentIndex;
+        public Slot IdentSlot;
+
+        public ItemIndexIdentifier(int _ItemIndex, Slot _ContainedSlot)
+        {
+            IdentIndex = _ItemIndex;
+            IdentSlot = _ContainedSlot;
         }
     }
 
@@ -96,32 +125,60 @@ public class Inventory : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             int RandomInt = Random.Range(1, 10);
-
-            //AddItem(m_ItemManager.ItemsFood, 1, RandomInt);
+            AddItem(m_ItemManager.ItemsFood, 1, RandomInt);
         }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
             int RandomInt = Random.Range(1, 10);
-
-            //AddItem(m_ItemManager.ItemsWeapon, 1, 1);
+            AddItem(m_ItemManager.ItemsWeapon, 1, 1);
         }
 
         if (Input.GetKeyDown(KeyCode.B))
         {
             int RandomInt = Random.Range(1, 10);
-
-            //AddItem(m_ItemManager.ItemsArmor, 1, 1);
+            AddItem(m_ItemManager.ItemsArmor, 1, 1);
         }
 
         if (Input.GetKeyDown(KeyCode.T))
         {
-            //Debug.Log(m_inventory[0].m_Name);
+            Debug.Log(m_slots[0].m_Item.m_Name);
         }
 
         if (Input.GetKeyDown(KeyCode.P))
         {
-            //RemoveItemFromSlot(FindSlot(m_slots, "Apfel"), 5);
+            if (FindSlot(m_slots, "Apfel") != -1)
+            {
+                RemoveItem(m_ItemManager.ItemsFood, 1, 5);
+            }
+            else
+            {
+                Debug.Log("AAHHHHH !!!");
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            if (FindSlot(m_slots, "Holzschwert") != -1)
+            {
+                RemoveItem(m_ItemManager.ItemsWeapon, 1, 1);
+            }
+            else
+            {
+                Debug.Log("AAHHHHH !!!");
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            if (FindSlot(m_slots, "Brustplatte") != -1)
+            {
+                RemoveItem(m_ItemManager.ItemsArmor, 1, 5);
+            }
+            else
+            {
+                Debug.Log("AAHHHHH !!!");
+            }
         }
 
     }
@@ -183,6 +240,51 @@ public class Inventory : MonoBehaviour
                 if (tmp.m_WeaponID == _ItemID)
                 {
                     AddItemToSlot(ChangeSlotToAdd(tmp), tmp, _AmountOfItemsToAdd);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void RemoveItem(List<Item> _ListOfItems, int _ItemID, int _AmountOfItemsToRemove)
+    {
+        if (_ListOfItems == m_ItemManager.ItemsFood)
+        {
+            foreach (Item item in _ListOfItems)
+            {
+                ItemFood tmp = (ItemFood)item;
+
+                if (tmp.m_FoodID == _ItemID)
+                {
+                    RemoveItemFromSlot(ChangeSlotToRemove(tmp), tmp, _AmountOfItemsToRemove);
+                    break;
+                }
+            }
+        }
+
+        if (_ListOfItems == m_ItemManager.ItemsArmor)
+        {
+            foreach (Item item in _ListOfItems)
+            {
+                ItemArmor tmp = (ItemArmor)item;
+
+                if (tmp.m_ArmorID == _ItemID)
+                {
+                    RemoveItemFromSlot(ChangeSlotToRemove(tmp), tmp, _AmountOfItemsToRemove);
+                    break;
+                }
+            }
+        }
+
+        if (_ListOfItems == m_ItemManager.ItemsWeapon)
+        {
+            foreach (Item item in _ListOfItems)
+            {
+                ItemWeapon tmp = (ItemWeapon)item;
+
+                if (tmp.m_WeaponID == _ItemID)
+                {
+                    RemoveItemFromSlot(ChangeSlotToRemove(tmp), tmp, _AmountOfItemsToRemove);
                     break;
                 }
             }
@@ -292,20 +394,19 @@ public class Inventory : MonoBehaviour
 
     private void AddItemToSlot(int _Index, Item _ItemToAdd, int _AmountOfItems)
     {
-        //bool OperationDone = false;
-
         while (true)
         {
             // If the Index is somewhere between the lowest and highest posible Number...
             if (_Index <= (m_slots.Count - 1) && _Index >= 0)
             {
                 // If the Itemname at the Slot with the Index of _Index is "Placeholder", which means that the slot is "Empty"
-                if (m_inventory[_Index].m_Name == "Placeholder")
+                if (m_slots[_Index].m_Item.m_Name == "Placeholder")
                 {
                     // Fill the Item in
                     m_slots[_Index].m_Item = _ItemToAdd;
                     m_inventory[_Index] = _ItemToAdd;
-                    m_ItemToOverwrite = Instantiate(m_slots[_Index].m_ItemPrefab, m_GridPanel.transform.GetChild(_Index).transform);
+                    //m_ItemToOverwrite = Instantiate(m_slots[_Index].m_ItemPrefab, m_GridPanel.transform.GetChild(_Index).transform);
+                    m_ItemToOverwrite = Instantiate(m_ItemPrefab, m_GridPanel.transform.GetChild(_Index).transform);
                     m_slots[_Index].m_ItemPrefab = m_ItemToOverwrite;
                     m_ItemToOverwrite.GetComponent<Image>().sprite = _ItemToAdd.m_Icon;
                     m_ItemToOverwrite.GetComponent<RectTransform>().anchorMin = new Vector2(0.05f, 0.05f);
@@ -327,14 +428,13 @@ public class Inventory : MonoBehaviour
                         if (_AmountOfItems + m_slots[_Index].m_Amount > m_slots[_Index].m_Item.m_StackSize)
                         {
                             // Devide the Amount of Items that should be added.
-                            DataPair DataSplit = new DataPair(m_slots[_Index].m_Amount, _AmountOfItems, m_slots[_Index].m_Item.m_StackSize);
+                            DataPair DataSplit = new DataPair(0, m_slots[_Index].m_Amount, _AmountOfItems, m_slots[_Index].m_Item.m_StackSize);
 
                             // Add X to the CurrentAmount.
                             m_slots[_Index].m_Amount += DataSplit.IValue;
 
                             // Change the text to the new Amount.
                             m_slots[_Index].m_ItemPrefab.transform.GetChild(0).GetComponent<Text>().text = "" + m_slots[_Index].m_Amount;
-                            Debug.Log("Add-Index: " + _Index + "| Count: " + m_slots[_Index].m_Amount + "Added: " + _AmountOfItems + " x " + _ItemToAdd.m_Name);
 
                             // The new amount of items that should be added, is the rest of the DataPair.
                             _AmountOfItems = DataSplit.IRest;
@@ -348,9 +448,8 @@ public class Inventory : MonoBehaviour
                             // Add X to the CurrentAmount.
                             m_slots[_Index].m_Amount += _AmountOfItems;
 
-                            // Change the text to the new Amount.
-                            m_slots[_Index].m_ItemPrefab.transform.GetChild(0).GetComponent<Text>().text = "" + m_slots[_Index].m_Amount;
-                            Debug.Log("Add-Index: " + _Index + "| Count: " + m_slots[_Index].m_Amount + "Added: " + _AmountOfItems + " x " + _ItemToAdd.m_Name);
+                            ChangeAmountText(m_slots[_Index]);
+
                             break;
                         }
 
@@ -410,23 +509,25 @@ public class Inventory : MonoBehaviour
         return -1;
     }
 
-    public int ChangeSlotToRemove(Item _ItemToRemove)
+    private int ChangeSlotToRemove(Item _ItemToRemove)
     {
-        // Alle SLots durchgehen.
-        for (int slot = 0; slot <= m_slots.Count - 1; slot++)
+
+        List<ItemIndexIdentifier> SlotsWithItem = FindSlotsWithItems(m_slots, _ItemToRemove);
+
+        int SmallestSize = _ItemToRemove.m_StackSize * 2;
+        ItemIndexIdentifier ToReturn = new ItemIndexIdentifier(0, new Slot());
+
+        foreach (ItemIndexIdentifier ident in SlotsWithItem)
         {
-            if (m_slots[slot].m_Item.m_Name == _ItemToRemove.m_Name && m_slots[slot].m_Amount > 0)
+            if (ident.IdentSlot.m_Amount <= SmallestSize)
             {
-                return slot;
-            }
-            else
-            {
-                return -1;
+                ToReturn = ident;
+                SmallestSize = ident.IdentSlot.m_Amount;
             }
         }
 
-        // Kein freier Platz gefunden!
-        return -1;
+        // Gibt den index vom slot zurück, der die kleinste menge des bestimmten objektes hat!
+        return ToReturn.IdentIndex;
     }
 
 
@@ -522,67 +623,106 @@ public class Inventory : MonoBehaviour
         return null;
     }
 
-    public Slot FindSlot(List<Slot> _ListToLookAt, string _Name)
+    public int FindSlot(List<Slot> _ListToLookAt, string _Name)
     {
         // If there is at least one Slot to look at...
         if (_ListToLookAt.Count > 0)
         {
-            foreach (Slot slot in _ListToLookAt)
+            for (int i = 0; i < _ListToLookAt.Count; i++)
             {
-                // If the Slots Name matches the Name the function is looking for...
-                if (slot.m_Item.m_Name == _Name)
+                if (m_slots[i].m_Item.m_Name == _Name)
                 {
-                    return slot;
+
+                    Debug.Log("SlotIndex = " + i);
+                    return i;
+                }
+            }
+
+        }
+        return -1;
+    }
+
+    public void RemoveItemFromSlot(int _SlotIndex, Item _ItemToRemove, int _RemoveCount)
+    {
+        if (_SlotIndex != -1)
+        {
+            while (true)
+            {
+                // Falls im Slot genug items sind...
+                if (m_slots[_SlotIndex].m_Amount >= _RemoveCount)
+                {
+                    m_slots[_SlotIndex].m_Amount -= _RemoveCount;
+
+                    ChangeAmountText(m_slots[_SlotIndex]);
+
+                    CheckToDestroy(m_slots[_SlotIndex].m_Amount, _SlotIndex);
+
+                    break;
+                }
+                else
+                {
+                    if (FindSlotsWithItems(m_slots, _ItemToRemove).Count > 1)
+                    {
+                        // Split the Data for the Amount of Items that need to be removed.
+                        DataPair RemoveDataSplit = new DataPair(1, m_slots[_SlotIndex].m_Amount, _RemoveCount, m_slots[_SlotIndex].m_Amount);
+
+                        //Reduce the amount of Items by the rest of that Slot
+                        m_slots[_SlotIndex].m_Amount -= RemoveDataSplit.IValue;
+
+                        ChangeAmountText(m_slots[_SlotIndex]);
+
+                        CheckToDestroy(m_slots[_SlotIndex].m_Amount, _SlotIndex);
+
+                        // Reduce the amount of items by the matching part of the DataPair.
+                        _RemoveCount = RemoveDataSplit.IRest;
+
+                        _SlotIndex = ChangeSlotToRemove(_ItemToRemove);
+
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void CheckToDestroy(int _Amount, int _SlotIndex)
+    {
+        if (_Amount == 0)
+        {
+            DestroyIconFromSlot(_SlotIndex);
+        }
+    }
+
+    private void DestroyIconFromSlot(int _SlotIndex)
+    {
+        // Grid panel child an der stelle I ... DESTROY
+        for (int i = 0; i < m_slots.Count; i++)
+        {
+            // If the current Iterator matches the SlotIndex...
+            if (i == _SlotIndex)
+            {
+                // If the Child of the Grid_Panel at that specific location is not empty...
+                if (m_GridPanel.transform.GetChild(_SlotIndex) != null)
+                {
+                    // Set the Item at the targeted Slot to a Placeholder-Item
+                    m_slots[_SlotIndex].m_Item = new ItemFood(-1, "Placeholder", "Placeholder!", 1, 0, 0);
+
+                    // Finds the Child-Object of that specific Slot we are looking at.
+                    Debug.Log(_SlotIndex);
+                    GameObject ObjectToEliminate = m_GridPanel.transform.GetChild(_SlotIndex).transform.GetChild(0).gameObject;
+
+                    // Destroy the Image from the Inventory-Grid-Panel
+                    Destroy(ObjectToEliminate);
+
+                    break;
                 }
             }
         }
 
-        // If there is no Slot found...
-        return null;
-    }
-
-    public void RemoveItemFromSlot(Slot _SlotWithItem, int _RemoveCount)
-    {
-        // Solange die Anzahl der zu entfernenden Items nicht 0 ist...
-        while (_RemoveCount > 0)
-        {
-            // Falls im Slot genug items sind...
-            if (_SlotWithItem.m_Amount >= _RemoveCount && _SlotWithItem.m_Amount > 0)
-            {
-                _SlotWithItem.m_Amount -= _RemoveCount;
-
-                ChangeAmountText(_SlotWithItem);
-
-                _RemoveCount = 0;
-
-                break;
-            }
-            else
-            {
-                // Reduce the amount of items by the number of items in the slot!
-                _RemoveCount -= _SlotWithItem.m_Amount;
-
-                _SlotWithItem.m_Amount = 0;
-
-                ChangeAmountText(_SlotWithItem);
-
-                ChangeSlotToRemove(_SlotWithItem.m_Item);
-
-                //DestroyIconFromSlot(_SlotWithItem);
-
-                break;
-            }
-        }
-
-    }
-
-    private void DestroyIconFromSlot(Slot _SlotToExecute)
-    {
-        if (_SlotToExecute.m_imageSlot != null)
-        {
-            _SlotToExecute.m_Item = new ItemFood(-1, "Placeholder", "Placeholder!", 1, 0, 0);
-            Destroy(_SlotToExecute.m_ItemPrefab);
-        }
     }
 
     private void ChangeAmountText(Slot _SlotToChangeText)
@@ -591,7 +731,18 @@ public class Inventory : MonoBehaviour
         _SlotToChangeText.m_ItemPrefab.transform.GetChild(0).GetComponent<Text>().text = "" + _SlotToChangeText.m_Amount;
     }
 
-    //      To DO:
-    //      
-    //  -   wichtig aktuell noch verlust bei loot größer gleich stacksize, da rest nicht impliziert werden kann, falls das inventar voll ist!!!
+    private List<ItemIndexIdentifier> FindSlotsWithItems(List<Slot> _InventorySlots, Item _ItemToRemove)
+    {
+        List<ItemIndexIdentifier> ListTargets = new List<ItemIndexIdentifier>();
+
+        for (int i = 0; i < _InventorySlots.Count; i++)
+        {
+            if (_InventorySlots[i].m_Item.m_Name == _ItemToRemove.m_Name)
+            {
+                ListTargets.Add(new ItemIndexIdentifier(i, m_slots[i]));
+            }
+        }
+
+        return ListTargets;
+    }
 }
