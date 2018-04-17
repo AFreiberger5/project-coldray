@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class FaceSlotsOnClick : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class FaceSlotsOnClick : MonoBehaviour
     public void FaceFillScrollContentWith()
     {
         CharacterDummy cd = FindObjectOfType<CharacterDummy>();
+
+        Scrollbar sb = m_FaceContentPanel.transform.parent.transform.parent.gameObject.GetComponentsInChildren<Scrollbar>().Where(o => o.gameObject.name == "Scrollbar Vertical").SingleOrDefault();
+        sb.value = 1;
 
         DummyEquipOnClick[] toBeDeleted;
         try

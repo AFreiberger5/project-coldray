@@ -71,6 +71,7 @@ public class CharacterDummy : MonoBehaviour
 
     private void Update()
     {
+        return;
         if (m_SelectedCharacter != "")
         {
             m_CharacterInspectorName.text = m_SelectedCharacter;
@@ -81,6 +82,11 @@ public class CharacterDummy : MonoBehaviour
             m_CharacterInspectorName.text = "";
             m_ModeInspectorName.text = "";
         }
+    }
+
+    public void DontDestroyDummyOnLoad()
+    {
+        DontDestroyOnLoad(gameObject);
     }
 
     public void SaveDummy()

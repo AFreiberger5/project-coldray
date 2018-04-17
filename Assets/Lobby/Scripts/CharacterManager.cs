@@ -4,7 +4,6 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
 using System.Linq;
-using UnityEditor;
 
 public class CharacterManager : MonoBehaviour
 {
@@ -52,12 +51,12 @@ public class CharacterManager : MonoBehaviour
         // Searches for character files and ignores the meta data
         DirectoryInfo info;
 
-        if (!Directory.Exists(Application.dataPath + "/Characters"))
+        if (!Directory.Exists(Application.persistentDataPath + "/Characters"))//
         {
-            Directory.CreateDirectory(Application.dataPath + "/Characters/");
+            Directory.CreateDirectory(Application.persistentDataPath + "/Characters/");//
         }
 
-        info = new DirectoryInfo(Application.dataPath + "/Characters/");
+        info = new DirectoryInfo(Application.persistentDataPath + "/Characters/");//
 
         FileInfo[] fileInfo = info.GetFiles();
         for (int i = 0; i < fileInfo.GetLength(0); i++)
@@ -79,8 +78,8 @@ public class CharacterManager : MonoBehaviour
         {
             try
             {
-                FileUtil.DeleteFileOrDirectory(Application.dataPath + "/Characters/");
-                FileUtil.DeleteFileOrDirectory(Application.dataPath + "/Characters/" + "Characters.meta");
+                //FileUtil.DeleteFileOrDirectory(Application.dataPath + "/Characters/");
+                //FileUtil.DeleteFileOrDirectory(Application.dataPath + "/Characters/" + "Characters.meta");
             }
             catch (System.Exception)
             { }

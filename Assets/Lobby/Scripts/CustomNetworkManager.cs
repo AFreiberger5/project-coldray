@@ -5,34 +5,62 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class CustomNetworkManager : NetworkManager
 {
-    public Text m_HostIP;
-    public Text m_JoinIP;
-    public Button m_JoinButton;
+    private CharacterDummy m_dummy;
 
-    private void Start()
-    {
-        m_HostIP.text = Network.player.ipAddress;// ??????????????????????????
+    // Lobby scene use only
+    private InputField m_HostIP;
+    private InputField m_JoinIP;
+    private Button m_JoinButton;
 
-        //m_HostIP.text = "127.0.0.1";
-    }
+    private bool m_gotIt = false;
 
     private void Update()
     {
-        if (m_JoinIP.text.Length > 3)
+        if (SceneManager.GetActiveScene().buildIndex == 0
+            &&
+            (m_HostIP == null
+            ||
+            m_JoinIP == null
+            ||
+            m_JoinButton == null))
         {
-            m_JoinButton.interactable = true;
+            m_gotIt = false;
+
+            LobbyInfoFeed info = FindObjectOfType<LobbyInfoFeed>();
+
+            info = FindObjectOfType<LobbyInfoFeed>();
+            m_HostIP = info.m_GetHostIp;
+            m_JoinIP = info.m_GetJoinIp;
+            m_JoinButton = info.m_GetJoinButton;
+
+            m_HostIP.text = Network.player.ipAddress;// ??????????????????????????
+
+            m_dummy = FindObjectOfType<CharacterDummy>();
+
+            m_gotIt = true;
         }
-        else
+
+        if (m_gotIt)
         {
-            m_JoinButton.interactable = false;
+            if (m_JoinIP.text.Length >= 1)
+            {
+                m_JoinButton.interactable = true;
+            }
+            else
+            {
+                m_JoinButton.interactable = false;
+            }
         }
     }
 
     public void SoloOnClick()
     {
+        m_dummy.DontDestroyDummyOnLoad();
+
         networkAddress = "localhost";
 
         maxConnections = 1;
@@ -42,7 +70,10 @@ public class CustomNetworkManager : NetworkManager
 
     public void HostOnClick()
     {
-        networkAddress = m_HostIP.text;
+        m_dummy.DontDestroyDummyOnLoad();
+
+        networkAddress = "localhost";
+        //networkAddress = m_HostIP.text;
 
         StartHost();
     }
@@ -50,14 +81,16 @@ public class CustomNetworkManager : NetworkManager
     public void JoinOnClick()
     {
         string iP;
-        if (CheckIP(m_JoinIP.text,out iP))
+        if (CheckIP(m_JoinIP.text, out iP))
         {
+            m_dummy.DontDestroyDummyOnLoad();
+
             networkAddress = iP;
             StartClient();
         }
         else
         {
-            Debug.Log("Nö");
+            m_JoinIP.text = "Invalid Ip";
         }
     }
 
@@ -66,6 +99,7 @@ public class CustomNetworkManager : NetworkManager
         base.OnServerConnect(_conn);
 
         print("Player ID: " + _conn.connectionId + "\n");
+        playerPrefab.GetComponent<PlayerCharacter>().m_PlayerId = _conn.connectionId;// Player Prefab gets its connectionId
     }
 
     private bool CheckIP(string _ip, out string _ckecked)
@@ -73,14 +107,12 @@ public class CustomNetworkManager : NetworkManager
         System.Net.IPAddress iP;
         if (System.Net.IPAddress.TryParse(_ip, out iP))
         {
-            //return iP.ToString();
             _ckecked = iP.ToString();
             return true;
         }
         else
         {
-            //return "localhost";
-            _ckecked = "localhost";
+            _ckecked = "ERROR";
             return false;
         }
     }

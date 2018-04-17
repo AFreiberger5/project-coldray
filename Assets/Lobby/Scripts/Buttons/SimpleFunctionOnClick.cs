@@ -23,8 +23,8 @@ public class SimpleFunctionOnClick : MonoBehaviour
 
         try
         {
-            File.Delete(Application.dataPath + "/Characters/" + cd.m_DummyName + ".sav");
-            File.Delete(Application.dataPath + "/Characters/" + cd.m_DummyName + ".sav.meta");
+            File.Delete(Application.persistentDataPath + "/Characters/" + cd.m_DummyName + ".sav");//
+            File.Delete(Application.persistentDataPath + "/Characters/" + cd.m_DummyName + ".sav.meta");//
         }
         catch (System.Exception)
         {

@@ -7,7 +7,7 @@ using System.IO;
 
 public static class SaveLoadManager
 {
-    private static string m_FolderPath = Path.Combine(Application.dataPath, "Characters");
+    private static string m_FolderPath = Path.Combine(Application.persistentDataPath, "Characters");//
 
     public static void SaveCharacter(CharacterStats _stats)
     {
@@ -22,8 +22,8 @@ public static class SaveLoadManager
         }
         catch (Exception)
         {
-            Directory.CreateDirectory(Path.Combine(Application.dataPath, "Characters"));
-            Debug.Log("Created Directory: " + Application.dataPath + "/Characters/");
+            Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "Characters"));//
+            Debug.Log("Created Directory: " + Application.persistentDataPath + "/Characters/");//
 
             stream = new FileStream(filePath, FileMode.Create);
         }
