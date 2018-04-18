@@ -61,8 +61,9 @@ public class BansheeAI : AIBase
     }
 
     public override void KillNPC()
-    {
-
+    {        
+        CurrentState = AIState.DYING;
+        OnNPCDeath();
     }
 
 
@@ -156,11 +157,13 @@ public class BansheeAI : AIBase
             CurrentState -= AIState.ATTACKING;
     }
 
-    public override void OnNPCDeath()
+    [Server]
+    protected override void OnNPCDeath()
     {
-
+        CurrentState = AIState.DEAD;
     }
 
+    [Server]
     public override void OnNPCSpawn()
     {
         CurrentState = AIState.ALIVE | AIState.IDLE;
@@ -200,7 +203,6 @@ public class BansheeAI : AIBase
 
     private void ChangeAnimations()
     {
-        previousState = CurrentState;
 
         if (CurrentState.HasFlag(AIState.ALIVE))
             m_animator.animator.SetBool(IDliving, true);
@@ -214,10 +216,14 @@ public class BansheeAI : AIBase
             m_animator.animator.SetBool(IDmove, true);
         if (CurrentState.HasFlag(AIState.ATTACKING))
             m_animator.animator.SetBool(IDattack, true);
+        if (!CurrentState.HasFlag(AIState.ATTACKING) && previousState.HasFlag(AIState.ATTACKING))
+            m_animator.animator.SetBool(IDattack, false);
         if (CurrentState.HasFlag(AIState.DYING) || CurrentState.HasFlag(AIState.DEAD))
         {
             m_animator.animator.SetBool(IDliving, false);
             m_animator.animator.SetBool(IDdeath, true);
         }
+
+        previousState = CurrentState;
     }
 }

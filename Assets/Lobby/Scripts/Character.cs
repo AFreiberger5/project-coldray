@@ -41,12 +41,12 @@ public class Character : MonoBehaviour
 
     public void Save()
     {
-        SaveLoadManager.SaveCharacter(this);
+       // SaveLoadManager.SaveCharacter(this);
     }
 
     public void Load(string _characterName)
     {
-        SaveLoadManager.LoadCharacter(_characterName, out m_CName, out m_CModel);
+        //SaveLoadManager.LoadCharacter(_characterName, out m_CName, out m_CModel);
         gameObject.name = _characterName;
     }
 

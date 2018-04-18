@@ -24,7 +24,7 @@ public abstract class AIBase : NetworkBehaviour
     /// <summary>
     /// To be executed when NPC is dying, handles loot drops and similar.
     /// </summary>
-    public abstract void OnNPCDeath();
+    protected abstract void OnNPCDeath();
 
     /// <summary>
     /// Handles the Decisionmaking of the NPC based on current State and possible options.
