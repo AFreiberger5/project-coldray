@@ -5,20 +5,22 @@ using UnityEngine.Networking;
 
 public class PlayerCharacter : NetworkBehaviour
 {
+    [SyncVar]
     public string m_PlayerName = "";
     public int m_PlayerId = 42;
     //public string m_PlayerNetId = "42";
     //public byte[] m_PlayerModel = new byte[7];
 
     [ClientCallback]
-    private void Start()
+    private void Update()
     {
         if (isLocalPlayer)
         {
-            while (m_PlayerName == "")
+            if (m_PlayerName == "")
             {
                 CharacterDummy dummy = FindObjectOfType<CharacterDummy>();
                 CmdNetworkInitialize(dummy.m_DummyName);
+                return;
                 // Destroy / make dummy invisible
                 //Destroy(dummy.gameObject);
             }

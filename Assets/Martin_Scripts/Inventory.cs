@@ -300,7 +300,7 @@ public class Inventory : MonoBehaviour
             if (_Index <= (m_slots.Count - 1) && _Index >= 0)
             {
                 // If the Itemname at the Slot with the Index of _Index is "Placeholder", which means that the slot is "Empty"
-                if (m_inventory[_Index].m_Name == "Placeholder")
+                if (m_inventory[_Index].m_NameMartin == "Placeholder")
                 {
                     // Fill the Item in
                     m_slots[_Index].m_Item = _ItemToAdd;
@@ -319,7 +319,7 @@ public class Inventory : MonoBehaviour
                 else
                 {
                     // If the Slots Amount of items is at the limit, seach for another Slot
-                    if (m_slots[_Index].m_Amount < m_slots[_Index].m_Item.m_StackSize && m_slots[_Index].m_Item.m_Name == _ItemToAdd.m_Name)
+                    if (m_slots[_Index].m_Amount < m_slots[_Index].m_Item.m_StackSize && m_slots[_Index].m_Item.m_NameMartin == _ItemToAdd.m_NameMartin)
                     {
 
                         // If the Slot will be full, Split the Amount of Items that you will insert to the Slot
@@ -334,7 +334,7 @@ public class Inventory : MonoBehaviour
 
                             // Change the text to the new Amount.
                             m_slots[_Index].m_ItemPrefab.transform.GetChild(0).GetComponent<Text>().text = "" + m_slots[_Index].m_Amount;
-                            Debug.Log("Add-Index: " + _Index + "| Count: " + m_slots[_Index].m_Amount + "Added: " + _AmountOfItems + " x " + _ItemToAdd.m_Name);
+                            Debug.Log("Add-Index: " + _Index + "| Count: " + m_slots[_Index].m_Amount + "Added: " + _AmountOfItems + " x " + _ItemToAdd.m_NameMartin);
 
                             // The new amount of items that should be added, is the rest of the DataPair.
                             _AmountOfItems = DataSplit.IRest;
@@ -350,7 +350,7 @@ public class Inventory : MonoBehaviour
 
                             // Change the text to the new Amount.
                             m_slots[_Index].m_ItemPrefab.transform.GetChild(0).GetComponent<Text>().text = "" + m_slots[_Index].m_Amount;
-                            Debug.Log("Add-Index: " + _Index + "| Count: " + m_slots[_Index].m_Amount + "Added: " + _AmountOfItems + " x " + _ItemToAdd.m_Name);
+                            Debug.Log("Add-Index: " + _Index + "| Count: " + m_slots[_Index].m_Amount + "Added: " + _AmountOfItems + " x " + _ItemToAdd.m_NameMartin);
                             break;
                         }
 
@@ -389,13 +389,13 @@ public class Inventory : MonoBehaviour
         for (int slot = 0; slot <= m_slots.Count - 1; slot++)
         {
             // Wenn der aktuelle Slot leer ist oder die stacksize nicht erreicht wurde und das entsprechnde Item im Slot vorhanden ist...
-            if (m_slots[slot].m_Item.m_Name == "Placeholder")
+            if (m_slots[slot].m_Item.m_NameMartin == "Placeholder")
             {
                 return slot;
             }
             else
             {
-                if (m_slots[slot].m_Item.m_Name == _ItemToAdd.m_Name && m_slots[slot].m_Amount < m_slots[slot].m_Item.m_StackSize)
+                if (m_slots[slot].m_Item.m_NameMartin == _ItemToAdd.m_NameMartin && m_slots[slot].m_Amount < m_slots[slot].m_Item.m_StackSize)
                 {
                     return slot;
                 }
@@ -415,7 +415,7 @@ public class Inventory : MonoBehaviour
         // Alle SLots durchgehen.
         for (int slot = 0; slot <= m_slots.Count - 1; slot++)
         {
-            if (m_slots[slot].m_Item.m_Name == _ItemToRemove.m_Name && m_slots[slot].m_Amount > 0)
+            if (m_slots[slot].m_Item.m_NameMartin == _ItemToRemove.m_NameMartin && m_slots[slot].m_Amount > 0)
             {
                 return slot;
             }
@@ -485,7 +485,7 @@ public class Inventory : MonoBehaviour
             {
                 ItemFood tmp = (ItemFood)item;
 
-                if (tmp.m_Name == _ItemName)
+                if (tmp.m_NameMartin == _ItemName)
                 {
                     return item;
                 }
@@ -498,7 +498,7 @@ public class Inventory : MonoBehaviour
             {
                 ItemArmor tmp = (ItemArmor)item;
 
-                if (tmp.m_Name == _ItemName)
+                if (tmp.m_NameMartin == _ItemName)
                 {
                     return item;
                 }
@@ -511,7 +511,7 @@ public class Inventory : MonoBehaviour
             {
                 ItemWeapon tmp = (ItemWeapon)item;
 
-                if (tmp.m_Name == _ItemName)
+                if (tmp.m_NameMartin == _ItemName)
                 {
                     return item;
                 }
@@ -530,7 +530,7 @@ public class Inventory : MonoBehaviour
             foreach (Slot slot in _ListToLookAt)
             {
                 // If the Slots Name matches the Name the function is looking for...
-                if (slot.m_Item.m_Name == _Name)
+                if (slot.m_Item.m_NameMartin == _Name)
                 {
                     return slot;
                 }

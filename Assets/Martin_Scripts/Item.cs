@@ -22,7 +22,7 @@ public abstract class Item : MonoBehaviour
     //	O										O
     //	#########################################
 
-    public string m_Name;
+    public string m_NameMartin;
     public string m_Description;
     public Sprite m_Icon;
 
@@ -33,7 +33,7 @@ public abstract class Item : MonoBehaviour
 
     public Item(string _Name, string _Description, int _StackSize)
     {
-        m_Name = _Name;
+        m_NameMartin = _Name;
         m_Description = _Description;
         m_StackSize = _StackSize;
 
