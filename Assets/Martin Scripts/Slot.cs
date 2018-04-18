@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Slot : MonoBehaviour 
+public class Slot : MonoBehaviour
 {
     //	#########################################
     //	O			Slot				        O
@@ -71,4 +71,6 @@ public class Slot : MonoBehaviour
         m_ItemPrefab.transform.GetChild(0).GetComponent<Text>().text = this.m_textAmount.text;
         m_ItemPrefab.transform.GetChild(1).GetComponent<Text>().text = this.m_textKey.text;
     }
+
+    
 }
