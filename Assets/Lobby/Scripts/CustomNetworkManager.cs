@@ -85,7 +85,8 @@ public class CustomNetworkManager : NetworkManager
         {
             m_dummy.DontDestroyDummyOnLoad();
 
-            networkAddress = iP;
+            //networkAddress = iP;// !!!!!!!!!!!!!!!!!!!!!!!!!!!
+            networkAddress = "127.0.0.1";
             StartClient();
         }
         else
