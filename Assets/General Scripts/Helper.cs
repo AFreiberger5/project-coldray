@@ -8,7 +8,9 @@
 ***************************************************/
 
 using System;
+using UnityEngine;
 
+#region Extensions
 // Since unity/mono does not support .net 4 or higher I had to write this
 // to avoid having to manually check Flags everytime
 public static class EnumExtensions
@@ -34,3 +36,35 @@ public static class EnumExtensions
     }
 
 }
+#endregion
+#region Enums
+[Flags]
+public enum AIState
+{
+    NONE = 0,
+    ALIVE = 1,
+    IDLE = 2,
+    AWARE = 4,
+    MOVING = 8,
+    ATTACKING = 16,
+    DYING = 32,
+    DEAD = 64
+
+}
+public enum DropTable
+{
+    NONE = 0,
+    BANSHEE = 1,
+}
+#endregion
+#region Functions
+public class Helper : MonoBehaviour
+{
+
+    public void SpawnLoot(DropTable _dropTable, Vector3 _position)
+    {
+
+    }
+
+}
+#endregion

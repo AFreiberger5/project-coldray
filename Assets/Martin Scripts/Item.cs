@@ -48,21 +48,7 @@ public abstract class Item : MonoBehaviour
         }
     }
 
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public abstract void OnMouseRightClick();
     public abstract void OnMouseLeftClick();
     public abstract void OnMouseMiddleClick();
-
-    
 }
