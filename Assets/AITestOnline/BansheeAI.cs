@@ -32,6 +32,7 @@ public class BansheeAI : AIBase
     private int IDmove;
     private int IDattack;
     private int IDdeath;
+    private Helper helper;
 
     [ServerCallback]
     private void Awake()
@@ -63,6 +64,7 @@ public class BansheeAI : AIBase
     public override void KillNPC()
     {        
         CurrentState = AIState.DYING;
+        ;
         OnNPCDeath();
     }
 
@@ -161,6 +163,8 @@ public class BansheeAI : AIBase
     protected override void OnNPCDeath()
     {
         CurrentState = AIState.DEAD;
+        helper.SpawnLoot(DropTable.BANSHEE, transform.position);
+        
     }
 
     [Server]
