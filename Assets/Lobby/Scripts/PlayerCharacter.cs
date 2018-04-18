@@ -7,9 +7,10 @@ public class PlayerCharacter : NetworkBehaviour
 {
     [SyncVar]
     public string m_PlayerName = "";
+    [SyncVar]
     public int m_PlayerId = 42;
-    //public string m_PlayerNetId = "42";
-    //public byte[] m_PlayerModel = new byte[7];
+
+    public byte[] m_PlayerModel = new byte[7];
 
     [ClientCallback]
     private void Update()
@@ -18,11 +19,15 @@ public class PlayerCharacter : NetworkBehaviour
         {
             if (m_PlayerName == "")
             {
+                print("1: " + m_PlayerName);
                 CharacterDummy dummy = FindObjectOfType<CharacterDummy>();
+                print("2: " + m_PlayerName);
                 CmdNetworkInitialize(dummy.m_DummyName);
-                return;
-                // Destroy / make dummy invisible
-                //Destroy(dummy.gameObject);
+
+                print("try to load: " + m_PlayerName);
+
+                //FindObjectOfType<PlayerStatsOnServer>().m_ServerPlayerNames[m_PlayerId] = dummy.m_DummyName;
+                //NetworkServer.FindLocalObject(new NetworkInstanceId(1)).GetComponent<PlayerStatsOnServer>().m_ServerPlayerNames[m_PlayerId] = m_PlayerName;
             }
         }
     }
@@ -31,15 +36,18 @@ public class PlayerCharacter : NetworkBehaviour
     public void CmdNetworkInitialize(string _string)
     {
         Debug.developerConsoleVisible = true;
-        //print("NetId: " + netId + ", Name: " + _string);
         m_PlayerName = _string;
-        //m_PlayerNetId = netId.ToString();
-        gameObject.name = _string;
-        //CmdLoadCharacter(_string);
+
+        RpcSetGameObjectName();
     }
 
-    [Command]
-    public void CmdLoadCharacter(string _characterName)
+    [ClientRpc]
+    public void RpcSetGameObjectName()
+    {
+        gameObject.name = m_PlayerName;
+    }
+
+    public void LoadCharacter(string _characterName)
     {
         string selectedCharacter = _characterName;
         CharacterStats cs = SaveLoadManager.LoadCharacter(selectedCharacter);
