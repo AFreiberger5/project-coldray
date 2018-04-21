@@ -5,52 +5,47 @@ using UnityEngine;
 public class Block
 {
 
-    public enum ECubeside { BOTTOM, TOP, LEFT, RIGHT, FRONT, BACK };
-    public enum EBlockType : byte { GRASS, DIRT, STONE, BEDROCK, REDSTONE, DIAMOND, AIR };
+    public enum ECubeside : byte { BOTTOM, TOP, LEFT, RIGHT, FRONT, BACK };
+    public enum EBlockType : byte { GRASS, DIRT, STONE, REDSTONE, DIAMOND, AIR , PROP};
 
     public EBlockType m_BlockType;
+    public EBlockType m_RootBlock;
+    public Material m_Atlas;
+    public Vector3 m_position;
     public bool m_IsSolid;
-    private Chunk m_owner;
-    private GameObject m_parent;
-    private Vector3 m_position;
+    public bool m_HasMesh;
+    protected GameObject m_parent;
+    protected Chunk m_owner;
 
 
-    Vector2[,] blockUVs =
+    public Vector2[,] m_BlockUVs =
     {
-        
-		/*GRASS TOP*/		{new Vector2( 0.125f, 0.375f ), new Vector2( 0.1875f, 0.375f),
-                                new Vector2( 0.125f, 0.4375f ),new Vector2( 0.1875f, 0.4375f )},
-		/*GRASS SIDE*/		{new Vector2( 0.1875f, 0.9375f ), new Vector2( 0.25f, 0.9375f),
-                                new Vector2( 0.1875f, 1.0f ),new Vector2( 0.25f, 1.0f )},
-		/*DIRT*/			{new Vector2( 0.125f, 0.9375f ), new Vector2( 0.1875f, 0.9375f),
-                                new Vector2( 0.125f, 1.0f ),new Vector2( 0.1875f, 1.0f )},
-		/*STONE*/			{new Vector2( 0, 0.875f ), new Vector2( 0.0625f, 0.875f),
-                                new Vector2( 0, 0.9375f ),new Vector2( 0.0625f, 0.9375f )},
-		/*BEDROCK*/			{new Vector2( 0.3125f, 0.8125f ), new Vector2( 0.375f, 0.8125f),
-                                new Vector2( 0.3125f, 0.875f ),new Vector2( 0.375f, 0.875f )},
-		/*REDSTONE*/		{new Vector2( 0.1875f, 0.75f ), new Vector2( 0.25f, 0.75f),
-                                new Vector2( 0.1875f, 0.8125f ),new Vector2( 0.25f, 0.8125f )},
-		/*DIAMOND*/			{new Vector2( 0.125f, 0.75f ), new Vector2( 0.1875f, 0.75f),
-                                new Vector2( 0.125f, 0.8125f ),new Vector2( 0.1875f, 0.8125f )}
+        /*TOP*/			//{new Vector2( 0.125f, 0.9375f ), new Vector2( 0.1875f, 0.9375f),
+                        //        new Vector2( 0.125f, 1.0f ),new Vector2( 0.1875f, 1.0f )},
+		/*SIDE*/		//{new Vector2( 0.125f, 0.9375f ), new Vector2( 0.1875f, 0.9375f),
+                        //        new Vector2( 0.125f, 1.0f ),new Vector2( 0.1875f, 1.0f )},
+		/*BOTTOM*/		//{new Vector2( 0.125f, 0.9375f ), new Vector2( 0.1875f, 0.9375f),
+                        //        new Vector2( 0.125f, 1.0f ),new Vector2( 0.1875f, 1.0f )}
     };
 
-    public Block(EBlockType _b, Vector3 _pos, GameObject _p, Chunk _o)
+    public Block() { }
+
+    public Block(EBlockType _b, Vector3 _pos, GameObject _p, Chunk _owner, Material _atlas)
     {
-        m_BlockType = _b;
-        m_owner = _o;
+        m_BlockType = _b;       
         m_parent = _p;
         m_position = _pos;
-        if (m_BlockType == EBlockType.AIR)
-            m_IsSolid = false;
-        else
-            m_IsSolid = true;
+        m_owner = _owner;
+        m_Atlas = _atlas;
+        m_HasMesh = true;        
     }
+   
 
     /// <summary>
     /// Builds a Quad for a given side of a Cube
     /// </summary>
     /// <param name="side"></param>
-	void CreateQuad(ECubeside _side)
+    void CreateQuad(ECubeside _side)
     {
         Mesh mesh = new Mesh();
         mesh.name = "ScriptedMesh" + _side.ToString();
@@ -66,26 +61,26 @@ public class Block
         Vector2 uv01;
         Vector2 uv11;
 
-        if (m_BlockType == EBlockType.GRASS && _side == ECubeside.TOP)
+        if (_side == ECubeside.TOP)
         {
-            uv00 = blockUVs[0, 0];
-            uv10 = blockUVs[0, 1];
-            uv01 = blockUVs[0, 2];
-            uv11 = blockUVs[0, 3];
+            uv00 = m_BlockUVs[0, 0];
+            uv10 = m_BlockUVs[0, 1];
+            uv01 = m_BlockUVs[0, 2];
+            uv11 = m_BlockUVs[0, 3];
         }
-        else if (m_BlockType == EBlockType.GRASS && _side == ECubeside.BOTTOM)
+        else if (_side == ECubeside.BOTTOM)
         {
-            uv00 = blockUVs[(int)(EBlockType.DIRT + 1), 0];
-            uv10 = blockUVs[(int)(EBlockType.DIRT + 1), 1];
-            uv01 = blockUVs[(int)(EBlockType.DIRT + 1), 2];
-            uv11 = blockUVs[(int)(EBlockType.DIRT + 1), 3];
+            uv00 = m_BlockUVs[2, 0];
+            uv10 = m_BlockUVs[2, 1];
+            uv01 = m_BlockUVs[2, 2];
+            uv11 = m_BlockUVs[2, 3];
         }
         else
         {
-            uv00 = blockUVs[(int)(m_BlockType + 1), 0];
-            uv10 = blockUVs[(int)(m_BlockType + 1), 1];
-            uv01 = blockUVs[(int)(m_BlockType + 1), 2];
-            uv11 = blockUVs[(int)(m_BlockType + 1), 3];
+            uv00 = m_BlockUVs[1, 0];
+            uv10 = m_BlockUVs[1, 1];
+            uv01 = m_BlockUVs[1, 2];
+            uv11 = m_BlockUVs[1, 3];
         }
 
         //all possible vertices 
@@ -182,42 +177,42 @@ public class Block
     /// <param name="_z"></param>
     /// <returns></returns>
 	public bool HasSolidNeighbour(int _x, int _y, int _z)
-    {
-        Block[,,] chunks;
-
-        if (_x < 0 || _x >= World.CHUNKSIZE ||
-           _y < 0 || _y >= World.CHUNKSIZE ||
-           _z < 0 || _z >= World.CHUNKSIZE)
-        {  //block in a neighbouring chunk
-
-            Vector3 neighbourChunkPos = this.m_parent.transform.position +
-                                        new Vector3((_x - (int)m_position.x) * World.CHUNKSIZE,
-                                                    (_y - (int)m_position.y) * World.CHUNKSIZE,
-                                                    (_z - (int)m_position.z) * World.CHUNKSIZE);
-            string neighbourName = World.BuildChunkName(neighbourChunkPos);
-
-            _x = ConvertBlockIndexToLocal(_x);
-            _y = ConvertBlockIndexToLocal(_y);
-            _z = ConvertBlockIndexToLocal(_z);
-
-            Chunk neighbourChunk;
-            if (World.CHUNKS.TryGetValue(neighbourName, out neighbourChunk))
-            {
-                chunks = neighbourChunk.m_ChunkData;
-            }
-            else // if no neighbour found
-                return false;
-        }
-        else //block in this chunk
-            chunks = m_owner.m_ChunkData;
-
-        try
-        {
-            return chunks[_x, _y, _z].m_IsSolid;
-        }
-        catch (System.IndexOutOfRangeException) { }
-
-        return false;
+    { 
+         Block[,,] chunks;
+        
+         if (_x < 0 || _x >= World.CHUNKSIZE ||
+            _y < 0 || _y >= 1 ||
+            _z < 0 || _z >= World.CHUNKSIZE)
+         {  //block in a neighbouring chunk
+        
+             Vector3 neighbourChunkPos = this.m_parent.transform.position +
+                                         new Vector3((_x - (int)m_position.x) * World.CHUNKSIZE,
+                                                     (_y - (int)m_position.y) * 1,
+                                                     (_z - (int)m_position.z) * World.CHUNKSIZE);
+             string neighbourName = World.BuildChunkName(neighbourChunkPos);
+        
+             _x = ConvertBlockIndexToLocal(_x);
+             _y = ConvertBlockIndexToLocal(_y);
+             _z = ConvertBlockIndexToLocal(_z);
+        
+             Chunk neighbourChunk;
+             if (World.CHUNKS.TryGetValue(neighbourName, out neighbourChunk))
+             {
+                 chunks = neighbourChunk.m_ChunkData;
+             }
+             else // if no neighbour found
+                 return false;
+         }
+         else //block in this chunk
+             chunks = m_owner.m_ChunkData;
+        
+         try
+         {
+             return chunks[_x, _y, _z].m_IsSolid;
+         }
+         catch (System.IndexOutOfRangeException) { }
+        
+         return false;
     }
 
     /// <summary>
@@ -225,7 +220,7 @@ public class Block
     /// </summary>
 	public void Draw()
     {
-        if (m_BlockType == EBlockType.AIR) return;
+        if (m_BlockType == EBlockType.AIR || m_HasMesh == false) return;
 
         if (!HasSolidNeighbour((int)m_position.x, (int)m_position.y, (int)m_position.z + 1))
             CreateQuad(ECubeside.FRONT);

@@ -11,19 +11,16 @@ using Realtime.Messaging.Internal;
 public class World : MonoBehaviour
 {
 
-    public GameObject m_Player;
     public Material m_TextureAtlas;
     public static int COLUMNHEIGHT = 1;
     public static int CHUNKSIZE = 32;
-    public static int RADIUS = 1;
+    public static int RADIUS = 4;
     public static ConcurrentDictionary<string, Chunk> CHUNKS;
-    public Slider m_LoadingAmount;
-    public Camera m_Cam;
-    public Button m_PlayButton;
-
+    public GameObject m_TreePrefab;
+    public GameObject m_PortalBPrefab;
+    private Component[] m_playerComponents;
     private bool m_newWorld = true;
     private bool m_building = false;
-    private bool m_dynamicWorld = false;
 
     /// <summary>
     /// Builds a name for the Chunk based on its position in the cartsian coordinate system
@@ -37,52 +34,14 @@ public class World : MonoBehaviour
                      (int)_v.z;
     }
 
-
-    // private void BuildChunkAt(int _x, int _y, int _z)
-    // {
-    //     Vector3 chunkPosition = new Vector3(_x * CHUNKSIZE,
-    //                                                    _y * CHUNKSIZE,
-    //                                                    _z * CHUNKSIZE);
-    //     Chunk c;
-    //     string name = BuildChunkName(chunkPosition);
-    //     // Chunk already in Dictionary? 
-    //     if (CHUNKS.TryGetValue(name, out c))
-    //     {
-    //         c = new Chunk(chunkPosition, m_TextureAtlas);
-    //         c.m_Chunk.transform.parent = this.transform;
-    //         CHUNKS.TryAdd(c.m_Chunk.name, c);
-    //     }
-    // }
-    //
-    // IEnumerator RecursiveBuildWorld(int _x, int _y, int _z, int _rad)
-    // {
-    //     yield return null;
-    // }
-    //
-    // IEnumerator DrawChunks()
-    // {
-    //     foreach (KeyValuePair<string, Chunk> c in CHUNKS)
-    //     {
-    //         if (c.Value.m_CurrentStatus == Chunk.EStatus.DRAW)
-    //         {
-    //             c.Value.Save();
-    //             c.Value.DrawChunk();
-    //         }
-    //     }
-    //     yield return null;
-    // }
-
     IEnumerator BuildWorld()
     {
         m_building = true;
 
         // Playerposition based on Chunkposition
-        int posx = (int)Mathf.Floor(m_Player.transform.position.x / CHUNKSIZE);
-        int posz = (int)Mathf.Floor(m_Player.transform.position.z / CHUNKSIZE);
-
-        // Number of Chunks to be created for Loading-slider as value
-        float totalChunks = (Mathf.Pow(RADIUS * 2 + 1, 2) * COLUMNHEIGHT) * 2;
-        int processCount = 0;
+        int posx = (int)Mathf.Floor(GameStatus.GetInstance().GetWorldPos().x / CHUNKSIZE);
+        int posz = (int)Mathf.Floor(GameStatus.GetInstance().GetWorldPos().z / CHUNKSIZE);
+       
 
         // generates chunks in a radius around the Player
         for (int z = -RADIUS; z <= RADIUS; z++)
@@ -97,7 +56,6 @@ public class World : MonoBehaviour
                     // Chunk already in Dictionary? 
                     if (CHUNKS.TryGetValue(name, out c))
                     {
-                        c.m_CurrentStatus = Chunk.EStatus.KEEP;
                         break;
                     }
                     else // no match in Dictionary = new Chunk
@@ -105,69 +63,54 @@ public class World : MonoBehaviour
                         c = new Chunk(chunkPosition, m_TextureAtlas);
                         c.m_Chunk.transform.parent = this.transform;
                         CHUNKS.TryAdd(c.m_Chunk.name, c);
-                    }
-                    if (m_newWorld)
-                    {
-                        processCount++;
-                        m_LoadingAmount.value = processCount / totalChunks * 100;
-                    }
+                    }               
 
-                    yield return null;
                 }
 
         foreach (KeyValuePair<string, Chunk> c in CHUNKS)
         {
             if (c.Value.m_CurrentStatus == Chunk.EStatus.DRAW)
             {
-                c.Value.Save();
                 c.Value.DrawChunk();
             }
 
-            c.Value.m_CurrentStatus = Chunk.EStatus.DONE;
-
-            if (m_newWorld)
-            {
-                processCount++;
-                m_LoadingAmount.value = processCount / totalChunks * 100;
-            }
             yield return null;
+            c.Value.m_CurrentStatus = Chunk.EStatus.DONE;        
         }
-        if (m_newWorld)
+        //this.transform.position = new Vector3(0, 100, 0);
+
+        foreach (KeyValuePair<string, Chunk> c in CHUNKS)
         {
-            m_Player.SetActive(true);
-            m_LoadingAmount.gameObject.SetActive(false);
-            m_Cam.gameObject.SetActive(false);
-            m_PlayButton.gameObject.SetActive(false);
+            PropSeed(c.Value.m_Chunk, c.Value.m_ChunkData);
+            c.Value.Save();
         }
 
+        
 
+        GameStatus.GetInstance().m_OverworldBuilt = true;
+        GameStatus.GetInstance().m_building = false;
+        Instantiate(m_PortalBPrefab, new Vector3(GameStatus.GetInstance().GetWorldPos().x,1, GameStatus.GetInstance().GetWorldPos().z), Quaternion.identity);
+        yield return null;
 
+    }
+
+    void PropSeed(GameObject _c, Block[,,] _b)
+    {
+        foreach (Block p in _b)
+            if (p.m_BlockType == Block.EBlockType.PROP && p.m_RootBlock == Block.EBlockType.REDSTONE)
+                Instantiate(m_TreePrefab, new Vector3(p.m_position.x + _c.transform.position.x,
+                                                      p.m_position.y + _c.transform.position.y + 2,
+                                                      p.m_position.z + _c.transform.position.z), Quaternion.identity);
     }
 
 
     public void StartBuild()
     {
-        StartCoroutine(BuildWorld());
-    }
-
-    // Use this for initialization
-    void Start()
-    {
-        m_Player.SetActive(false);
+        GameStatus.GetInstance().m_building = true;
         CHUNKS = new ConcurrentDictionary<string, Chunk>();
-        this.transform.position = Vector3.zero;
+        this.transform.position =GameStatus.GetInstance().GetWorldPos();
         this.transform.rotation = Quaternion.identity;
+        StartCoroutine(BuildWorld());       
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (m_dynamicWorld)
-        {
-            if (!m_building && !m_newWorld)
-            {
-                StartCoroutine(BuildWorld());
-            }
-        }
-    }
 }

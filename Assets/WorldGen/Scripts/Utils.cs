@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Utils {
 
-	static int MAXHEIGHT = 48;
+	static int MAXHEIGHT = 16;
 	static float SMOOTH = 0.001f;
 	static int OCTAVES = 1;
 	static float PERSISTENCE = 0.5f;
