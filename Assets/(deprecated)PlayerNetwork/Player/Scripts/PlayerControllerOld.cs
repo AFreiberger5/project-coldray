@@ -5,15 +5,15 @@ using UnityEngine.Networking;
 
 [RequireComponent(typeof(PlayerHealth))]
 [RequireComponent(typeof(PlayerAttack))]
-[RequireComponent(typeof(PlayerMotor))]
+[RequireComponent(typeof(PlayerMotorOld))]
 [RequireComponent(typeof(PlayerSetup))]
 
-public class PlayerController : NetworkBehaviour
+public class PlayerControllerOld : NetworkBehaviour
 {
     public Camera m_PlayerCam;
     PlayerHealth m_health;
     PlayerAttack m_shoot;
-    PlayerMotor m_motor;
+    PlayerMotorOld m_motor;
     PlayerSetup m_setup;
 
     Vector3 m_originalPosition;
@@ -26,7 +26,7 @@ public class PlayerController : NetworkBehaviour
     {
         m_health = GetComponent<PlayerHealth>();
         m_shoot = GetComponent<PlayerAttack>();
-        m_motor = GetComponent<PlayerMotor>();
+        m_motor = GetComponent<PlayerMotorOld>();
         m_setup = GetComponent<PlayerSetup>();
     }
 

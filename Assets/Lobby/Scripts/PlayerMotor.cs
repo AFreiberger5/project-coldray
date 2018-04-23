@@ -1,4 +1,12 @@
-﻿using System.Collections;
+﻿/******************************************
+*                                         *
+*   Script made by Alexander Blomenkamp   *
+*                                         *
+*   Edited by:                            *
+*                                         *
+******************************************/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
