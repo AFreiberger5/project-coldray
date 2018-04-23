@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 using Realtime.Messaging.Internal;
 
 //WARNING: if u change CHUNKSIZE or COLUMNHEIGHT please remove old mapdatafiles to cleanup manually
@@ -22,6 +23,8 @@ public class World : MonoBehaviour
     private bool m_newWorld = true;
     private bool m_building = false;
 
+    private NavMeshSurface m_surface;
+    // ToDo: add NavMeshModifier Volumo for Kevin pathfinding
     /// <summary>
     /// Builds a name for the Chunk based on its position in the cartsian coordinate system
     /// </summary>
@@ -92,6 +95,9 @@ public class World : MonoBehaviour
         Instantiate(m_PortalBPrefab, new Vector3(GameStatus.GetInstance().GetWorldPos().x,1, GameStatus.GetInstance().GetWorldPos().z), Quaternion.identity);
         yield return null;
 
+        m_surface = GetComponent<NavMeshSurface>();
+        m_surface.BuildNavMesh();
+
     }
 
     void PropSeed(GameObject _c, Block[,,] _b)
@@ -110,7 +116,9 @@ public class World : MonoBehaviour
         CHUNKS = new ConcurrentDictionary<string, Chunk>();
         this.transform.position =GameStatus.GetInstance().GetWorldPos();
         this.transform.rotation = Quaternion.identity;
-        StartCoroutine(BuildWorld());       
+        StartCoroutine(BuildWorld());
+
+        
     }
 
 }

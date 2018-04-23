@@ -55,6 +55,7 @@ public enum DropTable
 {
     NONE = 0,
     BANSHEE = 1,
+    KEVIN = 2,
 }
 #endregion
 #region Functions
@@ -63,6 +64,17 @@ public class Helper : MonoBehaviour
 
     public void SpawnLoot(DropTable _dropTable, Vector3 _position)
     {
+        switch (_dropTable)
+        {
+            case DropTable.NONE:
+                break;
+            case DropTable.BANSHEE:
+                break;
+            case DropTable.KEVIN:
+                break;
+            default:
+                break;
+        }
 
     }
 

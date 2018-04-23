@@ -47,25 +47,31 @@ public class BansheeAI : AIBase
         IDattack = Animator.StringToHash("isattacking");
         IDdeath = Animator.StringToHash("isdied");
         m_hitdistance = 1;
+        helper = new Helper();
 
     }
 
     [ServerCallback]
     void Update()
     {
+        //for debug testing only
+        if (Input.GetKeyDown(KeyCode.V))
+            CurrentState = CurrentState | AIState.DYING;
 
         if (!isLocalPlayer)
             NPCDecision();
 
         if (CurrentState != previousState)
             ChangeAnimations();
+
+        
     }
 
     public override void KillNPC()
-    {        
+    {
         CurrentState = AIState.DYING;
-        ;
-        OnNPCDeath();
+        
+        //OnNPCDeath();
     }
 
 
@@ -164,7 +170,7 @@ public class BansheeAI : AIBase
     {
         CurrentState = AIState.DEAD;
         helper.SpawnLoot(DropTable.BANSHEE, transform.position);
-        
+        NetworkServer.Destroy(gameObject);
     }
 
     [Server]
@@ -222,9 +228,15 @@ public class BansheeAI : AIBase
             m_animator.animator.SetBool(IDattack, true);
         if (!CurrentState.HasFlag(AIState.ATTACKING) && previousState.HasFlag(AIState.ATTACKING))
             m_animator.animator.SetBool(IDattack, false);
-        if (CurrentState.HasFlag(AIState.DYING) || CurrentState.HasFlag(AIState.DEAD))
+        if (CurrentState.HasFlag(AIState.DYING))
         {
             m_animator.animator.SetBool(IDliving, false);
+
+            //now called via animation event
+            //KillNPC();
+        }
+        if (CurrentState.HasFlag(AIState.DEAD))
+        {
             m_animator.animator.SetBool(IDdeath, true);
         }
 
