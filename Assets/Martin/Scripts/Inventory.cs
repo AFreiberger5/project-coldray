@@ -142,7 +142,7 @@ public class Inventory : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.T))
         {
-            Debug.Log(m_slots[0].m_Item.m_Name);
+            Debug.Log(m_slots[0].m_Item.m_IName);
         }
 
         if (Input.GetKeyDown(KeyCode.P))
@@ -400,7 +400,7 @@ public class Inventory : MonoBehaviour
             if (_Index <= (m_slots.Count - 1) && _Index >= 0)
             {
                 // If the Itemname at the Slot with the Index of _Index is "Placeholder", which means that the slot is "Empty"
-                if (m_slots[_Index].m_Item.m_Name == "Placeholder")
+                if (m_slots[_Index].m_Item.m_IName == "Placeholder")
                 {
                     // Fill the Item in
                     m_slots[_Index].m_Item = _ItemToAdd;
@@ -420,7 +420,7 @@ public class Inventory : MonoBehaviour
                 else
                 {
                     // If the Slots Amount of items is at the limit, seach for another Slot
-                    if (m_slots[_Index].m_Amount < m_slots[_Index].m_Item.m_StackSize && m_slots[_Index].m_Item.m_Name == _ItemToAdd.m_Name)
+                    if (m_slots[_Index].m_Amount < m_slots[_Index].m_Item.m_StackSize && m_slots[_Index].m_Item.m_IName == _ItemToAdd.m_IName)
                     {
 
                         // If the Slot will be full, Split the Amount of Items that you will insert to the Slot
@@ -488,13 +488,13 @@ public class Inventory : MonoBehaviour
         for (int slot = 0; slot <= m_slots.Count - 1; slot++)
         {
             // Wenn der aktuelle Slot leer ist oder die stacksize nicht erreicht wurde und das entsprechnde Item im Slot vorhanden ist...
-            if (m_slots[slot].m_Item.m_Name == "Placeholder")
+            if (m_slots[slot].m_Item.m_IName == "Placeholder")
             {
                 return slot;
             }
             else
             {
-                if (m_slots[slot].m_Item.m_Name == _ItemToAdd.m_Name && m_slots[slot].m_Amount < m_slots[slot].m_Item.m_StackSize)
+                if (m_slots[slot].m_Item.m_IName == _ItemToAdd.m_IName && m_slots[slot].m_Amount < m_slots[slot].m_Item.m_StackSize)
                 {
                     return slot;
                 }
@@ -586,7 +586,7 @@ public class Inventory : MonoBehaviour
             {
                 ItemFood tmp = (ItemFood)item;
 
-                if (tmp.m_Name == _ItemName)
+                if (tmp.m_IName == _ItemName)
                 {
                     return item;
                 }
@@ -599,7 +599,7 @@ public class Inventory : MonoBehaviour
             {
                 ItemArmor tmp = (ItemArmor)item;
 
-                if (tmp.m_Name == _ItemName)
+                if (tmp.m_IName == _ItemName)
                 {
                     return item;
                 }
@@ -612,7 +612,7 @@ public class Inventory : MonoBehaviour
             {
                 ItemWeapon tmp = (ItemWeapon)item;
 
-                if (tmp.m_Name == _ItemName)
+                if (tmp.m_IName == _ItemName)
                 {
                     return item;
                 }
@@ -630,7 +630,7 @@ public class Inventory : MonoBehaviour
         {
             for (int i = 0; i < _ListToLookAt.Count; i++)
             {
-                if (m_slots[i].m_Item.m_Name == _Name)
+                if (m_slots[i].m_Item.m_IName == _Name)
                 {
 
                     Debug.Log("SlotIndex = " + i);
@@ -737,7 +737,7 @@ public class Inventory : MonoBehaviour
 
         for (int i = 0; i < _InventorySlots.Count; i++)
         {
-            if (_InventorySlots[i].m_Item.m_Name == _ItemToRemove.m_Name)
+            if (_InventorySlots[i].m_Item.m_IName == _ItemToRemove.m_IName)
             {
                 ListTargets.Add(new ItemIndexIdentifier(i, m_slots[i]));
             }
