@@ -11,7 +11,7 @@ public static class SaveLoadManager
 
     public static void SaveCharacter(CharacterStats _stats)
     {
-        string filePath = Path.Combine(m_FolderPath, _stats.m_Name + ".sav");
+        string filePath = Path.Combine(m_FolderPath, _stats.m_StatsName + ".sav");
         BinaryFormatter bf = new BinaryFormatter();
         FileStream stream;
 
@@ -52,14 +52,14 @@ public static class SaveLoadManager
             stream.Close();
             stream.Dispose();
 
-            CharacterStats cs = new CharacterStats(data.m_Name, data.m_Model);
+            CharacterStats cs = new CharacterStats(data.m_StatsName, data.m_Model);
             return cs;
         }
         else
         {
             Debug.LogError("Character could not be loaded.");
 
-            CharacterStats cs = new CharacterStats("ERROR", new byte[7]);
+            CharacterStats cs = new CharacterStats("ERROR", new int[7]);
             return cs;
         }
     }

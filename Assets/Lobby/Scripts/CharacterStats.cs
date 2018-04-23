@@ -15,66 +15,21 @@ public class CharacterStats
     // hair = 6
     // arraylength = 7
 
-    public string m_Name; 
-    public byte[] m_Model = new byte[7];
-
-    //public bool Gender
-    //{
-    //    get
-    //    {
-    //        return m_Model[0] == 0;
-    //    }
-    //    set
-    //    {
-    //        m_Model[0] = value ? (byte)0 : (byte)1;
-    //    }
-    //}
-    //public byte SkinColor
-    //{
-    //    get
-    //    {
-    //        return m_Model[1];
-    //    }
-    //}
-    //public byte Face
-    //{
-    //    get
-    //    {
-    //        return m_Model[2];
-    //    }
-    //}
-    //public byte Ears
-    //{
-    //    get
-    //    {
-    //        return m_Model[3];
-    //    }
-    //}
-    //public byte Eyes
-    //{
-    //    get
-    //    {
-    //        return m_Model[4];
-    //    }
-    //}
-    //public byte Accessories
-    //{
-    //    get
-    //    {
-    //        return m_Model[5];
-    //    }
-    //}
-    //public byte Hair
-    //{
-    //    get
-    //    {
-    //        return m_Model[6];
-    //    }
-    //}
-
-    public CharacterStats(string _name, byte[] _model)
+    public string m_StatsName; 
+    public int[] m_Model = new int[7]
     {
-        m_Name = _name;
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    };
+
+    public CharacterStats(string _name, int[] _model)
+    {
+        m_StatsName = _name;
         m_Model = _model;
     }
 }

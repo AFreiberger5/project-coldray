@@ -13,65 +13,19 @@ public class CharacterDummy : MonoBehaviour
 
     public string m_DummyName;
 
-    public byte[] m_DummyModel = new byte[7];
-    
-    public bool Gender// Index: 0
+    public int[] m_DummyModel = new int[7]
     {
-        get
-        {
-            return m_DummyModel[0] == 1;
-        }
-        set
-        {
-            m_DummyModel[0] = value ? (byte)0 : (byte)1;
-        }
-    }
-    public byte SkinColor// Index: 1
-    {
-        get
-        {
-            return m_DummyModel[1];
-        }
-    }
-    public byte Face// Index: 2
-    {
-        get
-        {
-            return m_DummyModel[2];
-        }
-    }
-    public byte Ears// Index: 3
-    {
-        get
-        {
-            return m_DummyModel[3];
-        }
-    }
-    public byte Eyes// Index: 4
-    {
-        get
-        {
-            return m_DummyModel[4];
-        }
-    }
-    public byte Accessories// Index: 5
-    {
-        get
-        {
-            return m_DummyModel[5];
-        }
-    }
-    public byte Hair// Index: 6
-    {
-        get
-        {
-            return m_DummyModel[6];
-        }
-    }
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    };
 
     private void Update()
     {
-        return;
         if (m_SelectedCharacter != "")
         {
             m_CharacterInspectorName.text = m_SelectedCharacter;
@@ -99,7 +53,7 @@ public class CharacterDummy : MonoBehaviour
     {
         string selectedCharacter = _selectedCharacter;
         CharacterStats cs = SaveLoadManager.LoadCharacter(selectedCharacter);
-        m_DummyName = cs.m_Name;
+        m_DummyName = cs.m_StatsName;
         m_DummyModel = cs.m_Model;
 
         // BUILD DUMMY HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

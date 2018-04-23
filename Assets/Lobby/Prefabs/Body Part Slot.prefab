@@ -40,7 +40,6 @@ GameObject:
   - component: {fileID: 114928027780630438}
   - component: {fileID: 114312366090899040}
   - component: {fileID: 114984321072865558}
-  - component: {fileID: 114329016311637258}
   m_Layer: 5
   m_Name: Body Part Slot
   m_TagString: Untagged
@@ -86,33 +85,9 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114928027780630438}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 114329016311637258}
-        m_MethodName: ChangeModelIdAt
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &114329016311637258
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1714094836064376}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d04f8439db1a9f4f86d91c749eb9337, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_DummyBodyPartId: 0
-  m_DummyPrefabId: 0
 --- !u!114 &114723913737786466
 MonoBehaviour:
   m_ObjectHideFlags: 1
