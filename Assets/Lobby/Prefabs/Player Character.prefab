@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4521201150536012}
   - component: {fileID: 33089062469357642}
-  - component: {fileID: 65457321297379558}
   - component: {fileID: 23590000642321990}
   m_Layer: 0
   m_Name: Cube
@@ -68,15 +67,16 @@ GameObject:
   m_Component:
   - component: {fileID: 4278892713512676}
   - component: {fileID: 114302346067905340}
-  - component: {fileID: 114801937652722264}
+  - component: {fileID: 136567849309384978}
   - component: {fileID: 54938573302175412}
+  - component: {fileID: 114801937652722264}
   - component: {fileID: 114325184904921982}
   - component: {fileID: 114595185523740060}
   - component: {fileID: 114056951516535814}
   - component: {fileID: 114190378373065044}
   m_Layer: 0
   m_Name: Player Character
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -105,7 +105,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1750250912350828}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -1.822}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4459809721520710}
@@ -259,18 +259,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!65 &65457321297379558
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1011541366195198}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114056951516535814
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -368,7 +356,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_rigidbody: {fileID: 0}
   m_playerBody: {fileID: 4478391587927012}
-  m_moveSpeed: 150
+  m_moveSpeed: 200
   m_bodyRotSpeed: 15
 --- !u!114 &114801937652722264
 MonoBehaviour:
@@ -391,3 +379,16 @@ Behaviour:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1832445565592122}
   m_Enabled: 1
+--- !u!136 &136567849309384978
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1750250912350828}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.7
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.5, z: 0}

@@ -32,7 +32,7 @@ public class PortalTeleporterA : MonoBehaviour
             {
                 Vector3 portalToPlayer = m_Player.position - transform.position;
                 float dotProduct = Vector3.Dot(transform.up, portalToPlayer);
-                if (dotProduct < 0f)
+                if (dotProduct > 0f)
                 {
 
                     float rotationDiff = -Quaternion.Angle(transform.rotation, m_portalB.rotation);
