@@ -6,8 +6,5 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Lobby/Scenes/LobbyScene.unity
-    guid: d4c07cd3e0a9c4d43850042d365f247e
-  - enabled: 1
-    path: Assets/Lobby/Scenes/OnlineScene.unity
-    guid: 52e48a72592161846bbb5badbfdffecc
+    path: Assets/GregorLookHere/DummySync.unity
+    guid: 198b7e2f15be1be468e028319bdfdcdb
