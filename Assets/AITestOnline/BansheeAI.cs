@@ -46,7 +46,6 @@ public class BansheeAI : AIBase
         IDmove = Animator.StringToHash("ismoving");
         IDattack = Animator.StringToHash("isattacking");
         IDdeath = Animator.StringToHash("isdied");
-        m_hitdistance = 1;
         helper = new Helper();
 
     }
@@ -63,8 +62,13 @@ public class BansheeAI : AIBase
 
         if (CurrentState != previousState)
             ChangeAnimations();
-
         
+        
+    }
+
+    public void PrintTest(string _name)
+    {
+        print(_name);
     }
 
     public override void KillNPC()
@@ -77,7 +81,6 @@ public class BansheeAI : AIBase
 
     public override void NPCDecision()
     {
-
         if (CurrentState.HasFlag(AIState.IDLE) && !CurrentState.HasFlag(AIState.DEAD))
         {
             if (m_PlayerInRange)
@@ -134,6 +137,7 @@ public class BansheeAI : AIBase
             if (m_agent.remainingDistance < m_hitdistance
                 && !m_agent.pathPending)
             {
+                
                 Attack();
 
                 return;

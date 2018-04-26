@@ -11,15 +11,3 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Lobby/Scenes/OnlineScene.unity
     guid: 52e48a72592161846bbb5badbfdffecc
-  - enabled: 1
-    path: Assets/WorldGen/Scenes/OfflineScene.unity
-    guid: 2943cab9da255974ba7c98df1e22a4c1
-  - enabled: 1
-    path: Assets/WorldGen/Scenes/Nexus&Overworld.unity
-    guid: 60d9d475370157f428ce4ff710865687
-  - enabled: 1
-    path: Assets/AITestOnline/AITestLogin.unity
-    guid: 9b56ea7e0c4b32e4e94a328e374f1024
-  - enabled: 1
-    path: Assets/AITestOnline/AITestOnline.unity
-    guid: 0f4cc0f95bd7acb44b86540575537f03

@@ -3961,7 +3961,8 @@ AnimationClip:
   - time: 2
     functionName: OnNPCDeath
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 6d30c539225a9f540b346624e24362b9,
+      type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
