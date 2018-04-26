@@ -22,16 +22,51 @@ public class KevinAI : AIBase
     private int IDdeath;
     private Helper helper;
     private NavMeshAgent m_agent;
+    private Vector3[] positions;
+    private bool SearchingCoffe;
+    private bool FoundCoffe;
+    private int currentCoffePoint;
+
+    void Start()
+    {
+        positions = new Vector3[5];
+        currentCoffePoint = 1;
+        m_agent = GetComponent<NavMeshAgent>();
+        m_agent.destination = transform.position;
+        m_agent.autoBraking = false;
+    }
     
-    void Start () 
-	{
-       
-	}
-	
-	void Update () 
-	{
-		
-	}
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+            RunAway();
+
+        if (m_agent.remainingDistance < 0.025f && !m_agent.pathPending && SearchingCoffe)
+        {
+            SearchCoffe();
+        }
+        if (FoundCoffe)
+        {
+            //Head in ground
+        }
+
+    }
+
+    private void SearchCoffe()
+    {
+
+        if (currentCoffePoint > positions.Length)
+        {
+            SearchingCoffe = false;
+            FoundCoffe = true;
+            return;
+        }
+
+        m_agent.destination = positions[currentCoffePoint];
+
+
+        currentCoffePoint++;
+    }
     public override void KillNPC()
     {
 
@@ -44,11 +79,33 @@ public class KevinAI : AIBase
 
     public override void OnNPCSpawn()
     {
-        
+
     }
 
     protected override void OnNPCDeath()
     {
-        
+
+    }
+
+    private void RunAway()
+    {
+        // create a path by finding 5 waypoints, taken from current position/direction
+        // must get away from local position,
+        SearchingCoffe = true;
+        for (int i = 0; i < positions.Length; i++)
+        {
+            if (i == 0)
+                positions[i] = new Vector3(Random.Range(0f, 5f), 0, Random.Range(0f, 5f));
+            else
+                positions[i] = new Vector3(Random.Range(1f, 5f) + positions[i - 1].x, 0, Random.Range(1f, 5f) + positions[i - 1].z);
+
+        }
+
+        for (int j = 1; j < positions.Length; j++)
+        {
+            positions[j] = transform.TransformPoint(positions[j]);
+        }
+        m_agent.enabled = true;
+        m_agent.destination = transform.TransformPoint(positions[0]);
     }
 }
