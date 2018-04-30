@@ -41,13 +41,14 @@ public class KevinAI : AIBase
         if (Input.GetKeyDown(KeyCode.Space))
             RunAway();
 
-        if (m_agent.remainingDistance < 0.025f && !m_agent.pathPending && SearchingCoffe)
+        if (SearchingCoffe && m_agent.remainingDistance < 0.1f && !m_agent.pathPending )
         {
             SearchCoffe();
         }
         if (FoundCoffe)
         {
             //Head in ground
+            m_agent.enabled = false;
         }
 
     }
@@ -55,7 +56,7 @@ public class KevinAI : AIBase
     private void SearchCoffe()
     {
 
-        if (currentCoffePoint > positions.Length)
+        if (currentCoffePoint >= positions.Length)
         {
             SearchingCoffe = false;
             FoundCoffe = true;
