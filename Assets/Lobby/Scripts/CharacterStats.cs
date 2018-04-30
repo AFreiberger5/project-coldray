@@ -3,28 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// this class stores all information relevant to the player character
+/// </summary>
 [Serializable]
 public class CharacterStats
 {
-    // m/w = 0
-    // color = 1
-    // face = 2
-    // ears = 3
-    // eyes = 4
-    // accessories = 5
-    // hair = 6
-    // arraylength = 7
-
     public string m_StatsName; 
-    public int[] m_Model = new int[7]
+    public int[] m_Model = new int[9]
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        0,// gender
+        0,// skin color
+        0,// head
+        0,// ears
+        0,// eyes
+        0,// accessories
+        0,// hair
+        0,// hair color
+        0//  eye color
     };
 
     public CharacterStats(string _name, int[] _model)

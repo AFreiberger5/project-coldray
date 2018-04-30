@@ -7,8 +7,13 @@ using System.IO;
 
 public static class SaveLoadManager
 {
-    private static string m_FolderPath = Path.Combine(Application.persistentDataPath, "Characters");//
+    // leads to C:\Users\user\AppData\LocalLow\companyName\projectTitle\Characters
+    private static string m_FolderPath = Path.Combine(Application.persistentDataPath, "Characters");
 
+    /// <summary>
+    /// takes in relevant information and stores them in a binary file to prevent modifaction/cheating
+    /// </summary>
+    /// <param relevant character information="_stats"></param>
     public static void SaveCharacter(CharacterStats _stats)
     {
         string filePath = Path.Combine(m_FolderPath, _stats.m_StatsName + ".sav");
@@ -37,6 +42,12 @@ public static class SaveLoadManager
         stream.Dispose();
     }
 
+    /// <summary>
+    /// takes in a character name and loads a file with a matching name
+    /// returns the loaded information in form of a character stats class
+    /// </summary>
+    /// <param character name="_characterName"></param>
+    /// <returns></returns>
     public static CharacterStats LoadCharacter(string _characterName)
     {
         string filePath = Path.Combine(m_FolderPath, _characterName + ".sav");
@@ -59,7 +70,7 @@ public static class SaveLoadManager
         {
             Debug.LogError("Character could not be loaded.");
 
-            CharacterStats cs = new CharacterStats("ERROR", new int[7]);
+            CharacterStats cs = new CharacterStats("ERROR", new int[9]);
             return cs;
         }
     }

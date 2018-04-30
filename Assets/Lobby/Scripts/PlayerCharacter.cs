@@ -8,8 +8,6 @@ public class PlayerCharacter : NetworkBehaviour
 {
     [SyncVar(hook = "OnChangeName")]
     public string m_PlayerName = "";
-    [SyncVar]
-    public int m_PlayerId = 42;
 
     private void OnChangeName(string _s)
     {
@@ -17,26 +15,23 @@ public class PlayerCharacter : NetworkBehaviour
         SINGLETOOOOON.Instance.RegPlayer(m_PlayerId, m_PlayerName);
     }
 
+    [SyncVar]
+    public int m_PlayerId = 42;// default, regular ids would be 0,1 ...
 
-
-
-    //[SyncVar]
-    //public string m_PlayerName = "";
-    //[SyncVar]
-    //public int m_PlayerId = 42;
-
-    public int[] m_PlayerModel = new int[7]
+    public int[] m_PlayerModel = new int[9]
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
+        0,// gender
+        0,// skin color
+        0,// head
+        0,// ears
+        0,// eyes
+        0,// accessories
+        0,// hair
+        0,// hair color
+        0//  eye color
     };
 
-    public bool Gender// Index: 0
+    public bool Gender// index: 0
     {
         get
         {
@@ -47,51 +42,92 @@ public class PlayerCharacter : NetworkBehaviour
             m_PlayerModel[0] = value ? 0 : 1;
         }
     }
-    public int SkinColor// Index: 1
+    public int SkinColor// index: 1
     {
         get
         {
             return m_PlayerModel[1];
         }
     }
-    public int Face// Index: 2
+    public int Face// index: 2
     {
         get
         {
             return m_PlayerModel[2];
         }
     }
-    public int Ears// Index: 3
+    public int Ears// index: 3
     {
         get
         {
             return m_PlayerModel[3];
         }
     }
-    public int Eyes// Index: 4
+    public int Eyes// index: 4
     {
         get
         {
             return m_PlayerModel[4];
         }
     }
-    public int Accessories// Index: 5
+    public int Accessories// index: 5
     {
         get
         {
             return m_PlayerModel[5];
         }
     }
-    public int Hair// Index: 6
+    public int Hair// index: 6
     {
         get
         {
             return m_PlayerModel[6];
         }
     }
+    public int HairColor// index 7
+    {
+        get
+        {
+            return m_PlayerModel[7];
+        }
+    }
+    public int EyeColor// index 8
+    {
+        get
+        {
+            return m_PlayerModel[8];
+        }
+    }
 
-    //[ClientCallback]
-    private void Update()
+    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
+    //public Rigidbody m_rigidbody;
+    private Vector2 m_movement;// !!!!!!!!!!!!!!!
+    private Vector3 m_movement2;// !!!!!!!!!!!!!!
+    private float m_speed = 10f;
+    private float m_maxVelocityChange = 10f;
+
+    //private Transform m_cam;
+
+
+    private void Start()
+    {
+        if (isLocalPlayer)
+        {
+            //transform.Rotate(0, 45, 0);// RISKY BUSINESS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            //m_rigidbody = GetComponent<Rigidbody>();
+
+            //Transform camAnchor = transform.Find("CamAnchor");
+            //m_cam = Camera.main.transform;
+            //m_cam.SetParent(camAnchor);
+            //m_cam.position = camAnchor.position;
+            //m_cam.rotation = camAnchor.rotation;
+        }
+    }
+
+    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
+
+    private void FixedUpdate()
     {
         if (isLocalPlayer)
         {
@@ -102,9 +138,37 @@ public class PlayerCharacter : NetworkBehaviour
 
                 print("try to load: " + m_PlayerName);
 
-                //SINGLETOOOOON.Instance.RegisterPlayerInArray(m_PlayerId, m_PlayerName);
+                LoadCharacter(m_PlayerName);
             }
+
+            // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
+
+            //CmdPlayerMove(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
+            //CmdPlayerMove2(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
         }
+
+        // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
+
+        if (isServer)
+        {
+            //Vector3 targetVelocity = new Vector3(m_movement.x, 0, m_movement.y);
+            //targetVelocity = m_cam.transform.TransformDirection(targetVelocity);// CAM TRANSFORM RISKY OR NOT ?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!
+            //targetVelocity *= m_speed;
+            //
+            //Vector3 velocity = m_rigidbody.velocity;
+            //Vector3 velocityChange = (targetVelocity - velocity);
+            //velocityChange.x = Mathf.Clamp(velocityChange.x, -m_maxVelocityChange, m_maxVelocityChange);
+            //velocityChange.z = Mathf.Clamp(velocityChange.z, -m_maxVelocityChange, m_maxVelocityChange);
+            //velocityChange.y = 0;
+            //m_rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+
+
+            //m_rigidbody.MovePosition(transform.position + m_movement2);
+        }
+
+        // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
     }
 
     [Command]
@@ -116,15 +180,29 @@ public class PlayerCharacter : NetworkBehaviour
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
 
-    //public void LoadCharacter(string _characterName)
-    //{
-    //    string selectedCharacter = _characterName;
-    //    CharacterStats cs = SaveLoadManager.LoadCharacter(selectedCharacter);
-    //    m_PlayerName = cs.m_StatsName;
-    //    //m_PlayerModel = cs.m_Model;
-    //
-    //    // BUILD CHARACTER HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //}
+    [Command]
+    private void CmdPlayerMove(Vector2 _move)
+    {
+        m_movement = _move;
+    }
+
+    [Command]
+    private void CmdPlayerMove2(Vector3 _move)
+    {
+        m_movement2 = _move.normalized * m_speed * Time.deltaTime;
+    }
+
+    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
+
+    public void LoadCharacter(string _characterName)
+    {
+        string selectedCharacter = _characterName;
+        CharacterStats cs = SaveLoadManager.LoadCharacter(selectedCharacter);
+        m_PlayerName = cs.m_StatsName;
+        m_PlayerModel = cs.m_Model;
+    
+        // BUILD CHARACTER HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    }
 
     //public string GetPrefabPath(int _id)
     //{
@@ -147,27 +225,21 @@ public class PlayerCharacter : NetworkBehaviour
     //        switch (type)
     //        {
     //            case 1:
-    //                m_TEST_TYPE = "Color";
     //                Debug.Log("Color");
     //                break;
     //            case 2:
-    //                m_TEST_TYPE = "Face";
     //                Debug.Log("Face");
     //                break;
     //            case 3:
-    //                m_TEST_TYPE = "Ears";
     //                Debug.Log("Ears");
     //                break;
     //            case 4:
-    //                m_TEST_TYPE = "Eyes";
     //                Debug.Log("Eyes");
     //                break;
     //            case 5:
-    //                m_TEST_TYPE = "Accessories";
     //                Debug.Log("Accessories");
     //                break;
     //            case 6:
-    //                m_TEST_TYPE = "Hair";
     //                Debug.Log("Hair");
     //                break;
     //            default:
@@ -180,35 +252,26 @@ public class PlayerCharacter : NetworkBehaviour
     //        switch (type)
     //        {
     //            case 0:
-    //                m_TEST_TYPE = "Head";
     //                Debug.Log("Head");
     //                break;
     //            case 1:
-    //                m_TEST_TYPE = "Chest";
     //                Debug.Log("Chest");
     //                break;
     //            case 2:
-    //                m_TEST_TYPE = "Legs";
     //                Debug.Log("Legs");
     //                break;
     //            case 3:
-    //                m_TEST_TYPE = "Hands";
     //                Debug.Log("Hands");
     //                break;
     //            case 4:
-    //                m_TEST_TYPE = "Feet";
     //                Debug.Log("Feet");
     //                break;
     //            default:
     //                break;
     //        }
     //    }
-    //    // TEST
-    //    m_TEST_ITEM_INDEX = index;
-    //
     //
     //    path += _id.ToString();
-    //    //path += ".prefab";
     //
     //    Debug.Log(path);
     //
