@@ -15,7 +15,7 @@ public class KevinAI : AIBase
 {
 
     private Animator m_animator;
-    private AIState m_currentState;
+    private EAIState m_currentState;
     private int IDliving;
     private int IDmove;
     private int IDattack;
@@ -68,17 +68,17 @@ public class KevinAI : AIBase
 
         currentCoffePoint++;
     }
-    public override void KillNPC()
+    protected override void KillNPC()
     {
 
     }
 
-    public override void NPCDecision()
+    protected override void NPCDecision()
     {
 
     }
 
-    public override void OnNPCSpawn()
+    protected override void OnNPCSpawn()
     {
 
     }
@@ -108,5 +108,32 @@ public class KevinAI : AIBase
         }
         m_agent.enabled = true;
         m_agent.destination = transform.TransformPoint(positions[0]);
+    }
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    public override void OnInteraction()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    /// <param name="_value">Damage/Value received</param>
+    /// <param name="_damageType">Type of Attack (Use NONE if not an attack)</param>
+    public override void OnInteraction(float _value, EDamageType _damageType)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    /// <param name="_obj">(Quest-)object from Player</param>
+    public override void OnInteraction(object _obj)
+    {
+        throw new System.NotImplementedException();
     }
 }
