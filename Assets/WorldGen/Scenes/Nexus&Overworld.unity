@@ -379,6 +379,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1539691570}
   - component: {fileID: 1539691569}
+  - component: {fileID: 1539691571}
   m_Layer: 0
   m_Name: WorldManager
   m_TagString: Untagged
@@ -397,7 +398,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e0319caf96924048b159b1d72420066, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_EntryRoom: {fileID: 1995092972647798, guid: 13a1cad8d5f3b6b40b2ed568e53ac417,
+    type: 2}
+  m_DeadendsA: []
+  m_buildDungeon: 1
   m_OverworldBuilt: 0
+  m_DungeonADone: 0
   m_building: 0
 --- !u!4 &1539691570
 Transform:
@@ -412,6 +418,38 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1539691571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1539691568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 0
+    i1: 0
+    i2: 0
+    i3: 0
+    i4: 0
+    i5: 0
+    i6: 0
+    i7: 0
+    i8: 0
+    i9: 0
+    i10: 0
+    i11: 0
+    i12: 0
+    i13: 0
+    i14: 0
+    i15: 0
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!1 &1738311407
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,6 +728,67 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1928173341
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1928173343}
+  - component: {fileID: 1928173342}
+  m_Layer: 0
+  m_Name: RoomTemplate
+  m_TagString: Rooms
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1928173342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1928173341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86b30ea6fc68c394c827555550f05878, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SelfRegistered: 0
+  m_ClosedRoom: {fileID: 1312116640299552, guid: 81d58b1c05513f4479401ceced8e1dd9,
+    type: 2}
+  m_BottomRooms:
+  - {fileID: 1057828852130078, guid: d93704b86b7b83c47b8acc1e3448b889, type: 2}
+  - {fileID: 1070390033770980, guid: 9d00549a0abe77e4a8ac064219e3713d, type: 2}
+  - {fileID: 1128162729206144, guid: 4f7876663111c244c95ca6e33f79a3a2, type: 2}
+  m_LeftRooms:
+  - {fileID: 1409433964604122, guid: 147c08a17f46400498a247ec55d4e516, type: 2}
+  - {fileID: 1125597021100494, guid: 9746521fa8331914c9e920d85c18d5b8, type: 2}
+  - {fileID: 1647270159328362, guid: 8a02d1c93a20ffc4a9f398f46b4fad95, type: 2}
+  m_TopRooms:
+  - {fileID: 1968468003262194, guid: d9cdf8bd24e62c8468ca9c0ac7a31763, type: 2}
+  - {fileID: 1128162729206144, guid: 4f7876663111c244c95ca6e33f79a3a2, type: 2}
+  - {fileID: 1647270159328362, guid: 8a02d1c93a20ffc4a9f398f46b4fad95, type: 2}
+  - {fileID: 1627109910153612, guid: 045d8efce7df00f43a1dadcdcdf198b4, type: 2}
+  m_RightRooms:
+  - {fileID: 1679566702950530, guid: 1c4427446dd17af43812bcc92eed123a, type: 2}
+  - {fileID: 1125597021100494, guid: 9746521fa8331914c9e920d85c18d5b8, type: 2}
+  - {fileID: 1070390033770980, guid: 9d00549a0abe77e4a8ac064219e3713d, type: 2}
+  - {fileID: 1627109910153612, guid: 045d8efce7df00f43a1dadcdcdf198b4, type: 2}
+--- !u!4 &1928173343
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1928173341}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 100, y: 0.25, z: 100}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1956859971
 GameObject:
   m_ObjectHideFlags: 0
@@ -736,6 +835,9 @@ MonoBehaviour:
     type: 2}
   m_PortalBPrefab: {fileID: 1158578053667304, guid: 890e149abd759264ebee15acdb846e7d,
     type: 2}
+  m_PortalDungeonIn: {fileID: 1730430161023572, guid: a4ef24ed6f07fac479519f66f2beda12,
+    type: 2}
+  m_newWorld: 1
 --- !u!114 &1956859974
 MonoBehaviour:
   m_ObjectHideFlags: 0

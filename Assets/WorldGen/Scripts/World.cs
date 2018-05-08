@@ -11,7 +11,6 @@ using Realtime.Messaging.Internal;
 
 public class World : MonoBehaviour
 {
-
     public Material m_TextureAtlas;
     public static int COLUMNHEIGHT = 1;
     public static int CHUNKSIZE = 32;
@@ -19,9 +18,10 @@ public class World : MonoBehaviour
     public static ConcurrentDictionary<string, Chunk> CHUNKS;
     public GameObject m_TreePrefab;
     public GameObject m_PortalBPrefab;
-    private Component[] m_playerComponents;
-    private bool m_newWorld = true;
+    public GameObject m_PortalDungeonIn;
+    public bool m_newWorld = true;
     private bool m_building = false;
+
 
     private NavMeshSurface m_surface;
     // ToDo: add NavMeshModifier Volumo for Kevin pathfinding
@@ -44,7 +44,7 @@ public class World : MonoBehaviour
         // Playerposition based on Chunkposition
         int posx = (int)Mathf.Floor(GameStatus.GetInstance().GetWorldPos().x / CHUNKSIZE);
         int posz = (int)Mathf.Floor(GameStatus.GetInstance().GetWorldPos().z / CHUNKSIZE);
-       
+
 
         // generates chunks in a radius around the Player
         for (int z = -RADIUS; z <= RADIUS; z++)
@@ -66,8 +66,9 @@ public class World : MonoBehaviour
                         c = new Chunk(chunkPosition, m_TextureAtlas);
                         c.m_Chunk.transform.parent = this.transform;
                         CHUNKS.TryAdd(c.m_Chunk.name, c);
-                    }               
+                    }
 
+                    yield return null;
                 }
 
         foreach (KeyValuePair<string, Chunk> c in CHUNKS)
@@ -77,26 +78,28 @@ public class World : MonoBehaviour
                 c.Value.DrawChunk();
             }
 
+            c.Value.m_CurrentStatus = Chunk.EStatus.DONE;
             yield return null;
-            c.Value.m_CurrentStatus = Chunk.EStatus.DONE;        
         }
-        //this.transform.position = new Vector3(0, 100, 0);
 
         foreach (KeyValuePair<string, Chunk> c in CHUNKS)
         {
             PropSeed(c.Value.m_Chunk, c.Value.m_ChunkData);
             c.Value.Save();
+            yield return null;
         }
 
-        
 
-        GameStatus.GetInstance().m_OverworldBuilt = true;
-        GameStatus.GetInstance().m_building = false;
-        Instantiate(m_PortalBPrefab, new Vector3(GameStatus.GetInstance().GetWorldPos().x,1, GameStatus.GetInstance().GetWorldPos().z), Quaternion.identity);
+
+        Instantiate(m_PortalBPrefab, new Vector3(GameStatus.GetInstance().GetWorldPos().x, 1, GameStatus.GetInstance().GetWorldPos().z), Quaternion.identity);
+        Instantiate(m_PortalDungeonIn, new Vector3(GameStatus.GetInstance().GetWorldPos().x -10, 1, GameStatus.GetInstance().GetWorldPos().z -10), Quaternion.identity);
         yield return null;
 
         m_surface = GetComponent<NavMeshSurface>();
-        m_surface.BuildNavMesh();
+        m_surface.BuildNavMesh();        
+        GameStatus.GetInstance().m_building = false;
+        GameStatus.GetInstance().m_OverworldBuilt = true;
+        yield return null;
 
     }
 
@@ -114,11 +117,10 @@ public class World : MonoBehaviour
     {
         GameStatus.GetInstance().m_building = true;
         CHUNKS = new ConcurrentDictionary<string, Chunk>();
-        this.transform.position =GameStatus.GetInstance().GetWorldPos();
+        this.transform.position = GameStatus.GetInstance().GetWorldPos();
         this.transform.rotation = Quaternion.identity;
         StartCoroutine(BuildWorld());
 
-        
-    }
 
+    }
 }

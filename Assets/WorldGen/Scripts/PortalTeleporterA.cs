@@ -5,8 +5,7 @@ using UnityEngine;
 public class PortalTeleporterA : MonoBehaviour
 {
     private Transform m_Player;
-    private Transform m_portalB;
-   // private Vector3 m_offset = new Vector3(0, 0, 3);
+    private Transform m_portalB;   
     private bool m_selfRegistered = false;
     private bool m_playerContact = false;
 
