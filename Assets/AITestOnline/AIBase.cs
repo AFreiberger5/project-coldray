@@ -14,12 +14,12 @@ public abstract class AIBase : NetworkBehaviour
     /// <summary>
     /// To be executed when NPC is spawned.
     /// </summary>
-    public abstract void OnNPCSpawn();
+    protected abstract void OnNPCSpawn();
 
     /// <summary>
     /// Method to handle the death of the NPC
     /// </summary>
-    public abstract void KillNPC();
+    protected abstract void KillNPC();
 
     /// <summary>
     /// To be executed when NPC is dying, handles loot drops and similar.
@@ -29,5 +29,25 @@ public abstract class AIBase : NetworkBehaviour
     /// <summary>
     /// Handles the Decisionmaking of the NPC based on current State and possible options.
     /// </summary>
-    public abstract void NPCDecision();
+    protected abstract void NPCDecision();
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    public abstract void OnInteraction();
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    /// <param name="_value">Damage/Value received</param>
+    /// <param name="_damageType">Type of Attack (Use NONE if not an attack)</param>
+    public abstract void OnInteraction(float _value, EDamageType _damageType);
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    /// <param name="_obj">(Quest-)object from Player</param>
+    public abstract void OnInteraction(object _obj);
+
+    
 }

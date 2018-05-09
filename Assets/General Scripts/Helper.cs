@@ -39,7 +39,7 @@ public static class EnumExtensions
 #endregion
 #region Enums
 [Flags]
-public enum AIState
+public enum EAIState
 {
     NONE = 0,
     ALIVE = 1,
@@ -51,26 +51,42 @@ public enum AIState
     DEAD = 64
 
 }
-public enum DropTable
+public enum EDropTable
 {
     NONE = 0,
     BANSHEE = 1,
     KEVIN = 2,
 }
-#endregion
+[Flags]
+public enum EDamageType
+{
+    //None is used to call interaction Methods not through attacks
+    NONE = 0,
+    //TrueDamage ignores defense
+    TRUE = 1,
+    MAGICAL = 2,
+    PHYSICAL = 4,
+    RANGED = 8,
+    MELEE = 16,
+    //Percent damage relativ to total HP of NPC
+    PERCENTTOTAL = 32,
+    //Percent damage relativ to current HP of NPC
+    PERCENTCURRENT = 64,
+}
+    #endregion
 #region Functions
 public class Helper : MonoBehaviour
 {
 
-    public void SpawnLoot(DropTable _dropTable, Vector3 _position)
+    public void SpawnLoot(EDropTable _dropTable, Vector3 _position)
     {
         switch (_dropTable)
         {
-            case DropTable.NONE:
+            case EDropTable.NONE:
                 break;
-            case DropTable.BANSHEE:
+            case EDropTable.BANSHEE:
                 break;
-            case DropTable.KEVIN:
+            case EDropTable.KEVIN:
                 break;
             default:
                 break;

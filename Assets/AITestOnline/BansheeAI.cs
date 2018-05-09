@@ -15,29 +15,35 @@ using System;
 
 public class BansheeAI : AIBase
 {
+    //public variables for debug/testing/design access
     public float m_aggroDistance;
     public float m_deAggroDistance;
+    public float m_hitdistance;
     public Transform m_head;
 
 
-    private AIState CurrentState;
-    private AIState previousState;
+    private EAIState CurrentState;
+    private EAIState previousState;
     private List<GameObject> m_TargetPlayers;
     [SyncVar] private GameObject m_Target;
     private bool m_PlayerInRange;
     private NavMeshAgent m_agent;
+
+    [SerializeField] private int m_HealthPoints;
+
     private NetworkAnimator m_animator;
-    [SerializeField] private float m_hitdistance;
     private int IDliving;
     private int IDmove;
     private int IDattack;
     private int IDdeath;
+
     private Helper helper;
 
     [ServerCallback]
     private void Awake()
     {
         m_TargetPlayers = new List<GameObject>();
+        //Initialise the NPC
         OnNPCSpawn();
         m_agent = GetComponent<NavMeshAgent>();
         m_animator = GetComponent<NetworkAnimator>();
@@ -55,7 +61,7 @@ public class BansheeAI : AIBase
     {
         //for debug testing only
         if (Input.GetKeyDown(KeyCode.V))
-            CurrentState = CurrentState | AIState.DYING;
+            CurrentState = CurrentState | EAIState.DYING;
 
         if (!isLocalPlayer)
             NPCDecision();
@@ -71,17 +77,17 @@ public class BansheeAI : AIBase
         print(_name);
     }
 
-    public override void KillNPC()
+    protected override void KillNPC()
     {
-        CurrentState = AIState.DYING;
+        CurrentState = EAIState.DYING;
         
         //OnNPCDeath();
     }
 
 
-    public override void NPCDecision()
+    protected override void NPCDecision()
     {
-        if (CurrentState.HasFlag(AIState.IDLE) && !CurrentState.HasFlag(AIState.DEAD))
+        if (CurrentState.HasFlag(EAIState.IDLE) && !CurrentState.HasFlag(EAIState.DEAD))
         {
             if (m_PlayerInRange)
             {
@@ -117,8 +123,8 @@ public class BansheeAI : AIBase
 
                         }
                     }
-                    CurrentState -= AIState.IDLE;
-                    CurrentState = CurrentState | AIState.MOVING;
+                    CurrentState -= EAIState.IDLE;
+                    CurrentState = CurrentState | EAIState.MOVING;
 
                 }
                 else
@@ -128,7 +134,7 @@ public class BansheeAI : AIBase
 
             }
         }
-        if (CurrentState.HasFlag(AIState.MOVING) && !CurrentState.HasFlag(AIState.DEAD))
+        if (CurrentState.HasFlag(EAIState.MOVING) && !CurrentState.HasFlag(EAIState.DEAD))
         {
 
             m_agent.destination = m_Target.transform.position;
@@ -152,11 +158,11 @@ public class BansheeAI : AIBase
             {
                 m_agent.SetDestination(m_Target.transform.position);
 
-                if (CurrentState.HasFlag(AIState.ATTACKING))
-                    CurrentState -= AIState.ATTACKING;
+                if (CurrentState.HasFlag(EAIState.ATTACKING))
+                    CurrentState -= EAIState.ATTACKING;
 
-                CurrentState -= AIState.MOVING;
-                CurrentState = CurrentState | AIState.IDLE;
+                CurrentState -= EAIState.MOVING;
+                CurrentState = CurrentState | EAIState.IDLE;
                 return;
             }
 
@@ -165,22 +171,25 @@ public class BansheeAI : AIBase
 
     private void NotAttacking()
     {
-        if (CurrentState.HasFlag(AIState.ATTACKING))
-            CurrentState -= AIState.ATTACKING;
+        if (CurrentState.HasFlag(EAIState.ATTACKING))
+            CurrentState -= EAIState.ATTACKING;
     }
 
     [Server]
     protected override void OnNPCDeath()
     {
-        CurrentState = AIState.DEAD;
-        helper.SpawnLoot(DropTable.BANSHEE, transform.position);
+        CurrentState = EAIState.DEAD;
+        helper.SpawnLoot(EDropTable.BANSHEE, transform.position);
         NetworkServer.Destroy(gameObject);
     }
 
     [Server]
-    public override void OnNPCSpawn()
+    protected override void OnNPCSpawn()
     {
-        CurrentState = AIState.ALIVE | AIState.IDLE;
+        //Banshee is by default Idlling, moves on agression or sight
+        CurrentState = EAIState.ALIVE | EAIState.IDLE;
+
+        m_HealthPoints = 100;
 
     }
 
@@ -211,39 +220,69 @@ public class BansheeAI : AIBase
 
     private void Attack()
     {
-        if (!CurrentState.HasFlag(AIState.ATTACKING))
-            CurrentState = CurrentState | AIState.ATTACKING;
+        
+        if (!CurrentState.HasFlag(EAIState.ATTACKING))
+            CurrentState = CurrentState | EAIState.ATTACKING;
     }
 
     private void ChangeAnimations()
     {
 
-        if (CurrentState.HasFlag(AIState.ALIVE))
+        if (CurrentState.HasFlag(EAIState.ALIVE))
             m_animator.animator.SetBool(IDliving, true);
-        if (CurrentState.HasFlag(AIState.IDLE))
+        if (CurrentState.HasFlag(EAIState.IDLE))
         {
             m_animator.animator.SetBool(IDmove, false);
             m_animator.animator.SetBool(IDattack, false);
             m_animator.animator.SetBool(IDdeath, false);
         }
-        if (CurrentState.HasFlag(AIState.MOVING))
+        if (CurrentState.HasFlag(EAIState.MOVING))
             m_animator.animator.SetBool(IDmove, true);
-        if (CurrentState.HasFlag(AIState.ATTACKING))
+        if (CurrentState.HasFlag(EAIState.ATTACKING))
             m_animator.animator.SetBool(IDattack, true);
-        if (!CurrentState.HasFlag(AIState.ATTACKING) && previousState.HasFlag(AIState.ATTACKING))
+        if (!CurrentState.HasFlag(EAIState.ATTACKING) && previousState.HasFlag(EAIState.ATTACKING))
             m_animator.animator.SetBool(IDattack, false);
-        if (CurrentState.HasFlag(AIState.DYING))
+        if (CurrentState.HasFlag(EAIState.DYING))
         {
             m_animator.animator.SetBool(IDliving, false);
 
             //now called via animation event
             //KillNPC();
         }
-        if (CurrentState.HasFlag(AIState.DEAD))
+        if (CurrentState.HasFlag(EAIState.DEAD))
         {
             m_animator.animator.SetBool(IDdeath, true);
         }
 
         previousState = CurrentState;
+        
+    }
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    public override void OnInteraction()
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    /// <param name="_value">Damage/Value received</param>
+    /// <param name="_damageType">Type of Attack (Use NONE if not an attack)</param>
+    public override void OnInteraction(float _value, EDamageType _damageType)
+    {
+        
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    /// <param name="_obj">(Quest-)object from Player</param>
+    public override void OnInteraction(object _obj)
+    {
+        throw new NotImplementedException();
     }
 }
