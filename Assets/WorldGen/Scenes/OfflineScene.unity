@@ -113,6 +113,48 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &260936287
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4392131039989490, guid: 7c336a0e98a2ec046b9427ece91d92ef, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392131039989490, guid: 7c336a0e98a2ec046b9427ece91d92ef, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392131039989490, guid: 7c336a0e98a2ec046b9427ece91d92ef, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 2.592
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392131039989490, guid: 7c336a0e98a2ec046b9427ece91d92ef, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392131039989490, guid: 7c336a0e98a2ec046b9427ece91d92ef, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392131039989490, guid: 7c336a0e98a2ec046b9427ece91d92ef, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392131039989490, guid: 7c336a0e98a2ec046b9427ece91d92ef, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392131039989490, guid: 7c336a0e98a2ec046b9427ece91d92ef, type: 2}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 7c336a0e98a2ec046b9427ece91d92ef, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &1336619173
 GameObject:
   m_ObjectHideFlags: 0
@@ -237,17 +279,17 @@ MonoBehaviour:
   m_OfflineScene: OfflineScene
   m_OnlineScene: Nexus&Overworld
   m_SpawnPrefabs:
-  - {fileID: 1057828852130078, guid: d93704b86b7b83c47b8acc1e3448b889, type: 2}
-  - {fileID: 1312116640299552, guid: 81d58b1c05513f4479401ceced8e1dd9, type: 2}
-  - {fileID: 1995092972647798, guid: 13a1cad8d5f3b6b40b2ed568e53ac417, type: 2}
-  - {fileID: 1409433964604122, guid: 147c08a17f46400498a247ec55d4e516, type: 2}
-  - {fileID: 1125597021100494, guid: 9746521fa8331914c9e920d85c18d5b8, type: 2}
-  - {fileID: 1679566702950530, guid: 1c4427446dd17af43812bcc92eed123a, type: 2}
-  - {fileID: 1070390033770980, guid: 9d00549a0abe77e4a8ac064219e3713d, type: 2}
-  - {fileID: 1968468003262194, guid: d9cdf8bd24e62c8468ca9c0ac7a31763, type: 2}
-  - {fileID: 1128162729206144, guid: 4f7876663111c244c95ca6e33f79a3a2, type: 2}
-  - {fileID: 1647270159328362, guid: 8a02d1c93a20ffc4a9f398f46b4fad95, type: 2}
-  - {fileID: 1627109910153612, guid: 045d8efce7df00f43a1dadcdcdf198b4, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

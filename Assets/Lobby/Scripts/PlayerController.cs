@@ -15,13 +15,24 @@ using UnityEngine.Networking;
 
 public class PlayerController : NetworkBehaviour
 {
-    public Camera m_PlayerCam;
+    public Transform m_CamPos;
+    private Camera m_PlayerCam;
     PlayerMotor m_motor;
 
     // Use this for initialization
     void Start()
     {
-        m_motor = GetComponent<PlayerMotor>();
+        if (isLocalPlayer)
+        {
+            m_motor = GetComponent<PlayerMotor>();
+            m_PlayerCam = Camera.main;
+            m_PlayerCam.GetComponent<CamController>().SetCamPos(m_CamPos);
+        }
+        else
+        {
+            GetComponent<PlayerMotor>().enabled = false;
+            this.enabled = false;
+        }
     }
 
     void FixedUpdate()
@@ -40,7 +51,7 @@ public class PlayerController : NetworkBehaviour
         if (!isLocalPlayer)
         {
             return;
-        }   
+        }
 
         Vector3 bodyDir = Utility.ScreenToWorldPoint(Input.mousePosition, m_motor.m_playerBody.position.y, m_PlayerCam) - m_motor.m_playerBody.position;
         m_motor.RotatePlayerBody(bodyDir);
@@ -57,5 +68,13 @@ public class PlayerController : NetworkBehaviour
     {
         Debug.Log("Player Died");
         StartCoroutine("Respawn");
-    }    
+    }
+
+    public void SetCamRedirect(Transform _trf)
+    {
+        if (isLocalPlayer)
+        {
+            Camera.main.GetComponent<CamController>().SetCamPos(_trf);
+        } 
+    }
 }

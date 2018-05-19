@@ -42,8 +42,8 @@ public class World : MonoBehaviour
         m_building = true;
 
         // Playerposition based on Chunkposition
-        int posx = (int)Mathf.Floor(GameStatus.GetInstance().GetWorldPos().x / CHUNKSIZE);
-        int posz = (int)Mathf.Floor(GameStatus.GetInstance().GetWorldPos().z / CHUNKSIZE);
+        int posx = (int)Mathf.Floor(WorldManager.GetInstance().GetWorldPos().x / CHUNKSIZE);
+        int posz = (int)Mathf.Floor(WorldManager.GetInstance().GetWorldPos().z / CHUNKSIZE);
 
 
         // generates chunks in a radius around the Player
@@ -91,14 +91,13 @@ public class World : MonoBehaviour
 
 
 
-        Instantiate(m_PortalBPrefab, new Vector3(GameStatus.GetInstance().GetWorldPos().x, 1, GameStatus.GetInstance().GetWorldPos().z), Quaternion.identity);
-        Instantiate(m_PortalDungeonIn, new Vector3(GameStatus.GetInstance().GetWorldPos().x -10, 1, GameStatus.GetInstance().GetWorldPos().z -10), Quaternion.identity);
+        Instantiate(m_PortalBPrefab, new Vector3(WorldManager.GetInstance().GetWorldPos().x, 1, WorldManager.GetInstance().GetWorldPos().z), Quaternion.identity);
+        Instantiate(m_PortalDungeonIn, new Vector3(WorldManager.GetInstance().GetWorldPos().x -10, 1, WorldManager.GetInstance().GetWorldPos().z -10), Quaternion.identity);
         yield return null;
 
         m_surface = GetComponent<NavMeshSurface>();
-        m_surface.BuildNavMesh();        
-        GameStatus.GetInstance().m_building = false;
-        GameStatus.GetInstance().m_OverworldBuilt = true;
+        m_surface.BuildNavMesh();                
+        WorldManager.GetInstance().ReportWorldBuilt(true);
         yield return null;
 
     }
@@ -114,13 +113,10 @@ public class World : MonoBehaviour
 
 
     public void StartBuild()
-    {
-        GameStatus.GetInstance().m_building = true;
+    {        
         CHUNKS = new ConcurrentDictionary<string, Chunk>();
-        this.transform.position = GameStatus.GetInstance().GetWorldPos();
+        this.transform.position = WorldManager.GetInstance().GetWorldPos();
         this.transform.rotation = Quaternion.identity;
         StartCoroutine(BuildWorld());
-
-
     }
 }
