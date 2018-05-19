@@ -7,22 +7,21 @@ public class PortalTeleporterB : MonoBehaviour {
     private Transform m_Player;
     private Transform m_portalA;
     private Vector3 m_offset = new Vector3(0, 0, 3);
-    private bool m_selfRegistered = false;
+    public bool m_selfRegistered = false;
     private bool m_playerContact = false;
 
     // Update is called once per frame
     void Update()
     {
-        if (m_selfRegistered == false)
-        {
-            GameStatus.GetInstance().SetPortalB(this.transform);
-            GameStatus.GetInstance().SetNewPortalB(true);
-            m_selfRegistered = true;
+        if (m_selfRegistered == false)        {
+            WorldManager.GetInstance().SetPortalB(this.transform);
+            WorldManager.GetInstance().SetNewPortalB(true);
+            
         }
 
         if (m_portalA == null)
         {
-           m_portalA = GameStatus.GetInstance().GetPortalA();
+           m_portalA = WorldManager.GetInstance().GetPortalA();
         }
         if (m_portalA != null)
         {
