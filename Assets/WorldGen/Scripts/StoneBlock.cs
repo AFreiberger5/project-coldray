@@ -16,10 +16,10 @@ public class StoneBlock : Block
     }
 
     public override TextureTile TexturePosition(ECubeside _side)
-    {
+    {  
         TextureTile tile = new TextureTile();
-        tile.x = 4;
-        tile.y = 13;
-        return tile;
+         tile.x =1;
+         tile.y =15;
+        return tile;        
     }
 }

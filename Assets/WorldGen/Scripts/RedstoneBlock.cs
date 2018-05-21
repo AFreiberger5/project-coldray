@@ -19,7 +19,7 @@ public class RedstoneBlock : Block
     public override TextureTile TexturePosition(ECubeside _side)
     {
         TextureTile tile = new TextureTile();
-        tile.x = 3;
+        tile.x = 1;
         tile.y = 12;
         return tile;
     }

@@ -20,7 +20,7 @@ public class DiamondBlock : Block
     public override TextureTile TexturePosition(ECubeside _side)
     {
         TextureTile tile = new TextureTile();
-        tile.x = 2;
+        tile.x = 0;
         tile.y = 12;
         return tile;
     }

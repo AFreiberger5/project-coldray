@@ -22,11 +22,11 @@ public class GrassBlock : Block
         {
             case ECubeside.TOP:
                 tile.x = 0;
-                tile.y = 16;
+                tile.y = 15;
                 return tile;
             case ECubeside.BOTTOM:
                 tile.x = 2;
-                tile.y = 16;
+                tile.y = 15;
                 return tile;
         }
         tile.x = 3;

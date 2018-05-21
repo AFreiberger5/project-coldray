@@ -18,8 +18,8 @@ public class DirtBlock : Block
     public override TextureTile TexturePosition(ECubeside _side)
     {
         TextureTile tile = new TextureTile();
-        tile.x = 3;
-        tile.y = 15;
+        tile.x = 5;
+        tile.y = 13;
         return tile;
     }
 }
