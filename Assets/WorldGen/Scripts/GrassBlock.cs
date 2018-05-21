@@ -4,17 +4,6 @@ using UnityEngine;
 
 public class GrassBlock : Block
 {
-
-    public Vector2[,] myUVs =
-    {
-        /*TOP*/			{new Vector2( 0.125f, 0.375f ), new Vector2( 0.1875f, 0.375f),
-                                new Vector2( 0.125f, 0.4375f ),new Vector2( 0.1875f, 0.4375f )},
-		/*SIDE*/		{new Vector2( 0.1875f, 0.9375f ), new Vector2( 0.25f, 0.9375f),
-                                new Vector2( 0.1875f, 1.0f ),new Vector2( 0.25f, 1.0f )},
-		/*BOTTOM*/		{new Vector2( 0.125f, 0.9375f ), new Vector2( 0.1875f, 0.9375f),
-                                new Vector2( 0.125f, 1.0f ),new Vector2( 0.1875f, 1.0f )}
-    };
-
     public GrassBlock(Vector3 _pos, GameObject _parent, Chunk _owner, Material _atlas)
     {
         m_BlockType = EBlockType.GRASS;
@@ -24,7 +13,24 @@ public class GrassBlock : Block
         m_Atlas = _atlas;
         m_HasMesh = true;
         m_IsSolid = true;
-        m_BlockUVs = myUVs;
+    }
 
+    public override TextureTile TexturePosition(ECubeside _side)
+    {
+        TextureTile tile = new TextureTile();
+        switch (_side)
+        {
+            case ECubeside.TOP:
+                tile.x = 0;
+                tile.y = 16;
+                return tile;
+            case ECubeside.BOTTOM:
+                tile.x = 2;
+                tile.y = 16;
+                return tile;
+        }
+        tile.x = 3;
+        tile.y = 15;
+        return tile;
     }
 }
