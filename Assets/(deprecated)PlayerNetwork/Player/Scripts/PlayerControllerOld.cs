@@ -73,8 +73,8 @@ public class PlayerControllerOld : NetworkBehaviour
          */
         #endregion
 
-        Vector3 bodyDir = Utility.ScreenToWorldPoint(Input.mousePosition, m_motor.m_playerBody.position.y, m_PlayerCam) - m_motor.m_playerBody.position;
-        m_motor.RotatePlayerBody(bodyDir);
+        //Vector3 bodyDir = Utility.ScreenToWorldPoint(Input.mousePosition, m_motor.m_playerBody.position.y, m_PlayerCam) - m_motor.m_playerBody.position;
+        //m_motor.RotatePlayerBody(bodyDir);
     }
 
     Vector3 GetInput()
