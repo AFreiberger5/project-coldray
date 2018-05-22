@@ -5,6 +5,14 @@ using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+//||                                                ||\\
+//||            Script by Gregor Hempel             ||\\
+//||            23.03.2018                          ||\\
+//||            Edits:                              ||\\
+//||                                                ||\\
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+
 public static class SaveLoadManager
 {
     // leads to C:\Users\user\AppData\LocalLow\companyName\projectTitle\Characters

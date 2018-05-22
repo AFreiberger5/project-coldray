@@ -38,7 +38,7 @@ public class WorldManager : NetworkBehaviour
     private Transform m_PortalA;
     private Transform m_PortalB;
     private bool m_newPortalB = false;
-    private Vector3 m_WorldPosition = new Vector3(575, 0, 734);
+    private Vector3 m_WorldPosition = new Vector3(336, 0, 127);
 
     void Awake()
     {

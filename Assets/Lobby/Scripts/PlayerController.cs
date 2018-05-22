@@ -1,73 +1,66 @@
-﻿/******************************************
-*                                         *
-*   Script made by Alexander Blomenkamp   *
-*                                         *
-*   Edited by:                            *
-*                                         *
-******************************************/
-
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(PlayerMotor))]
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+//||                                                ||\\
+//||            Script by Gregor Hempel             ||\\
+//||            23.03.2018                          ||\\
+//||            Edits:                              ||\\
+//||                                                ||\\
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
 
 public class PlayerController : NetworkBehaviour
 {
-    public Transform m_CamPos;
-    private Camera m_PlayerCam;
-    PlayerMotor m_motor;
+    public Camera m_PlayerCamera;
 
-    // Use this for initialization
-    void Start()
+    public Transform m_PlayerBodyT;
+
+    private Rigidbody m_playerRigidBody;
+    private float m_playerSpeed = 5.0f;
+    private float m_playerRotSpeed = 10.0f;
+    private Vector3 m_playerMovement;
+
+    private void Start()
+    {
+        m_playerRigidBody = GetComponent<Rigidbody>();
+    }
+
+    private void Update()
     {
         if (isLocalPlayer)
         {
-            m_motor = GetComponent<PlayerMotor>();
-            m_PlayerCam = Camera.main;
-            m_PlayerCam.GetComponent<CamController>().SetCamPos(m_CamPos);
+            FaceMousePosition();
         }
-        else
+    }
+
+    private void FixedUpdate()
+    {
+        if (isLocalPlayer)
         {
-            GetComponent<PlayerMotor>().enabled = false;
-            this.enabled = false;
+            m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+            m_playerMovement = m_playerMovement.normalized * m_playerSpeed * Time.deltaTime;
+
+            m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
         }
     }
 
-    void FixedUpdate()
+    private void FaceMousePosition()
     {
-        if (!isLocalPlayer)
+        if (isLocalPlayer)
         {
-            return;
+            Ray ray = m_PlayerCamera.ScreenPointToRay(Input.mousePosition);
+            Plane plane = new Plane(Vector3.up, new Vector3(0, m_PlayerBodyT.position.y, 0));
+            float distance = 0.0f;
+
+            if (plane.Raycast(ray, out distance))
+            {
+                Vector3 dir = ray.GetPoint(distance) - m_PlayerBodyT.position;
+
+                m_PlayerBodyT.rotation = Quaternion.Slerp(m_PlayerBodyT.rotation, Quaternion.LookRotation(dir), m_playerRotSpeed * Time.deltaTime);
+            }
         }
-
-        Vector3 inputDirection = GetInput();
-        m_motor.MovePlayer(inputDirection);
-    }
-
-    void Update()
-    {
-        if (!isLocalPlayer)
-        {
-            return;
-        }
-
-        Vector3 bodyDir = Utility.ScreenToWorldPoint(Input.mousePosition, m_motor.m_playerBody.position.y, m_PlayerCam) - m_motor.m_playerBody.position;
-        m_motor.RotatePlayerBody(bodyDir);
-    }
-
-    Vector3 GetInput()
-    {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-        return new Vector3(h, 0, v);
-    }
-
-    private void Disable()
-    {
-        Debug.Log("Player Died");
-        StartCoroutine("Respawn");
     }
 
     public void SetCamRedirect(Transform _trf)
@@ -75,6 +68,11 @@ public class PlayerController : NetworkBehaviour
         if (isLocalPlayer)
         {
             Camera.main.GetComponent<CamController>().SetCamPos(_trf);
-        } 
+        }
+    }
+
+    public void OnPlayerTakeDamage(float _damage, EDamageType _dmgType)
+    {
+
     }
 }

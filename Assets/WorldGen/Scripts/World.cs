@@ -14,8 +14,8 @@ public class World : MonoBehaviour
     public Material m_TextureAtlas;
     public static int COLUMNHEIGHT = 1;
     public static int CHUNKSIZE = 32;
-    public static int RADIUS = 4;
-    public static ConcurrentDictionary<string, Chunk> CHUNKS;
+    public static int RADIUS = 8;
+    public static Dictionary<string, Chunk> CHUNKS;
     public GameObject m_TreePrefab;
     public GameObject m_PortalBPrefab;
     public GameObject m_PortalDungeonIn;
@@ -65,7 +65,7 @@ public class World : MonoBehaviour
                     {
                         c = new Chunk(chunkPosition, m_TextureAtlas);
                         c.m_Chunk.transform.parent = this.transform;
-                        CHUNKS.TryAdd(c.m_Chunk.name, c);
+                        CHUNKS.Add(c.m_Chunk.name, c);
                     }
 
                     yield return null;
@@ -114,7 +114,7 @@ public class World : MonoBehaviour
 
     public void StartBuild()
     {        
-        CHUNKS = new ConcurrentDictionary<string, Chunk>();
+        CHUNKS = new Dictionary<string, Chunk>();
         this.transform.position = WorldManager.GetInstance().GetWorldPos();
         this.transform.rotation = Quaternion.identity;
         StartCoroutine(BuildWorld());

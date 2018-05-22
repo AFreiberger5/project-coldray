@@ -7,6 +7,14 @@ using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.SceneManagement;
 
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+//||                                                ||\\
+//||            Script by Gregor Hempel             ||\\
+//||            23.03.2018                          ||\\
+//||            Edits:                              ||\\
+//||                                                ||\\
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+
 public class CustomNetworkManager : NetworkManager
 {
     private CharacterDummy m_dummy;
@@ -14,6 +22,7 @@ public class CustomNetworkManager : NetworkManager
     // these variables are only used in the offline scene
     private InputField m_HostIPInputField;
     private InputField m_JoinIPInputField;
+    private Text m_JoinColorfulText;
     private bool m_gotTheInformation = false;
 
     /// <summary>
@@ -21,7 +30,7 @@ public class CustomNetworkManager : NetworkManager
     /// </summary>
     private void Update()
     {
-        if (SceneManager.GetActiveScene().buildIndex == 0// the offline scene is active
+        if (SceneManager.GetActiveScene().name == "LobbyScene"// the lobby scene is active
             &&
             (m_HostIPInputField == null// one of the input fields or buttons is missing
             ||
@@ -34,8 +43,12 @@ public class CustomNetworkManager : NetworkManager
             info = FindObjectOfType<LobbyInfoFeed>();// procures the information carrier
             m_HostIPInputField = info.m_GetHostIpInputField;// procures the required information
             m_JoinIPInputField = info.m_GetJoinIpInputField;// ""
+            m_JoinColorfulText = info.m_GetJoinColorfulText;// ""
+            m_JoinIPInputField.onValueChanged.RemoveAllListeners();// savety mesure !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            m_JoinIPInputField.onValueChanged.AddListener(DisplayIpInColorfulText);
 
             m_HostIPInputField.text = Network.player.ipAddress;// ??????????????????????????????????????????????? RIGHT IP ADRESS?????????????????????????
+            m_HostIPInputField.onValueChanged.AddListener(DisplayOwnIP);
 
             m_dummy = FindObjectOfType<CharacterDummy>();// procures the current dummy
 
@@ -80,13 +93,9 @@ public class CustomNetworkManager : NetworkManager
         {
             m_dummy.DontDestroyDummyOnLoad();// allows the dummy to travel to the online scene
 
-            //networkAddress = ip;// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            networkAddress = "127.0.0.1";
+            networkAddress = ip;// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //networkAddress = "127.0.0.1";
             StartClient();
-        }
-        else
-        {
-            m_JoinIPInputField.text = "Invalid Ip";
         }
     }
 
@@ -110,20 +119,34 @@ public class CustomNetworkManager : NetworkManager
     /// <returns></returns>
     private bool CheckIP(string _ip, out string _ckecked)
     {
-        System.Net.IPAddress iP;
-        if (System.Net.IPAddress.TryParse(_ip, out iP)
+        System.Net.IPAddress ip;
+        if (System.Net.IPAddress.TryParse(_ip, out ip)
             &&
             _ip.Length >= 1)
         {
-            _ckecked = iP.ToString();
+            _ckecked = ip.ToString();
 
             return true;
         }
         else
         {
-            _ckecked = "Invalid IP";
-
+            _ckecked = "Invalid Ip";
+            m_JoinColorfulText.text = "<i><color=red>" + _ckecked + "</color></i>";
             return false;
         }
+    }
+
+    /// <summary>
+    /// displays the ip input in a rich text
+    /// </summary>
+    /// <param ip input="_ip"></param>
+    private void DisplayIpInColorfulText(string _ip)
+    {
+        m_JoinColorfulText.text = "<color=black>" + _ip + "</color>";
+    }
+
+    private void DisplayOwnIP(string _ip)
+    {
+        m_HostIPInputField.text = Network.player.ipAddress;// ??????????????????????????????????????????????? RIGHT IP ADRESS?????????????????????????
     }
 }
