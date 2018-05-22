@@ -11,6 +11,7 @@ using System;
 using UnityEngine;
 
 #region Extensions
+
 // Since unity/mono does not support .net 4 or higher I had to write this
 // to avoid having to manually check Flags everytime
 public static class EnumExtensions
@@ -39,7 +40,7 @@ public static class EnumExtensions
 #endregion
 #region Enums
 [Flags]
-public enum AIState
+public enum EAIState
 {
     NONE = 0,
     ALIVE = 1,
@@ -51,26 +52,47 @@ public enum AIState
     DEAD = 64
 
 }
-public enum DropTable
+public enum EDropTable
 {
     NONE = 0,
     BANSHEE = 1,
     KEVIN = 2,
 }
+[Flags]
+public enum EDamageType
+{
+    //None is used to call interaction Methods not through attacks
+    NONE = 0,
+    //TrueDamage ignores defense
+    TRUE = 1,
+    MAGICAL = 2,
+    PHYSICAL = 4,
+    RANGED = 8,
+    MELEE = 16,
+    //Percent damage relativ to total HP of NPC
+    PERCENTTOTAL = 32,
+    //Percent damage relativ to current HP of NPC
+    PERCENTCURRENT = 64,
+}
 #endregion
+
 #region Functions
 public class Helper : MonoBehaviour
 {
+    //Max playercount, used for Balancing, spawning etc.
+    private static readonly int m_MAXPLAYERCOUNT = 4;
 
-    public void SpawnLoot(DropTable _dropTable, Vector3 _position)
+    internal static int MAX_PLAYERCOUNT { get { return m_MAXPLAYERCOUNT; } }
+
+    public void SpawnLoot(EDropTable _dropTable, Vector3 _position)
     {
         switch (_dropTable)
         {
-            case DropTable.NONE:
+            case EDropTable.NONE:
                 break;
-            case DropTable.BANSHEE:
+            case EDropTable.BANSHEE:
                 break;
-            case DropTable.KEVIN:
+            case EDropTable.KEVIN:
                 break;
             default:
                 break;

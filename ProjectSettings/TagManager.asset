@@ -7,6 +7,9 @@ TagManager:
   - TankShell
   - hitFX
   - MainCanvas
+  - TileSpawnPoint
+  - Occupied
+  - Rooms
   layers:
   - Default
   - TransparentFX

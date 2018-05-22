@@ -5,9 +5,8 @@ using UnityEngine;
 public class PortalTeleporterA : MonoBehaviour
 {
     private Transform m_Player;
-    private Transform m_portalB;
-   // private Vector3 m_offset = new Vector3(0, 0, 3);
-    private bool m_selfRegistered = false;
+    private Transform m_portalB;   
+    public bool m_selfRegistered = false;
     private bool m_playerContact = false;
 
 
@@ -16,14 +15,14 @@ public class PortalTeleporterA : MonoBehaviour
     {
         if (m_selfRegistered == false)
         {
-            GameStatus.GetInstance().SetPortalA(this.transform);
-            m_selfRegistered = true;
+            WorldManager.GetInstance().SetPortalA(this.transform);
+            
         }
 
-        if (m_portalB == null && GameStatus.GetInstance().GetNewPortalB())
+        if (m_portalB == null && WorldManager.GetInstance().GetNewPortalB())
         {
-            m_portalB = GameStatus.GetInstance().GetPortalB();
-            GameStatus.GetInstance().SetNewPortalB(false);
+            m_portalB = WorldManager.GetInstance().GetPortalB();
+            WorldManager.GetInstance().SetNewPortalB(false);
         }
         if (m_portalB != null)
         {
