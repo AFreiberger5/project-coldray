@@ -31,6 +31,7 @@ public class BansheeAI : AIBase
     [SerializeField]
     private int m_Damage = 15;
 
+
     #region AnimatiorVariables
     private NetworkAnimator m_animator;
     private int IDliving;
@@ -49,13 +50,13 @@ public class BansheeAI : AIBase
     private void Awake()
     {
         //Add Defense Values for all Types of DamageSources
-#region AddDefenseValues
-        
-        DefenseValues.Add(EDamageType.MELEE,    0);
-        DefenseValues.Add(EDamageType.RANGED,   0);
-        DefenseValues.Add(EDamageType.MAGICAL,  0);
+        #region AddDefenseValues
+
+        DefenseValues.Add(EDamageType.MELEE, 0);
+        DefenseValues.Add(EDamageType.RANGED, 0);
+        DefenseValues.Add(EDamageType.MAGICAL, 0);
         DefenseValues.Add(EDamageType.PHYSICAL, 0);
-        DefenseValues.Add(EDamageType.TRUE,     0);
+        DefenseValues.Add(EDamageType.TRUE, 0);
         #endregion
 
         m_TargetPlayers = new List<GameObject>();
@@ -74,21 +75,21 @@ public class BansheeAI : AIBase
 
     [ServerCallback]
     void Update()
-    {  
+    {
         if (!isLocalPlayer)
             NPCDecision();
 
         if (m_currentState != previousState)
-            ChangeAnimations(); 
+            ChangeAnimations();
     }
 
-    
+
     [Server]
     protected override void KillNPC()
     {
         //Triggers Death Animation, End of animation calls OnNPCDeath()
-        m_currentState = EAIState.DYING;        
-       
+        m_currentState = EAIState.DYING;
+
     }
 
 
@@ -153,7 +154,7 @@ public class BansheeAI : AIBase
 
             if (m_agent.remainingDistance < m_hitdistance
                 && !m_agent.pathPending)
-            {                    
+            {
                 Attack();
 
                 return;
@@ -231,13 +232,13 @@ public class BansheeAI : AIBase
     [Server]
     private void Attack()
     {
-        
+
         if (!m_currentState.HasFlag(EAIState.ATTACKING))
             m_currentState = m_currentState | EAIState.ATTACKING;
 
-        if ( m_hitdistance * m_hitdistance <= (transform.position - m_Target.transform.position).sqrMagnitude)
+        if (m_hitdistance * m_hitdistance <= (transform.position - m_Target.transform.position).sqrMagnitude)
         {
-            //ToDo: Wait for Player Damage Calcutaion and implement it here
+            m_Target.GetComponent<PlayerController>().OnPlayerTakeDamage(m_Damage, EDamageType.MELEE | EDamageType.PHYSICAL);
         }
     }
 
@@ -272,7 +273,7 @@ public class BansheeAI : AIBase
         }
 
         previousState = m_currentState;
-        
+
     }
 
     /// <summary>

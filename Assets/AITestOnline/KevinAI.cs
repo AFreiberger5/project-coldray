@@ -21,8 +21,8 @@ public class KevinAI : AIBase
     private Helper helper;
     private NavMeshAgent m_agent;
     private Vector3[] positions;
-    private bool SearchingCoffe;
-    private bool FoundCoffe;
+    private bool m_isSearchingCoffe;
+    private bool m_foundCoffe;
     private int currentCoffePoint;
 
     #region AnimatiorVariables
@@ -75,11 +75,11 @@ public class KevinAI : AIBase
         if (!isLocalPlayer)
             NPCDecision();
 
-        if (SearchingCoffe && m_agent.remainingDistance < 0.1f && !m_agent.pathPending)
+        if (m_isSearchingCoffe && m_agent.remainingDistance < 0.1f && !m_agent.pathPending)
         {
             SearchCoffe();
         }
-        if (FoundCoffe)
+        if (m_foundCoffe)
         {
             //Head in ground
             m_agent.enabled = false;
@@ -93,13 +93,16 @@ public class KevinAI : AIBase
 
         if (currentCoffePoint >= positions.Length)
         {
-            SearchingCoffe = false;
-            FoundCoffe = true;
+            m_isSearchingCoffe = false;
+            m_foundCoffe = true;
             return;
         }
         m_agent.destination = positions[currentCoffePoint];
         while (m_agent.pathPending)
-        { }
+        {
+            //ToDo: Check if this while causes issues or not
+            //wait for the path to be completed
+        }
         if (m_agent.path == null)
         {
             NavMeshHit NHit;
@@ -142,7 +145,7 @@ public class KevinAI : AIBase
     {
         // create a path by finding 5 waypoints, taken from current position/direction
         // must get away from local position,
-        SearchingCoffe = true;
+        m_isSearchingCoffe = true;
         for (int i = 0; i < positions.Length; i++)
         {
             if (i == 0)
@@ -190,7 +193,7 @@ public class KevinAI : AIBase
     /// <param name="_damageType">Type of Attack (Use NONE if not an attack)</param>
     public override void OnInteraction(float _value, EDamageType _damageType)
     {
-        SearchingCoffe = true;
+        m_isSearchingCoffe = true;
 
         if (!_damageType.HasFlag(EDamageType.NONE))
         {
