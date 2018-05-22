@@ -3293,7 +3293,7 @@ MonoBehaviour:
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 1
   m_OfflineScene: LobbyScene
-  m_OnlineScene: TestScene
+  m_OnlineScene: OnlineScene
   m_SpawnPrefabs: []
   m_CustomConfig: 1
   m_MaxConnections: 4

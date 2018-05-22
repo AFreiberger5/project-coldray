@@ -63,7 +63,15 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    public void OnPlayerTakeDamage()
+    public void SetCamRedirect(Transform _trf)
+    {
+        if (isLocalPlayer)
+        {
+            Camera.main.GetComponent<CamController>().SetCamPos(_trf);
+        }
+    }
+
+    public void OnPlayerTakeDamage(float _damage, EDamageType _dmgType)
     {
 
     }
