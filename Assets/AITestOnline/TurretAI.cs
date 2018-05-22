@@ -10,8 +10,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurretAI : AIBase 
+public class TurretAI : AIBase
 {
+    public GameObject m_bullet;
+    public List<PlayerController> m_Players;
+
+    private Animator m_animator;
+    private int IDAttack;
+    private int IDDeath;
+
+    void Awake()
+    {
+        IDAttack = Animator.StringToHash("IsAtacking");
+        IDDeath = Animator.StringToHash("IsDying");
+    }
     // Use this for initialization
     void Start()
     {
@@ -23,7 +35,7 @@ public class TurretAI : AIBase
     {
 
     }
-    
+
     public void Shoot()
     {
 

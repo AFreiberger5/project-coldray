@@ -5,11 +5,9 @@
 *   Edited by:                            *
 *                                         *
 ******************************************/
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Linq;
 using UnityEngine.AI;
 using System;
 
@@ -97,6 +95,7 @@ public class BansheeAI : AIBase
     [Server]
     protected override void NPCDecision()
     {
+        //If NPC is idle, check for nearby Players
         if (m_currentState.HasFlag(EAIState.IDLE) && !m_currentState.HasFlag(EAIState.DEAD))
         {
             if (m_PlayerInRange)
@@ -104,13 +103,15 @@ public class BansheeAI : AIBase
                 List<RaycastHit> hits = new List<RaycastHit>();
                 RaycastHit hit;
 
+                //Players get added via OnTriggerEnter
                 foreach (GameObject Player in m_TargetPlayers)
                 {
-
+                    //Check if vision to player is blocked by Walls
                     if (Physics.Raycast(m_head.transform.position, (Player.transform.position - m_head.transform.position).normalized
                         , out hit, m_aggroDistance * m_aggroDistance, LayerMask.GetMask(new string[] { "Walls", "Player" })
                         , QueryTriggerInteraction.Ignore))
                     {
+                        //Checks if enemey can be seen (Eye-angle)
                         Vector3 playerAng = Player.transform.position;
                         playerAng.y = m_head.transform.position.y;
                         float angle = Vector3.SignedAngle((playerAng - m_head.transform.position), m_head.forward, Vector3.up);
@@ -122,6 +123,7 @@ public class BansheeAI : AIBase
                 }
                 if (hits.Count > 0)
                 {
+                    //If target was found, make it the target
                     float distance = m_aggroDistance * m_aggroDistance + 1;
                     foreach (RaycastHit RHit in hits)
                     {
@@ -146,7 +148,7 @@ public class BansheeAI : AIBase
         }
         if (m_currentState.HasFlag(EAIState.MOVING) && !m_currentState.HasFlag(EAIState.DEAD))
         {
-
+            //If Banshee is following a target, check if it can be hit or no/if target is lost
             m_agent.destination = m_Target.transform.position;
 
             if (m_agent.remainingDistance < m_hitdistance
@@ -241,6 +243,7 @@ public class BansheeAI : AIBase
 
     private void ChangeAnimations()
     {
+        //Change animations based on current States
 
         if (m_currentState.HasFlag(EAIState.ALIVE))
             m_animator.animator.SetBool(IDliving, true);

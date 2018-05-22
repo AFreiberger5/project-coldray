@@ -53,7 +53,7 @@ public class DunGen : NetworkBehaviour
             m_toProcess.Add(m_startPos, new byte[] { 1, 1, 1, 1 });
             DunGenController();
         }
-        
+
     }
 
     void DunGenController()
@@ -239,7 +239,7 @@ public class DunGen : NetworkBehaviour
                 dummyroom.CloseWalls(m_DungeonATiles[i].doors);
             }
         }
-        
+
     }
 
     [Command]
@@ -251,7 +251,9 @@ public class DunGen : NetworkBehaviour
             GameObject dummy = Instantiate(m_EntryRoom, m_DungeonATiles[i].pos, Quaternion.identity);
             Room dummyroom = dummy.GetComponent<Room>();
             dummyroom.CloseWalls(m_DungeonATiles[i].doors);
-            dummyroom.SpawnEnemies((m_RoomSizeX/2)-2,(m_RoomSizeZ/2)-2);
+            //Don't spawn enemies in Startroom or Bossroom
+            if (i > 0 && i < m_DungeonATiles.Count - 1)
+                dummyroom.SpawnEnemies((m_RoomSizeX / 2) - 2, (m_RoomSizeZ / 2) - 2);
         }
-    }   
+    }
 }

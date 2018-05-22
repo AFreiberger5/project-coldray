@@ -80,7 +80,7 @@ public class Room : NetworkBehaviour
             m_Turrets[i] = Instantiate(m_Turret, new Vector3(Random.Range(-_maxX, _maxX), transform.position.y, Random.Range(-_maxY, _maxY)), transform.rotation);
             m_Turrets[i].SetActive(false);
             NetworkServer.Spawn(m_Turrets[i]);
-            
+
         }
 
 
@@ -92,10 +92,28 @@ public class Room : NetworkBehaviour
         {
             foreach (GameObject Turret in m_Turrets)
             {
-                Turret.SetActive(true);
-                
+                if (Turret.activeSelf == false)
+                    Turret.SetActive(true);
+
+                Turret.GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
+
             }
             other.GetComponent<PlayerController>().SetCamRedirect(m_RoomCamPos);
+        }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.CompareTag("Player"))
+        {
+            foreach (GameObject Turret in m_Turrets)
+            {
+                foreach (PlayerController PC in Turret.GetComponent<TurretAI>().m_Players)
+                {
+                    // ToDo: remove player from list if Player.id = other.id
+                    //if(PC.)
+                }
+
+            }
         }
     }
 }

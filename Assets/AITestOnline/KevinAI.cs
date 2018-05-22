@@ -27,7 +27,7 @@ public class KevinAI : AIBase
 
     #region AnimatiorVariables
     private Animator m_animator;
-    private int IDliving;
+    private int IDLiving;
     private int IDMove;
     private int IDFear;
     private int IDDeath;
@@ -42,7 +42,7 @@ public class KevinAI : AIBase
     [ServerCallback]
     private void Awake()
     {
-        IDliving = Animator.StringToHash("IsLiving");
+        IDLiving = Animator.StringToHash("IsLiving");
         IDMove = Animator.StringToHash("IsWalking");
         IDFear = Animator.StringToHash("IsFearing");
         IDDeath = Animator.StringToHash("IsDying");
@@ -89,6 +89,7 @@ public class KevinAI : AIBase
 
     private void SearchCoffe()
     {
+        //When Kevin gets hit, he panicks and tries to quickly find all his Cofffe(TM) to hide it
 
         if (currentCoffePoint >= positions.Length)
         {
@@ -102,7 +103,7 @@ public class KevinAI : AIBase
         if (m_agent.path == null)
         {
             NavMeshHit NHit;
-            NavMesh.SamplePosition(positions[currentCoffePoint],out NHit,5,NavMesh.AllAreas);
+            NavMesh.SamplePosition(positions[currentCoffePoint],out NHit,5,NavMesh.AllAreas); //Get neat point if random point was invalid
             m_agent.destination = NHit.position;
         }
 
