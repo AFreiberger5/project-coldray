@@ -7,26 +7,11 @@ using UnityEngine.Networking;
 public class WorldManager : NetworkBehaviour
 {
     static WorldManager INSTANCE;
-
-  // public static WorldManager Instance
-  // {
-  //     get
-  //     {
-  //         if (INSTANCE == null)
-  //         {
-  //             INSTANCE = FindObjectOfType<WorldManager>();
-  //             if (INSTANCE == null)
-  //             {
-  //                 INSTANCE = new GameObject().AddComponent<WorldManager>();
-  //             }
-  //         }
-  //         return INSTANCE;
-  //     }
-  // }
+    
 
     public static WorldManager GetInstance()
     {
-        return INSTANCE;
+        return INSTANCE;        
     }
 
     [SyncVar(hook = "OnChangeWorld")]

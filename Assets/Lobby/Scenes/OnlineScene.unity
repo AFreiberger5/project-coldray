@@ -642,7 +642,7 @@ MonoBehaviour:
   m_TextureAtlas: {fileID: 2100000, guid: 2adc05e89e1ac854e91a6f8d9389ba02, type: 2}
   m_TreePrefab: {fileID: 1825402383431754, guid: d7a440f10790330428f19b36a2c1be9f,
     type: 2}
-  m_PortalBPrefab: {fileID: 1158578053667304, guid: 890e149abd759264ebee15acdb846e7d,
+  m_PortalBPrefab: {fileID: 1407323624087402, guid: 1b1badbc2f0002c4ab71185f9c4a4ca9,
     type: 2}
   m_PortalDungeonIn: {fileID: 1730430161023572, guid: a4ef24ed6f07fac479519f66f2beda12,
     type: 2}
@@ -773,7 +773,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_OverworldBuilt: 0
   m_DungeonADone: 0
-  m_building: 0
 --- !u!114 &988858647
 MonoBehaviour:
   m_ObjectHideFlags: 0

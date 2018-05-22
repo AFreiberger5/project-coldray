@@ -8,7 +8,7 @@ public class DirtBlock : Block
     {
         m_BlockType = EBlockType.DIRT;
         m_parent = _parent;
-        m_position = _pos;
+        m_Position = _pos;
         m_owner = _owner;
         m_Atlas = _atlas;
         m_IsSolid = true;
