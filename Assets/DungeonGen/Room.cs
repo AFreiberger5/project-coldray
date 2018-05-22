@@ -73,7 +73,8 @@ public class Room : NetworkBehaviour
         }
         int spawns = Random.Range(0, Helper.MAX_PLAYERCOUNT);
         //Lowering the chance the room with a lot of mobs
-        spawns = (spawns < Helper.MAX_PLAYERCOUNT / 2) ? spawns : Random.Range(0, spawns);
+        //ToDo: Balance how many spawns
+        spawns = (spawns < Helper.MAX_PLAYERCOUNT / 2) ? spawns : Random.Range(0, Helper.MAX_PLAYERCOUNT);
         for (int i = 0; i < spawns; i++)
         {
             //Spawn Turrets and add it to a list

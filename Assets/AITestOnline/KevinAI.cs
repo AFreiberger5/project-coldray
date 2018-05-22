@@ -200,8 +200,6 @@ public class KevinAI : AIBase
                 OnNPCDeath();
             }
         }
-
-
     }
 
     /// <summary>
