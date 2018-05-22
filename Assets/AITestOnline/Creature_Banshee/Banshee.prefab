@@ -260,7 +260,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1061507453935134}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -8.945178, y: -4.049874e-17, z: 18.23901}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4373692476670636}
@@ -1062,8 +1062,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_aggroDistance: 40
   m_deAggroDistance: 500
-  m_head: {fileID: 4639620176373746}
   m_hitdistance: 5
+  m_head: {fileID: 4639620176373746}
+  m_HealthPoints: 0
 --- !u!135 &135864260437099926
 SphereCollider:
   m_ObjectHideFlags: 1

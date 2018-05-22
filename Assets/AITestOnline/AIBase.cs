@@ -5,11 +5,12 @@
 *   Edited by:                            *
 *                                         *
 ******************************************/
+using System.Collections.Generic;
 using UnityEngine.Networking;
 
-public abstract class AIBase : NetworkBehaviour 
+public abstract class AIBase : NetworkBehaviour
 {
-    internal const int MAX_PLAYERCOUNT = 4;
+    
 
     /// <summary>
     /// To be executed when NPC is spawned.
@@ -49,5 +50,25 @@ public abstract class AIBase : NetworkBehaviour
     /// <param name="_obj">(Quest-)object from Player</param>
     public abstract void OnInteraction(object _obj);
 
-    
+    /// <summary>
+    /// Calculates Recieved Damage based on NPC defense
+    /// </summary>
+    /// <param name="_damage">The unmitigated Damage</param>
+    /// <param name="_damageType">Type(s) of Damage recieved</param>
+    /// <param name="_defenseList">Dictionary with the defensive Values against each Type</param>
+    /// <returns></returns>
+    public virtual float DamageCalculation(float _damage, EDamageType _damageType, Dictionary<EDamageType, float> _defenseList)
+    {
+        if(_defenseList != null && _defenseList.Count > 0)
+        foreach (KeyValuePair<EDamageType, float> Type in _defenseList)
+        {
+            if (_damageType.HasFlag(Type.Key))
+                _damage -= Type.Value;
+        }
+
+        //If Defense are higher than damage, no damage is dealt, negative damage does not heal the NPC, but it might Tickle him to death
+        return (_damage > 0) ? _damage : 0;
+    }
+
+
 }
