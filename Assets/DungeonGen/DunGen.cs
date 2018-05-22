@@ -1,4 +1,11 @@
-﻿using System.Collections.Generic;
+﻿/******************************************
+*                                         *
+*   Script made by Alexander Bloomenkamp  *
+*                                         *
+*   Edited by:  Alexander Freiberger      *
+*                                         *
+******************************************/
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -240,10 +247,11 @@ public class DunGen : NetworkBehaviour
     {
 
         for (int i = 0; i < m_DungeonATiles.Count; i++)
-        {
+        {                                               //bossraum == letzer eintrag in synchlist
             GameObject dummy = Instantiate(m_EntryRoom, m_DungeonATiles[i].pos, Quaternion.identity);
             Room dummyroom = dummy.GetComponent<Room>();
             dummyroom.CloseWalls(m_DungeonATiles[i].doors);
+            dummyroom.SpawnEnemies((m_RoomSizeX/2)-2,(m_RoomSizeZ/2)-2);
         }
     }   
 }
