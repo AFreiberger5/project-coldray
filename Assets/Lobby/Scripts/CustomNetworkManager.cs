@@ -7,59 +7,61 @@ using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.SceneManagement;
 
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+//||                                                ||\\
+//||            Script by Gregor Hempel             ||\\
+//||            23.03.2018                          ||\\
+//||            Edits:                              ||\\
+//||                                                ||\\
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+
 public class CustomNetworkManager : NetworkManager
 {
     private CharacterDummy m_dummy;
 
-    // Lobby scene use only
-    private InputField m_HostIP;
-    private InputField m_JoinIP;
-    private Button m_JoinButton;
+    // these variables are only used in the offline scene
+    private InputField m_HostIPInputField;
+    private InputField m_JoinIPInputField;
+    private Text m_JoinColorfulText;
+    private bool m_gotTheInformation = false;
 
-    private bool m_gotIt = false;
-
+    /// <summary>
+    /// procures much needed informations
+    /// </summary>
     private void Update()
     {
-        if (SceneManager.GetActiveScene().buildIndex == 0
+        if (SceneManager.GetActiveScene().name == "LobbyScene"// the lobby scene is active
             &&
-            (m_HostIP == null
+            (m_HostIPInputField == null// one of the input fields or buttons is missing
             ||
-            m_JoinIP == null
-            ||
-            m_JoinButton == null))
+            m_JoinIPInputField == null))// ""
         {
-            m_gotIt = false;
+            m_gotTheInformation = false;
 
-            LobbyInfoFeed info = FindObjectOfType<LobbyInfoFeed>();
+            LobbyInfoFeed info = FindObjectOfType<LobbyInfoFeed>();// the lobby managers dontdestroyonload prevents it from keeping the information
 
-            info = FindObjectOfType<LobbyInfoFeed>();
-            m_HostIP = info.m_GetHostIp;
-            m_JoinIP = info.m_GetJoinIp;
-            m_JoinButton = info.m_GetJoinButton;
+            info = FindObjectOfType<LobbyInfoFeed>();// procures the information carrier
+            m_HostIPInputField = info.m_GetHostIpInputField;// procures the required information
+            m_JoinIPInputField = info.m_GetJoinIpInputField;// ""
+            m_JoinColorfulText = info.m_GetJoinColorfulText;// ""
+            m_JoinIPInputField.onValueChanged.RemoveAllListeners();// savety mesure !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            m_JoinIPInputField.onValueChanged.AddListener(DisplayIpInColorfulText);
 
-            m_HostIP.text = Network.player.ipAddress;// ??????????????????????????
+            m_HostIPInputField.text = Network.player.ipAddress;// ??????????????????????????????????????????????? RIGHT IP ADRESS?????????????????????????
+            m_HostIPInputField.onValueChanged.AddListener(DisplayOwnIP);
 
-            m_dummy = FindObjectOfType<CharacterDummy>();
+            m_dummy = FindObjectOfType<CharacterDummy>();// procures the current dummy
 
-            m_gotIt = true;
-        }
-
-        if (m_gotIt)
-        {
-            if (m_JoinIP.text.Length >= 1)
-            {
-                m_JoinButton.interactable = true;
-            }
-            else
-            {
-                m_JoinButton.interactable = false;
-            }
+            m_gotTheInformation = true;
         }
     }
 
+    /// <summary>
+    /// hosts a game but limits the maximum player amount to one
+    /// </summary>
     public void SoloOnClick()
     {
-        m_dummy.DontDestroyDummyOnLoad();
+        m_dummy.DontDestroyDummyOnLoad();// allows the dummy to travel to the online scene
 
         networkAddress = "localhost";
 
@@ -68,53 +70,83 @@ public class CustomNetworkManager : NetworkManager
         StartHost();
     }
 
+    /// <summary>
+    /// hosts a game for a maximum of 4 active players
+    /// </summary>
     public void HostOnClick()
     {
-        m_dummy.DontDestroyDummyOnLoad();
+        m_dummy.DontDestroyDummyOnLoad();// allows the dummy to travel to the online scene
 
         networkAddress = "localhost";
-        //networkAddress = m_HostIP.text;
+        //networkAddress = m_HostIP.text;// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         StartHost();
     }
 
+    /// <summary>
+    /// lets the player join an active game
+    /// </summary>
     public void JoinOnClick()
     {
-        string iP;
-        if (CheckIP(m_JoinIP.text, out iP))
+        string ip;
+        if (CheckIP(m_JoinIPInputField.text, out ip))
         {
-            m_dummy.DontDestroyDummyOnLoad();
+            m_dummy.DontDestroyDummyOnLoad();// allows the dummy to travel to the online scene
 
-            //networkAddress = iP;// !!!!!!!!!!!!!!!!!!!!!!!!!!!
-            networkAddress = "127.0.0.1";
+            networkAddress = ip;// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //networkAddress = "127.0.0.1";
             StartClient();
-        }
-        else
-        {
-            m_JoinIP.text = "Invalid Ip";
         }
     }
 
+    /// <summary>
+    /// passes the network connection on to the player character
+    /// </summary>
+    /// <param the players network connection="_conn"></param>
     public override void OnServerConnect(NetworkConnection _conn)
     {
         base.OnServerConnect(_conn);
 
         print("Player ID: " + _conn.connectionId + "\n");
-        playerPrefab.GetComponent<PlayerCharacter>().m_PlayerId = _conn.connectionId;// Player Prefab gets its connectionId
+        playerPrefab.GetComponent<PlayerCharacter>().m_PlayerId = _conn.connectionId;// passes the network connection on to the player character
     }
 
+    /// <summary>
+    /// checks the ip address for possible violations
+    /// </summary>
+    /// <param ip adress="_ip"></param>
+    /// <param checked ip address="_ckecked"></param>
+    /// <returns></returns>
     private bool CheckIP(string _ip, out string _ckecked)
     {
-        System.Net.IPAddress iP;
-        if (System.Net.IPAddress.TryParse(_ip, out iP))
+        System.Net.IPAddress ip;
+        if (System.Net.IPAddress.TryParse(_ip, out ip)
+            &&
+            _ip.Length >= 1)
         {
-            _ckecked = iP.ToString();
+            _ckecked = ip.ToString();
+
             return true;
         }
         else
         {
-            _ckecked = "ERROR";
+            _ckecked = "Invalid Ip";
+            m_JoinColorfulText.text = "<i><color=red>" + _ckecked + "</color></i>";
             return false;
         }
+    }
+
+    /// <summary>
+    /// displays the ip input in a rich text
+    /// </summary>
+    /// <param ip input="_ip"></param>
+    private void DisplayIpInColorfulText(string _ip)
+    {
+        m_JoinColorfulText.text = "<color=black>" + _ip + "</color>";
+    }
+
+    private void DisplayOwnIP(string _ip)
+    {
+        m_HostIPInputField.text = Network.player.ipAddress;// ??????????????????????????????????????????????? RIGHT IP ADRESS?????????????????????????
     }
 }

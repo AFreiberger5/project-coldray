@@ -10,16 +10,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Networking;
 
 public class KevinAI : AIBase
 {
 
-    private Animator m_animator;
+
     private EAIState m_currentState;
-    private int IDliving;
-    private int IDmove;
-    private int IDattack;
-    private int IDdeath;
+
     private Helper helper;
     private NavMeshAgent m_agent;
     private Vector3[] positions;
@@ -27,6 +25,41 @@ public class KevinAI : AIBase
     private bool FoundCoffe;
     private int currentCoffePoint;
 
+    #region AnimatiorVariables
+    private Animator m_animator;
+    private int IDLiving;
+    private int IDMove;
+    private int IDFear;
+    private int IDDeath;
+    private int IDRunning;
+    #endregion
+
+    [SyncVar, SerializeField]
+    private float m_HP = -1;
+
+    private Dictionary<EDamageType, float> DefenseValues = new Dictionary<EDamageType, float>();
+
+    [ServerCallback]
+    private void Awake()
+    {
+        IDLiving = Animator.StringToHash("IsLiving");
+        IDMove = Animator.StringToHash("IsWalking");
+        IDFear = Animator.StringToHash("IsFearing");
+        IDDeath = Animator.StringToHash("IsDying");
+        IDRunning = Animator.StringToHash("IsRunning");
+
+        //Add Defense Values for all Types of DamageSources
+        #region AddDefenseValues
+
+        DefenseValues.Add(EDamageType.MELEE, 0);
+        DefenseValues.Add(EDamageType.RANGED, 0);
+        DefenseValues.Add(EDamageType.MAGICAL, 0);
+        DefenseValues.Add(EDamageType.PHYSICAL, 0);
+        DefenseValues.Add(EDamageType.TRUE, 0);
+        #endregion
+    }
+
+    [ServerCallback]
     void Start()
     {
         positions = new Vector3[5];
@@ -35,13 +68,14 @@ public class KevinAI : AIBase
         m_agent.destination = transform.position;
         m_agent.autoBraking = false;
     }
-    
+
+    [ServerCallback]
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-            RunAway();
+        if (!isLocalPlayer)
+            NPCDecision();
 
-        if (SearchingCoffe && m_agent.remainingDistance < 0.1f && !m_agent.pathPending )
+        if (SearchingCoffe && m_agent.remainingDistance < 0.1f && !m_agent.pathPending)
         {
             SearchCoffe();
         }
@@ -55,6 +89,7 @@ public class KevinAI : AIBase
 
     private void SearchCoffe()
     {
+        //When Kevin gets hit, he panicks and tries to quickly find all his Cofffe(TM) to hide it
 
         if (currentCoffePoint >= positions.Length)
         {
@@ -62,14 +97,22 @@ public class KevinAI : AIBase
             FoundCoffe = true;
             return;
         }
-
         m_agent.destination = positions[currentCoffePoint];
-
+        while (m_agent.pathPending)
+        { }
+        if (m_agent.path == null)
+        {
+            NavMeshHit NHit;
+            NavMesh.SamplePosition(positions[currentCoffePoint],out NHit,5,NavMesh.AllAreas); //Get neat point if random point was invalid
+            m_agent.destination = NHit.position;
+        }
 
         currentCoffePoint++;
     }
     protected override void KillNPC()
     {
+        //DeathLogic not executed directly here, incase Death Animations get added
+        OnNPCDeath();
 
     }
 
@@ -80,14 +123,21 @@ public class KevinAI : AIBase
 
     protected override void OnNPCSpawn()
     {
+        m_currentState = EAIState.ALIVE | EAIState.IDLE;
 
+        if (m_HP == -1)
+            m_HP = 100;
     }
+
 
     protected override void OnNPCDeath()
     {
-
+        m_currentState = EAIState.DEAD;
+        helper.SpawnLoot(EDropTable.KEVIN, transform.position);
+        NetworkServer.Destroy(gameObject);
     }
 
+    [Server]
     private void RunAway()
     {
         // create a path by finding 5 waypoints, taken from current position/direction
@@ -107,7 +157,21 @@ public class KevinAI : AIBase
             positions[j] = transform.TransformPoint(positions[j]);
         }
         m_agent.enabled = true;
-        m_agent.destination = transform.TransformPoint(positions[0]);
+        //ToDo: check if point is off Navmesh -> move away from edges
+        NavMeshHit NMHit = new NavMeshHit();
+        for (int i = 0; i < 3; i++)
+        {
+            NavMeshHit NHit;
+            if (NavMesh.SamplePosition(transform.TransformPoint(positions[0]), out NHit, 2, NavMesh.AllAreas))
+            {
+                NMHit = NHit;
+                i = 3;
+            }
+        }
+        if (NMHit.position == null)
+            m_agent.destination = Vector3.zero;
+        else
+            m_agent.destination = NMHit.position;
     }
 
     /// <summary>
@@ -118,6 +182,7 @@ public class KevinAI : AIBase
         throw new System.NotImplementedException();
     }
 
+    [Server]
     /// <summary>
     /// Called from Player when interacting with the NPC for Combat and Quests
     /// </summary>
@@ -125,7 +190,18 @@ public class KevinAI : AIBase
     /// <param name="_damageType">Type of Attack (Use NONE if not an attack)</param>
     public override void OnInteraction(float _value, EDamageType _damageType)
     {
-        throw new System.NotImplementedException();
+        SearchingCoffe = true;
+
+        if (!_damageType.HasFlag(EDamageType.NONE))
+        {
+            m_HP -= base.DamageCalculation(_value, _damageType, DefenseValues);
+            if (m_HP <= 0)
+            {
+                OnNPCDeath();
+            }
+        }
+
+
     }
 
     /// <summary>

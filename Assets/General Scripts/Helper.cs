@@ -11,6 +11,7 @@ using System;
 using UnityEngine;
 
 #region Extensions
+
 // Since unity/mono does not support .net 4 or higher I had to write this
 // to avoid having to manually check Flags everytime
 public static class EnumExtensions
@@ -73,10 +74,15 @@ public enum EDamageType
     //Percent damage relativ to current HP of NPC
     PERCENTCURRENT = 64,
 }
-    #endregion
+#endregion
+
 #region Functions
 public class Helper : MonoBehaviour
 {
+    //Max playercount, used for Balancing, spawning etc.
+    private static readonly int m_MAXPLAYERCOUNT = 4;
+
+    internal static int MAX_PLAYERCOUNT { get { return m_MAXPLAYERCOUNT; } }
 
     public void SpawnLoot(EDropTable _dropTable, Vector3 _position)
     {
