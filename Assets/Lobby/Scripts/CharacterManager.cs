@@ -5,6 +5,14 @@ using System.IO;
 using UnityEngine.UI;
 using System.Linq;
 
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+//||                                                ||\\
+//||            Script by Gregor Hempel             ||\\
+//||            23.03.2018                          ||\\
+//||            Edits:                              ||\\
+//||                                                ||\\
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+
 public class CharacterManager : MonoBehaviour
 {
     public GameObject m_CharacterSelectionScroller;

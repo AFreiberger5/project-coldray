@@ -3,6 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+//||                                                ||\\
+//||            Script by Gregor Hempel             ||\\
+//||            23.03.2018                          ||\\
+//||            Edits:                              ||\\
+//||                                                ||\\
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+
 /// <summary>
 /// this class stores all information relevant to the player character
 /// </summary>

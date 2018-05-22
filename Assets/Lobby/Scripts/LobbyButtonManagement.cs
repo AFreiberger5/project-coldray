@@ -8,6 +8,14 @@ using UnityEngine.SceneManagement;
 using System.IO;
 using System.Text.RegularExpressions;
 
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+//||                                                ||\\
+//||            Script by Gregor Hempel             ||\\
+//||            23.03.2018                          ||\\
+//||            Edits:                              ||\\
+//||                                                ||\\
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+
 public class LobbyButtonManagement : MonoBehaviour
 {
     [Header("Requirements")]
@@ -30,7 +38,7 @@ public class LobbyButtonManagement : MonoBehaviour
     private bool m_awake = false;
 
     // character name restrictions
-    private Regex m_rgx = new Regex(@"^[a-zA-Z0-9]* ?[a-zA-Z0-9]*$");
+    private Regex m_rgx = new Regex(@"^[a-zA-Z0-9]+ ?[a-zA-Z0-9]*$");
     private int m_characterMin = 3;
     private int m_characterMax = 10;
 
@@ -105,6 +113,7 @@ public class LobbyButtonManagement : MonoBehaviour
         m_colorfulText = m_NameInputField.GetComponentsInChildren<Text>().Where(o => o.gameObject.name == "Colorful Text").SingleOrDefault();
 
         m_NameInputField.characterLimit = m_characterMax;
+        m_NameInputField.onValueChanged.RemoveAllListeners();// savety mesure
         m_NameInputField.onValueChanged.AddListener(DisplayColorfulString);
 
         m_SelectedLast = null;
@@ -118,6 +127,8 @@ public class LobbyButtonManagement : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        GameObject csg = EventSystem.current.currentSelectedGameObject;
+
         if (m_awake
             &&
             EventSystem.current.currentSelectedGameObject != null
@@ -423,6 +434,6 @@ public class LobbyButtonManagement : MonoBehaviour
     /// <param string to be displayed in red="_string"></param>
     private void DisplayStringInRed(string _string)
     {
-        m_colorfulText.text = "<b><color=red>" + _string + "</color></b>";
+        m_colorfulText.text = "<i><color=red>" + _string + "</color></i>";
     }
 }

@@ -4,6 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+//||                                                ||\\
+//||            Script by Gregor Hempel             ||\\
+//||            23.03.2018                          ||\\
+//||            Edits:                              ||\\
+//||                                                ||\\
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+
 public class CharacterDummy : MonoBehaviour
 {
     public string m_DummyName;
@@ -122,10 +130,10 @@ public class CharacterDummy : MonoBehaviour
 
             // gets the male animator
             m_DummyAnimator.runtimeAnimatorController =
-                Resources.Load("Prefabs/M_Humanoid/Female_Human",
+                Resources.Load("Prefabs/F_Humanoid/Player_Character",
                 typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
 
-            m_DummyAnimator.Play("Idle");
+            m_DummyAnimator.Play("idle");
         }
         else// female
         {
@@ -133,10 +141,10 @@ public class CharacterDummy : MonoBehaviour
 
             // gets the female animator
             m_DummyAnimator.runtimeAnimatorController =
-                Resources.Load("Prefabs/F_Humanoid/Female_Human",
+                Resources.Load("Prefabs/F_Humanoid/Player_Character",
                 typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
 
-            m_DummyAnimator.Play("Idle");
+            m_DummyAnimator.Play("idle");
         }
 
         // iterates the entire body and instantiates bodyparts according to the gender
