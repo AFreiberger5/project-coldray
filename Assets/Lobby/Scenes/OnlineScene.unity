@@ -640,9 +640,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TextureAtlas: {fileID: 2100000, guid: 2adc05e89e1ac854e91a6f8d9389ba02, type: 2}
-  m_TreePrefab: {fileID: 1825402383431754, guid: d7a440f10790330428f19b36a2c1be9f,
+  m_TreePrefab: {fileID: 1389371529969874, guid: 7006e09f72281ed4fb73707b305a5078,
     type: 2}
-  m_PortalBPrefab: {fileID: 1407323624087402, guid: 1b1badbc2f0002c4ab71185f9c4a4ca9,
+  m_PortalBPrefab: {fileID: 1519280447558174, guid: 2959c2bcb4f58534fb57c14c29646419,
     type: 2}
   m_PortalDungeonIn: {fileID: 1730430161023572, guid: a4ef24ed6f07fac479519f66f2beda12,
     type: 2}
