@@ -17,8 +17,8 @@ using UnityEngine;
 [Serializable]
 public class CharacterStats
 {
-    public string m_StatsName; 
-    public int[] m_Model = new int[9]
+    public string m_StatsName;
+    public int[] m_StatsModel = new int[9]
     {
         0,// gender
         0,// skin color
@@ -31,9 +31,13 @@ public class CharacterStats
         0//  eye color
     };
 
-    public CharacterStats(string _name, int[] _model)
+    public float m_StatsCurrentHP;
+
+    public CharacterStats(string _name, int[] _model, float _currentHP)
     {
         m_StatsName = _name;
-        m_Model = _model;
+        m_StatsModel = _model;
+
+        m_StatsCurrentHP = _currentHP;
     }
 }

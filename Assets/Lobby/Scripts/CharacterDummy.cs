@@ -33,6 +33,8 @@ public class CharacterDummy : MonoBehaviour
     public Text m_ModeInspectorName;
     public string m_SelectedCharacter = "";
 
+    #region Player Anchors
+
     public Transform m_DummyAnchorHead;
     public Transform m_DummyAnchorBody;
     public Transform m_DummyAnchorLArm1;
@@ -47,6 +49,8 @@ public class CharacterDummy : MonoBehaviour
     public Transform m_DummyAnchorRLeg1;
     public Transform m_DummyAnchorRLeg2;
     public Transform m_DummyAnchorRLeg3;
+
+    #endregion
 
     private GameObject[] m_DummyCustomisationObjects = new GameObject[8];
     private GameObject[] m_DummyBody = new GameObject[13];
@@ -94,7 +98,7 @@ public class CharacterDummy : MonoBehaviour
     /// </summary>
     public void SaveDummy()
     {
-        CharacterStats cs = new CharacterStats(m_DummyName, m_DummyModel);
+        CharacterStats cs = new CharacterStats(m_DummyName, m_DummyModel, 100.0f);
         SaveLoadManager.SaveCharacter(cs);
     }
 
@@ -109,7 +113,7 @@ public class CharacterDummy : MonoBehaviour
         string selectedCharacter = _selectedCharacter;
         CharacterStats cs = SaveLoadManager.LoadCharacter(selectedCharacter);
         m_DummyName = cs.m_StatsName;
-        m_DummyModel = cs.m_Model;
+        m_DummyModel = cs.m_StatsModel;
         
         BuildDummyBody();
         BuildEntireDummyCustomisation();
