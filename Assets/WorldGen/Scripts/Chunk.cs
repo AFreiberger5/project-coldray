@@ -81,8 +81,7 @@ public class Chunk
         FileStream file = File.Open(chunkFile, FileMode.OpenOrCreate);
         m_blockData = new BlockData(m_ChunkData);
         bf.Serialize(file, m_blockData);
-        file.Close();
-        // Debug.Log("Saving chunk to File:" + chunkFile);
+        file.Close();        
     }
 
 
@@ -141,37 +140,37 @@ public class Chunk
                         if (Utils.FBM3D(worldX, worldY, worldZ, 0.02f, 4) < 0.42f && worldY < 16)
                         {
                             m_ChunkData[x, y, z] = new DiamondBlock(pos, m_Chunk.gameObject, this, m_CubeAtlas);
-                            m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.DIAMOND, new Vector3(pos.x, pos.y + 1, pos.z), m_Chunk.gameObject, this, m_CubeAtlas);
+                            m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.DIAMOND, new Vector3(pos.x, pos.y + 1, pos.z),new Vector3 (worldX,worldY,worldZ), m_Chunk.gameObject, this, m_CubeAtlas);
 
                         }
                         else if (Utils.FBM3D(worldX, worldY, worldZ, 0.02f, 2) < 0.40f && worldY < 16)
                         {
                             m_ChunkData[x, y, z] = new RedstoneBlock(pos, m_Chunk.gameObject, this, m_CubeAtlas);
-                            m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.REDSTONE, new Vector3(pos.x, pos.y + 1, pos.z), m_Chunk.gameObject, this, m_CubeAtlas);
+                            m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.REDSTONE, new Vector3(pos.x, pos.y + 1, pos.z), new Vector3(worldX, worldY, worldZ), m_Chunk.gameObject, this, m_CubeAtlas);
                         }
                         else
                         {
                             m_ChunkData[x, y, z] = new StoneBlock(pos, m_Chunk.gameObject, this, m_CubeAtlas);
-                            m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.STONE, new Vector3(pos.x, pos.y + 1, pos.z), m_Chunk.gameObject, this, m_CubeAtlas);
+                            m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.STONE, new Vector3(pos.x, pos.y + 1, pos.z), new Vector3(worldX, worldY, worldZ), m_Chunk.gameObject, this, m_CubeAtlas);
                         }
                     }
                     else if (worldY == Utils.GenerateHeight(worldX - 1, worldZ - 1)) // Grass equals the heightvalue returned by the function 
                     {
                         m_ChunkData[x, y, z] = new GrassBlock(pos, m_Chunk.gameObject, this, m_CubeAtlas);
-                        m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.GRASS, new Vector3(pos.x, pos.y + 1, pos.z), m_Chunk.gameObject, this, m_CubeAtlas);
+                        m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.GRASS, new Vector3(pos.x, pos.y + 1, pos.z), new Vector3(worldX, worldY, worldZ), m_Chunk.gameObject, this, m_CubeAtlas);
                     }
                     else if (worldY < Utils.GenerateHeight(worldX, worldZ))
                     {
                         m_ChunkData[x, y, z] = new DirtBlock(pos, m_Chunk.gameObject, this, m_CubeAtlas);
-                        m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.DIRT, new Vector3(pos.x, pos.y + 1, pos.z), m_Chunk.gameObject, this, m_CubeAtlas);
+                        m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.DIRT, new Vector3(pos.x, pos.y + 1, pos.z), new Vector3(worldX, worldY, worldZ), m_Chunk.gameObject, this, m_CubeAtlas);
                     }
                     else
                     {
                         m_ChunkData[x, y, z] = new AirBlock(pos, m_Chunk.gameObject, this, m_CubeAtlas);
-                        m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.AIR, new Vector3(pos.x, pos.y + 1, pos.z), m_Chunk.gameObject, this, m_CubeAtlas);
+                        m_ChunkData[x, y + 1, z] = new PropPoint(Block.EBlockType.AIR, new Vector3(pos.x, pos.y + 1, pos.z), new Vector3(worldX, worldY, worldZ), m_Chunk.gameObject, this, m_CubeAtlas);
                     }
 
-                    //m_CurrentStatus = EStatus.DRAW;
+                    m_CurrentStatus = EStatus.DRAW;
                 }
         // Save();
     }
@@ -192,7 +191,7 @@ public class Chunk
         MeshCollider collider = m_Chunk.gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
         collider.sharedMesh = m_Chunk.transform.GetComponent<MeshFilter>().mesh;
 
-        //m_CurrentStatus = EStatus.DONE;
+        m_CurrentStatus = EStatus.DONE;
 
     }
 
