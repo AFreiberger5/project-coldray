@@ -112,7 +112,10 @@ public class Room : NetworkBehaviour
                 foreach (PlayerController PC in Turret.GetComponent<TurretAI>().m_Players)
                 {
                     // ToDo: remove player from list if Player.id = other.id
-                    //if(PC.)
+                    if (PC.GetComponent<PlayerCharacter>().m_PlayerId == other.GetComponent<PlayerCharacter>().m_PlayerId)
+                        Turret.GetComponent<TurretAI>().m_Players.Remove(PC);
+                    if (Turret.GetComponent<TurretAI>().m_Players.Count <= 0)
+                        Turret.SetActive(false);
                 }
 
             }

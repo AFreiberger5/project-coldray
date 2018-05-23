@@ -22,7 +22,7 @@ public class BansheeAI : AIBase
     [SyncVar]
     private EAIState m_currentState;
     [SyncVar]
-    private EAIState previousState;
+    private EAIState m_previousState;
     private List<GameObject> m_TargetPlayers;
     [SyncVar]//Testing if this is necessary or can help with interpolation/lag/etc.
     private GameObject m_Target;
@@ -31,13 +31,12 @@ public class BansheeAI : AIBase
     [SerializeField]
     private int m_Damage = 15;
 
-
     #region AnimatiorVariables
     private NetworkAnimator m_animator;
-    private int IDliving;
-    private int IDmove;
-    private int IDattack;
-    private int IDdeath;
+    private int IDLiving;
+    private int IDMove;
+    private int IDAttack;
+    private int IDDeath;
     #endregion
     private Helper helper;
 
@@ -65,10 +64,10 @@ public class BansheeAI : AIBase
         m_agent = GetComponent<NavMeshAgent>();
         m_animator = GetComponent<NetworkAnimator>();
         //  m_animator.SetParameterAutoSend(0, true);
-        IDliving = Animator.StringToHash("isliving");
-        IDmove = Animator.StringToHash("ismoving");
-        IDattack = Animator.StringToHash("isattacking");
-        IDdeath = Animator.StringToHash("isdied");
+        IDLiving = Animator.StringToHash("isliving");
+        IDMove = Animator.StringToHash("ismoving");
+        IDAttack = Animator.StringToHash("isattacking");
+        IDDeath = Animator.StringToHash("isdied");
         helper = new Helper();
 
     }
@@ -76,10 +75,9 @@ public class BansheeAI : AIBase
     [ServerCallback]
     void Update()
     {
-        if (!isLocalPlayer)
-            NPCDecision();
+        NPCDecision();
 
-        if (m_currentState != previousState)
+        if (m_currentState != m_previousState)
             ChangeAnimations();
     }
 
@@ -238,7 +236,7 @@ public class BansheeAI : AIBase
 
         if (m_hitdistance * m_hitdistance <= (transform.position - m_Target.transform.position).sqrMagnitude)
         {
-            m_Target.GetComponent<PlayerController>().OnPlayerTakeDamage(m_Damage, EDamageType.MELEE | EDamageType.PHYSICAL);
+            //ToDo: Wait for Player Damage Calcutaion and implement it here
         }
     }
 
@@ -247,32 +245,32 @@ public class BansheeAI : AIBase
         //Change animations based on current States
 
         if (m_currentState.HasFlag(EAIState.ALIVE))
-            m_animator.animator.SetBool(IDliving, true);
+            m_animator.animator.SetBool(IDLiving, true);
         if (m_currentState.HasFlag(EAIState.IDLE))
         {
-            m_animator.animator.SetBool(IDmove, false);
-            m_animator.animator.SetBool(IDattack, false);
-            m_animator.animator.SetBool(IDdeath, false);
+            m_animator.animator.SetBool(IDMove, false);
+            m_animator.animator.SetBool(IDAttack, false);
+            m_animator.animator.SetBool(IDDeath, false);
         }
         if (m_currentState.HasFlag(EAIState.MOVING))
-            m_animator.animator.SetBool(IDmove, true);
+            m_animator.animator.SetBool(IDMove, true);
         if (m_currentState.HasFlag(EAIState.ATTACKING))
-            m_animator.animator.SetBool(IDattack, true);
-        if (!m_currentState.HasFlag(EAIState.ATTACKING) && previousState.HasFlag(EAIState.ATTACKING))
-            m_animator.animator.SetBool(IDattack, false);
+            m_animator.animator.SetBool(IDAttack, true);
+        if (!m_currentState.HasFlag(EAIState.ATTACKING) && m_previousState.HasFlag(EAIState.ATTACKING))
+            m_animator.animator.SetBool(IDAttack, false);
         if (m_currentState.HasFlag(EAIState.DYING))
         {
-            m_animator.animator.SetBool(IDliving, false);
+            m_animator.animator.SetBool(IDLiving, false);
 
             //now called via animation event
             //KillNPC();
         }
         if (m_currentState.HasFlag(EAIState.DEAD))
         {
-            m_animator.animator.SetBool(IDdeath, true);
+            m_animator.animator.SetBool(IDDeath, true);
         }
 
-        previousState = m_currentState;
+        m_previousState = m_currentState;
 
     }
 
