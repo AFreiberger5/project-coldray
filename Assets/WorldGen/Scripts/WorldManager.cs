@@ -95,6 +95,7 @@ public class WorldManager : NetworkBehaviour
     void CmdSetWorldBool(bool _b)
     {
         m_OverworldBuilt = _b;
+        GameObject.FindObjectOfType<World>().InstantiateProps();
     }
 
     void OnChangeWorld(bool _b)

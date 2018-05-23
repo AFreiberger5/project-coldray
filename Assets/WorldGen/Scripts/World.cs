@@ -40,6 +40,7 @@ public class World : NetworkBehaviour
     public bool m_newWorld = true;
     private bool m_building = false;
     public SyncListPropInfo m_WorldProps = new SyncListPropInfo();
+    private List<PropInfo> m_propFlushList = new List<PropInfo>();
     private Dictionary<Vector3, byte> m_allPropPoints = new Dictionary<Vector3, byte>();
     private List<Vector3> m_freePropPoints = new List<Vector3>();
     private List<Vector3> m_occupiedPropPoints = new List<Vector3>();
@@ -111,36 +112,33 @@ public class World : NetworkBehaviour
             yield return null;
         }
 
-        if (isServer)
+
+        foreach (KeyValuePair<string, Chunk> c in CHUNKS)
         {
-            foreach (KeyValuePair<string, Chunk> c in CHUNKS)
-            {
-                IsolatePropPoints(c.Value.m_Chunk, c.Value.m_ChunkData);
-                //c.Value.Save();
-                yield return null;
-                //Instantiate(m_PortalBPrefab, new Vector3(WorldManager.GetInstance().GetWorldPos().x, 1, WorldManager.GetInstance().GetWorldPos().z), Quaternion.identity);
-                //Instantiate(m_PortalDungeonIn, new Vector3(WorldManager.GetInstance().GetWorldPos().x - 10, 1, WorldManager.GetInstance().GetWorldPos().z - 10), Quaternion.identity);
+            IsolatePropPoints(c.Value.m_Chunk, c.Value.m_ChunkData);
+            //c.Value.Save();
+            yield return null;
+            //Instantiate(m_PortalBPrefab, new Vector3(WorldManager.GetInstance().GetWorldPos().x, 1, WorldManager.GetInstance().GetWorldPos().z), Quaternion.identity);
+            //Instantiate(m_PortalDungeonIn, new Vector3(WorldManager.GetInstance().GetWorldPos().x - 10, 1, WorldManager.GetInstance().GetWorldPos().z - 10), Quaternion.identity);
 
-            }
-            SpawnPortal(0, 6);
-            yield return null;
-            SpawnPortal(1, 6);
-            yield return null;
-            SpawnProp(2, 1, 5);
-            yield return null;
-            // CmdInstProps();
         }
-        m_surface = GetComponent<NavMeshSurface>();
-        m_surface.BuildNavMesh();
-        WorldManager.GetInstance().ReportWorldBuilt(true);
+        SpawnPortal(0, 6);
         yield return null;
-
+        SpawnPortal(1, 6);
+        yield return null;
+        SpawnProp(2, 0, 5);
+        yield return null;
     }
 
     [Command]
-    void CmdPopulateSyncList(Vector3 _propPos, byte _prefab)
+    void CmdPopulateSyncList()
     {
-        m_WorldProps.Add(new PropInfo(_propPos, _prefab));
+        foreach (PropInfo p in m_propFlushList)
+        {
+            m_WorldProps.Add(p);
+        }
+        ClearLists();
+        WorldManager.GetInstance().ReportWorldBuilt(true);
     }
 
     [Command]
@@ -156,13 +154,15 @@ public class World : NetworkBehaviour
         InstantiateProps();
     }
 
-    void InstantiateProps()
+    public void InstantiateProps()
     {
         foreach (PropInfo p in m_WorldProps)
         {
             Instantiate(m_PropPrefabs[p.PrefabIndex], p.WorldPosition, Quaternion.identity);
-
         }
+
+        m_surface = GetComponent<NavMeshSurface>();
+        m_surface.BuildNavMesh();
     }
 
     void IsolatePropPoints(GameObject _c, Block[,,] _b)
@@ -186,7 +186,7 @@ public class World : NetworkBehaviour
             b = CheckPropSpace(temp, _objRadius);
             if (b == true)
             {
-                CmdPopulateSyncList(new Vector3(temp.x, temp.y + 1, temp.z), _prefabIndex);
+                m_propFlushList.Add(new PropInfo(new Vector3(temp.x, temp.y + 1, temp.z), _prefabIndex));
                 for (int x = 0; x < _objRadius; x++)
                 {
                     for (int z = 0; z < _objRadius; z++)
@@ -225,7 +225,7 @@ public class World : NetworkBehaviour
                         int rnd = Random.Range(1, 101);
                         if (rnd <= _probability)
                         {
-                            //CmdPopulateSyncList(v, _prefabIndex);
+                            m_propFlushList.Add(new PropInfo(v, _prefabIndex));
                             for (int x = 0; x < _objRadius; x++)
                             {
                                 for (int z = 0; z < _objRadius; z++)
@@ -248,6 +248,7 @@ public class World : NetworkBehaviour
                 }
             }
         }
+        CmdPopulateSyncList();
     }
 
     void ClearLists()
@@ -255,6 +256,7 @@ public class World : NetworkBehaviour
         m_freePropPoints.Clear();
         m_occupiedPropPoints.Clear();
         m_allPropPoints.Clear();
+        m_propFlushList.Clear();
     }
 
     bool CheckPropSpace(Vector3 _propPos, int _radius)
