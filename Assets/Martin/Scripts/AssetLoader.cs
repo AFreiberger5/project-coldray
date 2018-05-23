@@ -9,8 +9,9 @@ public class AssetLoader : MonoBehaviour
     //	O---------------------------------------O
     //	O	Author:	Martin Lohse				O
     //	O	Date:	07.04.2018					O
-    //	O	Edited:								O
-    //	O	Description:						O
+    //	O	Edited: X							O
+    //	O	Description: Holds all the Icons    O
+    //	O	             for the Items.         O
     //	O---------------------------------------O
     //	O	Name:								O
     //	O	Date:								O
@@ -19,15 +20,6 @@ public class AssetLoader : MonoBehaviour
     //	O										O
     //	#########################################
 
+    // List for all the Icons in the Game
     public List<Sprite> m_Sprites;
-
-	// Use this for initialization
-	void Start () 
-	{
-	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
-	}
 }
