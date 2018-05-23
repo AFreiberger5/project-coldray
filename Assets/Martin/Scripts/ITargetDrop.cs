@@ -16,12 +16,17 @@ public interface ITargetDrop
     //	O---------------------------------------O
     //	O	Name:								O
     //	O	Date:								O
-    //  O 	Chanes:								O
+    //  O 	Changes:							O
     //	O---------------------------------------O
     //	O										O
     //	#########################################
 
+    // Does the Slot accept the Dragged-Object?
     bool Accept(IDragable _Dragged);
+
+    // Need the Items to be changed?
     bool NeedToChange();
+
+    // Do stuff once the Dragging-Process is done.
     void OnDragFinished(GameObject _DraggedObject);
 }

@@ -118,6 +118,10 @@ GameObject:
   - component: {fileID: 114560652046424898}
   - component: {fileID: 54693548076679718}
   - component: {fileID: 136942501834531956}
+<<<<<<< HEAD
+=======
+  - component: {fileID: 114253539487770712}
+>>>>>>> Martin
   m_Layer: 0
   m_Name: PlayerCharacter
   m_TagString: Player
@@ -626,6 +630,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PlayerCamera: {fileID: 20097329478119194}
   m_PlayerBodyT: {fileID: 4930290019003850}
+<<<<<<< HEAD
+=======
+--- !u!114 &114253539487770712
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1351405308318440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beee0d05ffd87864c840a77c62067dd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ItemManager: {fileID: 0}
+  m_GridPanel: {fileID: 0}
+  m_InventoryObject: {fileID: 0}
+  m_SlotPrefab: {fileID: 1691245370461480, guid: 71d6395ca2b879a4c956ab886fa1e575,
+    type: 2}
+  m_ItemPrefab: {fileID: 1656648918381208, guid: 5350f5ed6de96074db37e258bf67147d,
+    type: 2}
+  m_ItemToOverwrite: {fileID: 0}
+  m_inventory: []
+  m_SlotCount: 50
+  m_SlotsPerRow: 10
+>>>>>>> Martin
 --- !u!114 &114409414885979112
 MonoBehaviour:
   m_ObjectHideFlags: 1

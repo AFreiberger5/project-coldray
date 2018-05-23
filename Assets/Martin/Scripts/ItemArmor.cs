@@ -21,56 +21,48 @@ public class ItemArmor : Item
     //	O										O
     //	#########################################
 
+    // The ID of the Armor-Item.
     public int m_ArmorID;
 
-    private bool m_IsEquipt;
-
-    public ItemArmor(int _ArmorID, string _ArmorName, string _ArmorDescription, int _ArmorStackSize) : base(_ArmorName, _ArmorDescription, _ArmorStackSize)
+    /// <summary>
+    /// Constructor of the Armor-Items.
+    /// </summary>
+    /// <param name="_ArmorID"></param>
+    /// <param name="_ArmorName"></param>
+    /// <param name="_ArmorDescription"></param>
+    /// <param name="_ArmorStackSize"></param>
+    /// <param name="_ArmorRecipes"></param>
+    public ItemArmor(int _ArmorID, string _ArmorName, string _ArmorDescription, int _ArmorStackSize, params Recipe[] _ArmorRecipes) : base(_ArmorName, _ArmorDescription, _ArmorStackSize, _ArmorRecipes)
     {
+        m_ListID = 1;
         m_ArmorID = _ArmorID;
-
-        //Once the Armor is created or dropped, it's not automaticly equiped.
-        m_IsEquipt = false;
     }
 
-	// Use this for initialization
-	void Start () 
-	{
-		
-	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
-		
-	}
-
+    // Checks if the Left Mouse-Button is clicked.
     public override void OnMouseLeftClick()
     {
     }
 
+    // Checks if the Middle Mouse-Button is clicked.
     public override void OnMouseMiddleClick()
     {
     }
 
+    // Checks if the Right Mouse-Button is clicked.
     public override void OnMouseRightClick()
     {
-        // Is the Armor is in the Players Hand it should be armored!
     }
 
-    /// <summary>
-    /// Attachs or equips the Item to the virtual Player.
-    /// </summary>
-    public void Equip()
+    // Returns a string containing all the needed data of an Item.
+    public override string GetSerializable()
     {
-        m_IsEquipt = true;
-    }
+        string S = "";
 
-    /// <summary>
-    /// Detaches or unequips the Item from the virtual Player.
-    /// </summary>
-    public void UnEquip()
-    {
-        m_IsEquipt = false;
+        S += this.m_ListID;
+        S += "~";
+        S += this.m_ArmorID;
+        S += "~";
+
+        return S;
     }
 }
