@@ -22,20 +22,34 @@ public class IDP : MonoBehaviour, ITargetDrop
     //	O										O
     //	#########################################
 
+    /// <summary>
+    /// Is the Slot-Object accepting the Draggable?
+    /// </summary>
+    /// <param name="_Draggable"></param>
+    /// <returns></returns>
     public bool Accept(IDragable _Draggable)
     {
-        // Here are all the Conditions, that define the circumstances under witch the 
-        // Drag is accepted.
-        return true;
+            // It always does :D
+            return true;
     }
 
+    /// <summary>
+    /// Is there a need to change the Items?
+    /// </summary>
+    /// <returns></returns>
     public bool NeedToChange()
     {
+        // returns, if the Item has a IDragable somewhere.
         return GetComponentInChildren<IDragable>() != null;
     }
 
+    /// <summary>
+    /// When the Process of Dragging is finished.
+    /// </summary>
+    /// <param name="_DraggedObject"></param>
     public void OnDragFinished(GameObject _DraggedObject)
     {
+        // Reset the Anchor-Position of the Dragged-Object.
         _DraggedObject.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
     }
 }

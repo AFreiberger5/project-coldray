@@ -21,5 +21,6 @@ public interface IDragable
     //	O										O
     //	#########################################
 
+    // Returns the Draggable GameObject
     GameObject gameObject { get; }
 }

@@ -5,11 +5,12 @@ using UnityEngine;
 public class PropPoint : Block
 {
 
-    public PropPoint(EBlockType _type, Vector3 _pos, GameObject _parent, Chunk _owner, Material _atlas)
+    public PropPoint(EBlockType _type, Vector3 _pos,Vector3 _worldPos, GameObject _parent, Chunk _owner, Material _atlas)
     {
         m_BlockType = EBlockType.PROP;
         m_parent = _parent;
-        m_position = _pos;
+        m_Position = _pos;
+        m_WorldPos = _worldPos;
         m_owner = _owner;
         m_Atlas = _atlas;
         m_HasMesh = false;
@@ -27,13 +28,13 @@ public class PropPoint : Block
 
     public override void Draw()
     {
-        if (!HasSolidNeighbour((int)m_position.x, (int)m_position.y, (int)m_position.z + 1))
+        if (!HasSolidNeighbour((int)m_Position.x, (int)m_Position.y, (int)m_Position.z + 1))
             CreateQuad(ECubeside.FRONT);
-        if (!HasSolidNeighbour((int)m_position.x, (int)m_position.y, (int)m_position.z - 1))
+        if (!HasSolidNeighbour((int)m_Position.x, (int)m_Position.y, (int)m_Position.z - 1))
             CreateQuad(ECubeside.BACK);        
-        if (!HasSolidNeighbour((int)m_position.x - 1, (int)m_position.y, (int)m_position.z))
+        if (!HasSolidNeighbour((int)m_Position.x - 1, (int)m_Position.y, (int)m_Position.z))
             CreateQuad(ECubeside.LEFT);
-        if (!HasSolidNeighbour((int)m_position.x + 1, (int)m_position.y, (int)m_position.z))
+        if (!HasSolidNeighbour((int)m_Position.x + 1, (int)m_Position.y, (int)m_Position.z))
             CreateQuad(ECubeside.RIGHT);
     }
 
@@ -47,9 +48,9 @@ public class PropPoint : Block
         {  //block in a neighbouring chunk
 
             Vector3 neighbourChunkPos = this.m_parent.transform.position +
-                                        new Vector3((_x - (int)m_position.x) * World.CHUNKSIZE,
-                                                    (_y - (int)m_position.y) * World.CHUNKSIZE,
-                                                    (_z - (int)m_position.z) * World.CHUNKSIZE);
+                                        new Vector3((_x - (int)m_Position.x) * World.CHUNKSIZE,
+                                                    (_y - (int)m_Position.y) * World.CHUNKSIZE,
+                                                    (_z - (int)m_Position.z) * World.CHUNKSIZE);
             string neighbourName = World.BuildChunkName(neighbourChunkPos);
 
             _x = ConvertBlockIndexToLocal(_x);
@@ -135,7 +136,7 @@ public class PropPoint : Block
         mesh.RecalculateBounds();
 
         GameObject quad = new GameObject("Quad");
-        quad.transform.position = m_position;
+        quad.transform.position = m_Position;
         quad.transform.parent = this.m_parent.transform;
 
         MeshFilter meshFilter = (MeshFilter)quad.AddComponent(typeof(MeshFilter));

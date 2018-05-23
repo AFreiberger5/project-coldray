@@ -11,7 +11,8 @@ public class Block
     public EBlockType m_BlockType;
     public EBlockType m_RootBlock;
     public Material m_Atlas;
-    public Vector3 m_position;
+    public Vector3 m_Position;
+    public Vector3 m_WorldPos;
     public bool m_IsSolid;
     public bool m_HasMesh;
     protected GameObject m_parent;
@@ -23,7 +24,7 @@ public class Block
     {
         m_BlockType = _b;
         m_parent = _p;
-        m_position = _pos;
+        m_Position = _pos;
         m_owner = _owner;
         m_Atlas = _atlas;
         m_HasMesh = true;
@@ -132,7 +133,7 @@ public class Block
         mesh.RecalculateTangents();
 
         GameObject quad = new GameObject("Quad");
-        quad.transform.position = m_position;
+        quad.transform.position = m_Position;
         quad.transform.parent = this.m_parent.transform;
 
         MeshFilter meshFilter = (MeshFilter)quad.AddComponent(typeof(MeshFilter));
@@ -171,9 +172,9 @@ public class Block
         {  //block in a neighbouring chunk
 
             Vector3 neighbourChunkPos = this.m_parent.transform.position +
-                                        new Vector3((_x - (int)m_position.x) * World.CHUNKSIZE,
-                                                    (_y - (int)m_position.y) * World.CHUNKSIZE,
-                                                    (_z - (int)m_position.z) * World.CHUNKSIZE);
+                                        new Vector3((_x - (int)m_Position.x) * World.CHUNKSIZE,
+                                                    (_y - (int)m_Position.y) * World.CHUNKSIZE,
+                                                    (_z - (int)m_Position.z) * World.CHUNKSIZE);
             string neighbourName = World.BuildChunkName(neighbourChunkPos);
 
             _x = ConvertBlockIndexToLocal(_x);
@@ -207,17 +208,17 @@ public class Block
     {
         if (m_BlockType == EBlockType.AIR || m_HasMesh == false) return;
 
-        if (!HasSolidNeighbour((int)m_position.x, (int)m_position.y, (int)m_position.z + 1))
+        if (!HasSolidNeighbour((int)m_Position.x, (int)m_Position.y, (int)m_Position.z + 1))
             CreateQuad(ECubeside.FRONT);
-        if (!HasSolidNeighbour((int)m_position.x, (int)m_position.y, (int)m_position.z - 1))
+        if (!HasSolidNeighbour((int)m_Position.x, (int)m_Position.y, (int)m_Position.z - 1))
             CreateQuad(ECubeside.BACK);
-        if (!HasSolidNeighbour((int)m_position.x, (int)m_position.y + 1, (int)m_position.z))
+        if (!HasSolidNeighbour((int)m_Position.x, (int)m_Position.y + 1, (int)m_Position.z))
             CreateQuad(ECubeside.TOP);
-        if (!HasSolidNeighbour((int)m_position.x, (int)m_position.y - 1, (int)m_position.z))
+        if (!HasSolidNeighbour((int)m_Position.x, (int)m_Position.y - 1, (int)m_Position.z))
             CreateQuad(ECubeside.BOTTOM);
-        if (!HasSolidNeighbour((int)m_position.x - 1, (int)m_position.y, (int)m_position.z))
+        if (!HasSolidNeighbour((int)m_Position.x - 1, (int)m_Position.y, (int)m_Position.z))
             CreateQuad(ECubeside.LEFT);
-        if (!HasSolidNeighbour((int)m_position.x + 1, (int)m_position.y, (int)m_position.z))
+        if (!HasSolidNeighbour((int)m_Position.x + 1, (int)m_Position.y, (int)m_Position.z))
             CreateQuad(ECubeside.RIGHT);
     }
 }

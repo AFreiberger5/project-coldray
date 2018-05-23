@@ -25,8 +25,9 @@ public class ItemWeapon : Item
 
     public int m_WeaponID;
 
-    public ItemWeapon(int _WeaponID, string _WeaponName, string _WeaponDescription, int _WeaponStackSize) : base(_WeaponName, _WeaponDescription, _WeaponStackSize)
+    public ItemWeapon(int _WeaponID, string _WeaponName, string _WeaponDescription, int _WeaponStackSize, params Recipe[] _Recipes) : base(_WeaponName, _WeaponDescription, _WeaponStackSize, _Recipes)
     {
+        m_ListID = 2;
         m_WeaponID = _WeaponID;
 
         // Weapons are not automaticly equipt!
@@ -46,5 +47,17 @@ public class ItemWeapon : Item
     public override void OnMouseRightClick()
     {
         throw new NotImplementedException();
+    }
+
+    public override string GetSerializable()
+    {
+        string S = "";
+
+        S += this.m_ListID;
+        S += "~";
+        S += this.m_WeaponID;
+        S += "~";
+
+        return S;
     }
 }
