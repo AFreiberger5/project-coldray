@@ -7,21 +7,32 @@ using UnityEngine.Networking;
 public class WorldManager : NetworkBehaviour
 {
     static WorldManager INSTANCE;
-    
+
 
     public static WorldManager GetInstance()
     {
-        return INSTANCE;        
+        return INSTANCE;
     }
 
-    [SyncVar(hook = "OnChangeWorld")]
+    [SyncVar(hook = "OnBuildWorldNow")]
+    public bool m_BuildWorldNow = false;
+
+    [SyncVar(hook = "OnWorldDone")]
     public bool m_OverworldBuilt = false;
 
     [SyncVar(hook = "OnDungeonADone")]
     public bool m_DungeonADone = false;
-    
+
+    [SyncVar(hook = "OnPropsDone")]
+    public bool m_PropsDone = false;
+
+    [SyncVar(hook = "OnPropsListDone")]
+    public bool m_PropsListDone = false;
+
+
     private Transform m_PortalA;
     private Transform m_PortalB;
+    private PortalTeleporterA m_overworldTeleporter;
     private bool m_newPortalB = false;
     private Vector3 m_WorldPosition = new Vector3(336, 0, 127);
 
@@ -53,7 +64,15 @@ public class WorldManager : NetworkBehaviour
     public void SetPortalA(Transform _trf)
     {
         m_PortalA = _trf;
-        m_PortalA.GetComponent<PortalTeleporterA>().m_selfRegistered = true;
+        PortalTeleporterA tmp = m_PortalA.GetComponent<PortalTeleporterA>();
+        m_overworldTeleporter = tmp;
+        tmp.m_selfRegistered = true;
+        tmp.gameObject.SetActive(false);
+    }
+
+    public void ActivatePortalA()
+    {
+        m_overworldTeleporter.gameObject.SetActive(true);
     }
 
     public bool GetNewPortalB()
@@ -82,29 +101,77 @@ public class WorldManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        OnChangeWorld(m_OverworldBuilt);
         OnDungeonADone(m_DungeonADone);
+    }
+
+    public void ReportBuildWorldNow(bool _b)
+    {
+        CmdSetBuildWorldNow(_b);
     }
 
     public void ReportWorldBuilt(bool _b)
     {
-        CmdSetWorldBool(_b);
+        CmdSetWorldDone(_b);
+    }
+
+    public void ReportPropsDone(bool _b)
+    {
+        CmdSetPropsDone(_b);
     }
 
     [Command]
-    void CmdSetWorldBool(bool _b)
+    public void CmdSetPropsDone(bool _b)
     {
-        m_OverworldBuilt = _b;
-        GameObject.FindObjectOfType<World>().InstantiateProps();
+        m_PropsDone = _b;
     }
 
-    void OnChangeWorld(bool _b)
+    public void OnPropsDone(bool _b)
     {
-        if (!isServer)
+        if (isServer)
+        {
+            GameObject.FindObjectOfType<World>().CmdPopulateSyncList();
+        }
+    }
+
+    public void ReportPropsListDone(bool _b)
+    {
+        CmdSetPropsListDone(_b);
+
+    }
+
+    [Command]
+    void CmdSetPropsListDone(bool _b)
+    {
+        m_PropsListDone = _b;
+    }
+
+    public void OnPropsListDone(bool _b)
+    {
+        if (_b == true)
+        {
+            StartCoroutine(GameObject.FindObjectOfType<World>().InstantiateProps());
+        }
+    }
+
+    [Command]
+    public void CmdSetBuildWorldNow(bool _b)
+    {
+        m_BuildWorldNow = _b;
+    }
+
+    [Command]
+    void CmdSetWorldDone(bool _b)
+    {
+        m_OverworldBuilt = _b;
+    }
+
+    void OnWorldDone(bool _b)
+    {
+        if (isServer)
         {
             if (_b == true)
             {
-                GameObject.FindObjectOfType<World>().StartBuild();
+                GameObject.FindObjectOfType<World>().PropSeedController();
             }
         }
     }
@@ -113,6 +180,17 @@ public class WorldManager : NetworkBehaviour
     public void CmdBuildDungeonA()
     {
         GameObject.FindObjectOfType<DunGen>().PreGen();
+    }
+
+    void OnBuildWorldNow(bool _b)
+    {
+        if (!isServer)
+        {
+            if (_b)
+            {
+                GameObject.FindObjectOfType<World>().StartBuild();
+            }
+        }
     }
 
     void OnDungeonADone(bool _b)

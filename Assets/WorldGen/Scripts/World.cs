@@ -31,7 +31,7 @@ public class World : NetworkBehaviour
     public Material m_TextureAtlas;
     public static int COLUMNHEIGHT = 1;
     public static int CHUNKSIZE = 32;
-    public static int RADIUS = 8;
+    public static int RADIUS = 4;
     public static Dictionary<string, Chunk> CHUNKS;
     public GameObject m_TreePrefab;
     public GameObject m_PortalBPrefab;
@@ -49,6 +49,10 @@ public class World : NetworkBehaviour
 
     public void StartBuild()
     {
+        if (isServer)
+        {
+            WorldManager.GetInstance().ReportBuildWorldNow(true);
+        }
         CHUNKS = new Dictionary<string, Chunk>();
         this.transform.position = WorldManager.GetInstance().GetWorldPos();
         this.transform.rotation = Quaternion.identity;
@@ -71,12 +75,12 @@ public class World : NetworkBehaviour
     {
         m_building = true;
 
-        // Playerposition based on Chunkposition
+        // Center of the World to be build
         int posx = (int)Mathf.Floor(WorldManager.GetInstance().GetWorldPos().x / CHUNKSIZE);
         int posz = (int)Mathf.Floor(WorldManager.GetInstance().GetWorldPos().z / CHUNKSIZE);
 
 
-        // generates chunks in a radius around the Player
+        // generates chunks in a radius around the world center
         for (int z = -RADIUS; z <= RADIUS; z++)
             for (int x = -RADIUS; x <= RADIUS; x++)
                 for (int y = 0; y < COLUMNHEIGHT; y++)
@@ -113,56 +117,68 @@ public class World : NetworkBehaviour
         }
 
 
-        foreach (KeyValuePair<string, Chunk> c in CHUNKS)
+        if (isServer)
         {
-            IsolatePropPoints(c.Value.m_Chunk, c.Value.m_ChunkData);
-            //c.Value.Save();
-            yield return null;
-            //Instantiate(m_PortalBPrefab, new Vector3(WorldManager.GetInstance().GetWorldPos().x, 1, WorldManager.GetInstance().GetWorldPos().z), Quaternion.identity);
-            //Instantiate(m_PortalDungeonIn, new Vector3(WorldManager.GetInstance().GetWorldPos().x - 10, 1, WorldManager.GetInstance().GetWorldPos().z - 10), Quaternion.identity);
-
+            foreach (KeyValuePair<string, Chunk> c in CHUNKS)
+            {
+                IsolatePropPoints(c.Value.m_Chunk, c.Value.m_ChunkData);
+                //c.Value.Save();
+                yield return null;
+            }
+            WorldManager.GetInstance().ReportWorldBuilt(true);
         }
-        SpawnPortal(0, 6);
-        yield return null;
-        SpawnPortal(1, 6);
-        yield return null;
-        SpawnProp(2, 0, 5);
+
+    }
+
+    IEnumerator LateBuildWorld()
+    {
         yield return null;
     }
 
+
     [Command]
-    void CmdPopulateSyncList()
+    public void CmdPopulateSyncList()
     {
         foreach (PropInfo p in m_propFlushList)
         {
             m_WorldProps.Add(p);
         }
-        ClearLists();
-        WorldManager.GetInstance().ReportWorldBuilt(true);
+        StartCoroutine(ClearLists());
+        WorldManager.GetInstance().ReportPropsListDone(true);
+        if (isServer)
+        {
+            WorldManager.GetInstance().OnPropsListDone(WorldManager.GetInstance().m_PropsListDone);
+        }
     }
 
-    [Command]
-    void CmdInstProps()
+    public void PropSeedController()
     {
-        RpcInstProps();
-        InstantiateProps();
+        SpawnPortal(0, 6);
+
+        SpawnPortal(1, 6);
+
+        StartCoroutine(SpawnProp(2, 0, 5));
+
+
     }
 
-    [ClientRpc]
-    void RpcInstProps()
+    public IEnumerator InstantiateProps()
     {
-        InstantiateProps();
-    }
-
-    public void InstantiateProps()
-    {
+        int counter = 0;
         foreach (PropInfo p in m_WorldProps)
         {
             Instantiate(m_PropPrefabs[p.PrefabIndex], p.WorldPosition, Quaternion.identity);
+            counter++;
+            if (counter == 50)
+            {
+                counter = 0;
+                yield return null;
+            }
         }
 
         m_surface = GetComponent<NavMeshSurface>();
         m_surface.BuildNavMesh();
+        WorldManager.GetInstance().ActivatePortalA();
     }
 
     void IsolatePropPoints(GameObject _c, Block[,,] _b)
@@ -208,7 +224,7 @@ public class World : NetworkBehaviour
         }
     }
 
-    void SpawnProp(byte _prefabIndex, int _objRadius, int _probability)
+    public IEnumerator SpawnProp(byte _prefabIndex, int _objRadius, int _probability)
     {
         bool b = false;
 
@@ -241,22 +257,29 @@ public class World : NetworkBehaviour
 
                                     if (!m_occupiedPropPoints.Contains(new Vector3(v.x - x, v.y, v.z - z)))
                                         m_occupiedPropPoints.Add(new Vector3(v.x - x, v.y, v.z - z));
+                                    yield return null;
                                 }
                             }
                         }
                     }
                 }
             }
+            //yield return null;
         }
-        CmdPopulateSyncList();
+        yield return null;
+        WorldManager.GetInstance().ReportPropsDone(true);
     }
 
-    void ClearLists()
+    IEnumerator ClearLists()
     {
         m_freePropPoints.Clear();
+        yield return null;
         m_occupiedPropPoints.Clear();
+        yield return null;
         m_allPropPoints.Clear();
+        yield return null;
         m_propFlushList.Clear();
+        yield return null;
     }
 
     bool CheckPropSpace(Vector3 _propPos, int _radius)
