@@ -2,87 +2,79 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Realtime.Messaging.Internal;
+using UnityEngine.AI;
+using UnityEngine.Networking;
 
 //WARNING: if u change CHUNKSIZE or COLUMNHEIGHT please remove old mapdatafiles to cleanup manually
 // MapData is saved at :
 // C:\Users\User\AppData\LocalLow\DefaultCompany\TerraVoxel\MapData
 
-public class World : MonoBehaviour
+public class World : NetworkBehaviour
 {
+    public class SyncListPropInfo : SyncListStruct<PropInfo>
+    {
 
-    public GameObject m_Player;
+    }
+
+    public struct PropInfo
+    {
+        public Vector3 WorldPosition;
+        public byte PrefabIndex;
+
+        public PropInfo(Vector3 _worldPosition, byte _prefabIndex)
+        {
+            WorldPosition = _worldPosition;
+            PrefabIndex = _prefabIndex;
+        }
+    }
+
     public Material m_TextureAtlas;
     public static int COLUMNHEIGHT = 1;
     public static int CHUNKSIZE = 32;
-    public static int RADIUS = 1;
-    public static ConcurrentDictionary<string, Chunk> CHUNKS;
-    public Slider m_LoadingAmount;
-    public Camera m_Cam;
-    public Button m_PlayButton;
-
-    private bool m_newWorld = true;
+    public static int RADIUS = 8;
+    public static Dictionary<string, Chunk> CHUNKS;
+    public GameObject m_TreePrefab;
+    public GameObject m_PortalBPrefab;
+    public GameObject m_PortalDungeonIn;
+    public GameObject[] m_PropPrefabs;
+    public bool m_newWorld = true;
     private bool m_building = false;
-    private bool m_dynamicWorld = false;
+    public SyncListPropInfo m_WorldProps = new SyncListPropInfo();
+    private List<PropInfo> m_propFlushList = new List<PropInfo>();
+    private Dictionary<Vector3, byte> m_allPropPoints = new Dictionary<Vector3, byte>();
+    private List<Vector3> m_freePropPoints = new List<Vector3>();
+    private List<Vector3> m_occupiedPropPoints = new List<Vector3>();
+    private NavMeshSurface m_surface;
+    // ToDo: add NavMeshModifier Volumo for Kevin pathfinding
+
+    public void StartBuild()
+    {
+        CHUNKS = new Dictionary<string, Chunk>();
+        this.transform.position = WorldManager.GetInstance().GetWorldPos();
+        this.transform.rotation = Quaternion.identity;
+        StartCoroutine(BuildWorld());
+    }
 
     /// <summary>
     /// Builds a name for the Chunk based on its position in the cartsian coordinate system
     /// </summary>
     /// <param name="_v"></param>
     /// <returns></returns>
-	public static string BuildChunkName(Vector3 _v)
+    public static string BuildChunkName(Vector3 _v)
     {
         return (int)_v.x + "_" +
                      (int)_v.y + "_" +
                      (int)_v.z;
     }
 
-
-    // private void BuildChunkAt(int _x, int _y, int _z)
-    // {
-    //     Vector3 chunkPosition = new Vector3(_x * CHUNKSIZE,
-    //                                                    _y * CHUNKSIZE,
-    //                                                    _z * CHUNKSIZE);
-    //     Chunk c;
-    //     string name = BuildChunkName(chunkPosition);
-    //     // Chunk already in Dictionary? 
-    //     if (CHUNKS.TryGetValue(name, out c))
-    //     {
-    //         c = new Chunk(chunkPosition, m_TextureAtlas);
-    //         c.m_Chunk.transform.parent = this.transform;
-    //         CHUNKS.TryAdd(c.m_Chunk.name, c);
-    //     }
-    // }
-    //
-    // IEnumerator RecursiveBuildWorld(int _x, int _y, int _z, int _rad)
-    // {
-    //     yield return null;
-    // }
-    //
-    // IEnumerator DrawChunks()
-    // {
-    //     foreach (KeyValuePair<string, Chunk> c in CHUNKS)
-    //     {
-    //         if (c.Value.m_CurrentStatus == Chunk.EStatus.DRAW)
-    //         {
-    //             c.Value.Save();
-    //             c.Value.DrawChunk();
-    //         }
-    //     }
-    //     yield return null;
-    // }
-
     IEnumerator BuildWorld()
     {
         m_building = true;
 
         // Playerposition based on Chunkposition
-        int posx = (int)Mathf.Floor(m_Player.transform.position.x / CHUNKSIZE);
-        int posz = (int)Mathf.Floor(m_Player.transform.position.z / CHUNKSIZE);
+        int posx = (int)Mathf.Floor(WorldManager.GetInstance().GetWorldPos().x / CHUNKSIZE);
+        int posz = (int)Mathf.Floor(WorldManager.GetInstance().GetWorldPos().z / CHUNKSIZE);
 
-        // Number of Chunks to be created for Loading-slider as value
-        float totalChunks = (Mathf.Pow(RADIUS * 2 + 1, 2) * COLUMNHEIGHT) * 2;
-        int processCount = 0;
 
         // generates chunks in a radius around the Player
         for (int z = -RADIUS; z <= RADIUS; z++)
@@ -97,19 +89,13 @@ public class World : MonoBehaviour
                     // Chunk already in Dictionary? 
                     if (CHUNKS.TryGetValue(name, out c))
                     {
-                        c.m_CurrentStatus = Chunk.EStatus.KEEP;
                         break;
                     }
                     else // no match in Dictionary = new Chunk
                     {
                         c = new Chunk(chunkPosition, m_TextureAtlas);
                         c.m_Chunk.transform.parent = this.transform;
-                        CHUNKS.TryAdd(c.m_Chunk.name, c);
-                    }
-                    if (m_newWorld)
-                    {
-                        processCount++;
-                        m_LoadingAmount.value = processCount / totalChunks * 100;
+                        CHUNKS.Add(c.m_Chunk.name, c);
                     }
 
                     yield return null;
@@ -119,54 +105,217 @@ public class World : MonoBehaviour
         {
             if (c.Value.m_CurrentStatus == Chunk.EStatus.DRAW)
             {
-                c.Value.Save();
                 c.Value.DrawChunk();
             }
 
             c.Value.m_CurrentStatus = Chunk.EStatus.DONE;
-
-            if (m_newWorld)
-            {
-                processCount++;
-                m_LoadingAmount.value = processCount / totalChunks * 100;
-            }
             yield return null;
         }
-        if (m_newWorld)
+
+
+        foreach (KeyValuePair<string, Chunk> c in CHUNKS)
         {
-            m_Player.SetActive(true);
-            m_LoadingAmount.gameObject.SetActive(false);
-            m_Cam.gameObject.SetActive(false);
-            m_PlayButton.gameObject.SetActive(false);
+            IsolatePropPoints(c.Value.m_Chunk, c.Value.m_ChunkData);
+            //c.Value.Save();
+            yield return null;
+            //Instantiate(m_PortalBPrefab, new Vector3(WorldManager.GetInstance().GetWorldPos().x, 1, WorldManager.GetInstance().GetWorldPos().z), Quaternion.identity);
+            //Instantiate(m_PortalDungeonIn, new Vector3(WorldManager.GetInstance().GetWorldPos().x - 10, 1, WorldManager.GetInstance().GetWorldPos().z - 10), Quaternion.identity);
+
+        }
+        SpawnPortal(0, 6);
+        yield return null;
+        SpawnPortal(1, 6);
+        yield return null;
+        SpawnProp(2, 0, 5);
+        yield return null;
+    }
+
+    [Command]
+    void CmdPopulateSyncList()
+    {
+        foreach (PropInfo p in m_propFlushList)
+        {
+            m_WorldProps.Add(p);
+        }
+        ClearLists();
+        WorldManager.GetInstance().ReportWorldBuilt(true);
+    }
+
+    [Command]
+    void CmdInstProps()
+    {
+        RpcInstProps();
+        InstantiateProps();
+    }
+
+    [ClientRpc]
+    void RpcInstProps()
+    {
+        InstantiateProps();
+    }
+
+    public void InstantiateProps()
+    {
+        foreach (PropInfo p in m_WorldProps)
+        {
+            Instantiate(m_PropPrefabs[p.PrefabIndex], p.WorldPosition, Quaternion.identity);
         }
 
-
-
+        m_surface = GetComponent<NavMeshSurface>();
+        m_surface.BuildNavMesh();
     }
 
-
-    public void StartBuild()
+    void IsolatePropPoints(GameObject _c, Block[,,] _b)
     {
-        StartCoroutine(BuildWorld());
-    }
-
-    // Use this for initialization
-    void Start()
-    {
-        m_Player.SetActive(false);
-        CHUNKS = new ConcurrentDictionary<string, Chunk>();
-        this.transform.position = Vector3.zero;
-        this.transform.rotation = Quaternion.identity;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (m_dynamicWorld)
-        {
-            if (!m_building && !m_newWorld)
+        foreach (Block p in _b)
+            if (p.m_BlockType == Block.EBlockType.PROP)
             {
-                StartCoroutine(BuildWorld());
+                m_allPropPoints.Add(p.m_WorldPos, (byte)p.m_RootBlock);
+                m_freePropPoints.Add(p.m_WorldPos);
+            }
+    }
+
+
+    void SpawnPortal(byte _prefabIndex, int _objRadius)
+    {
+        bool b = false;
+
+        while (b == false)
+        {
+            Vector3 temp = m_freePropPoints[Random.Range(0, m_freePropPoints.Count + 1)];
+            b = CheckPropSpace(temp, _objRadius);
+            if (b == true)
+            {
+                m_propFlushList.Add(new PropInfo(new Vector3(temp.x, temp.y + 1, temp.z), _prefabIndex));
+                for (int x = 0; x < _objRadius; x++)
+                {
+                    for (int z = 0; z < _objRadius; z++)
+                    {
+                        if (!m_occupiedPropPoints.Contains(new Vector3(temp.x - x, temp.y, temp.z + z)))
+                            m_occupiedPropPoints.Add(new Vector3(temp.x - x, temp.y, temp.z + z));
+
+                        if (!m_occupiedPropPoints.Contains(new Vector3(temp.x + x, temp.y, temp.z + z)))
+                            m_occupiedPropPoints.Add(new Vector3(temp.x + x, temp.y, temp.z + z));
+
+                        if (!m_occupiedPropPoints.Contains(new Vector3(temp.x + x, temp.y, temp.z - z)))
+                            m_occupiedPropPoints.Add(new Vector3(temp.x + x, temp.y, temp.z - z));
+
+                        if (!m_occupiedPropPoints.Contains(new Vector3(temp.x - x, temp.y, temp.z - z)))
+                            m_occupiedPropPoints.Add(new Vector3(temp.x - x, temp.y, temp.z - z));
+                    }
+                }
+            }
+        }
+    }
+
+    void SpawnProp(byte _prefabIndex, int _objRadius, int _probability)
+    {
+        bool b = false;
+
+        foreach (Vector3 v in m_freePropPoints)
+        {
+            byte type;
+            if (m_allPropPoints.TryGetValue(v, out type))
+            {
+                if (type == 2)
+                {
+                    b = CheckPropSpace(v, _objRadius);
+                    if (b == true)
+                    {
+                        int rnd = Random.Range(1, 101);
+                        if (rnd <= _probability)
+                        {
+                            m_propFlushList.Add(new PropInfo(v, _prefabIndex));
+                            for (int x = 0; x < _objRadius; x++)
+                            {
+                                for (int z = 0; z < _objRadius; z++)
+                                {
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(v.x - x, v.y, v.z + z)))
+                                        m_occupiedPropPoints.Add(new Vector3(v.x - x, v.y, v.z + z));
+
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(v.x + x, v.y, v.z + z)))
+                                        m_occupiedPropPoints.Add(new Vector3(v.x + x, v.y, v.z + z));
+
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(v.x + x, v.y, v.z - z)))
+                                        m_occupiedPropPoints.Add(new Vector3(v.x + x, v.y, v.z - z));
+
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(v.x - x, v.y, v.z - z)))
+                                        m_occupiedPropPoints.Add(new Vector3(v.x - x, v.y, v.z - z));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        CmdPopulateSyncList();
+    }
+
+    void ClearLists()
+    {
+        m_freePropPoints.Clear();
+        m_occupiedPropPoints.Clear();
+        m_allPropPoints.Clear();
+        m_propFlushList.Clear();
+    }
+
+    bool CheckPropSpace(Vector3 _propPos, int _radius)
+    {
+
+
+        if (_radius == 0)
+        {
+            if (!m_occupiedPropPoints.Contains(_propPos))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            List<bool> check = new List<bool>();
+            for (int x = 0; x < _radius; x++)
+            {
+                for (int z = 0; z < _radius; z++)
+                {
+                    Vector3 tmp1 = new Vector3(_propPos.x - x, _propPos.y, _propPos.z + z);
+                    Vector3 tmp2 = new Vector3(_propPos.x + x, _propPos.y, _propPos.z + z);
+                    Vector3 tmp3 = new Vector3(_propPos.x + x, _propPos.y, _propPos.z - z);
+                    Vector3 tmp4 = new Vector3(_propPos.x - x, _propPos.y, _propPos.z - z);
+
+                    if (m_allPropPoints.ContainsKey(tmp1)
+                         && m_allPropPoints.ContainsKey(tmp2)
+                            && m_allPropPoints.ContainsKey(tmp3)
+                                && m_allPropPoints.ContainsKey(tmp4))
+                    {
+                        if (!m_occupiedPropPoints.Contains(tmp1)
+                                && !m_occupiedPropPoints.Contains(tmp2)
+                                    && !m_occupiedPropPoints.Contains(tmp3)
+                                        && !m_occupiedPropPoints.Contains(tmp4))
+                        {
+                            check.Add(true);
+                        }
+                        // else
+                        // {
+                        //     check.Add(false);
+                        // }
+                    }
+                    else
+                    {
+                        check.Add(false);
+                    }
+                }
+            }
+            if (!check.Contains(false))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

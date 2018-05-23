@@ -3,78 +3,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+//||                                                ||\\
+//||            Script by Gregor Hempel             ||\\
+//||            23.03.2018                          ||\\
+//||            Edits:                              ||\\
+//||                                                ||\\
+//||||||||||||||||||||||||||||||||||||||||||||||||||||\\
+
+/// <summary>
+/// this class stores all information relevant to the player character
+/// </summary>
 [Serializable]
 public class CharacterStats
 {
-    // m/w = 0
-    // color = 1
-    // face = 2
-    // ears = 3
-    // eyes = 4
-    // accessories = 5
-    // hair = 6
-    // arraylength = 7
-
-    public string m_Name; 
-    public byte[] m_Model = new byte[7];
-
-    //public bool Gender
-    //{
-    //    get
-    //    {
-    //        return m_Model[0] == 0;
-    //    }
-    //    set
-    //    {
-    //        m_Model[0] = value ? (byte)0 : (byte)1;
-    //    }
-    //}
-    //public byte SkinColor
-    //{
-    //    get
-    //    {
-    //        return m_Model[1];
-    //    }
-    //}
-    //public byte Face
-    //{
-    //    get
-    //    {
-    //        return m_Model[2];
-    //    }
-    //}
-    //public byte Ears
-    //{
-    //    get
-    //    {
-    //        return m_Model[3];
-    //    }
-    //}
-    //public byte Eyes
-    //{
-    //    get
-    //    {
-    //        return m_Model[4];
-    //    }
-    //}
-    //public byte Accessories
-    //{
-    //    get
-    //    {
-    //        return m_Model[5];
-    //    }
-    //}
-    //public byte Hair
-    //{
-    //    get
-    //    {
-    //        return m_Model[6];
-    //    }
-    //}
-
-    public CharacterStats(string _name, byte[] _model)
+    public string m_StatsName; 
+    public int[] m_Model = new int[9]
     {
-        m_Name = _name;
+        0,// gender
+        0,// skin color
+        0,// head
+        0,// ears
+        0,// eyes
+        0,// accessories
+        0,// hair
+        0,// hair color
+        0//  eye color
+    };
+
+    public CharacterStats(string _name, int[] _model)
+    {
+        m_StatsName = _name;
         m_Model = _model;
     }
 }

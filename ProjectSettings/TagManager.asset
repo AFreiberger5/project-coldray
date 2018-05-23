@@ -4,9 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - MainCanvas
   - TankShell
   - hitFX
+  - MainCanvas
+  - TileSpawnPoint
+  - Occupied
+  - Rooms
   layers:
   - Default
   - TransparentFX

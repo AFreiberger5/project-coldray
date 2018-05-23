@@ -5,38 +5,61 @@
 *   Edited by:                            *
 *                                         *
 ******************************************/
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Linq;
 using UnityEngine.AI;
 using System;
 
 public class BansheeAI : AIBase
 {
+    //public variables for debug/testing/design access
     public float m_aggroDistance;
     public float m_deAggroDistance;
+    public float m_hitdistance;
     public Transform m_head;
 
-
-    private AIState CurrentState;
-    private AIState previousState;
+    [SyncVar]
+    private EAIState m_currentState;
+    [SyncVar]
+    private EAIState previousState;
     private List<GameObject> m_TargetPlayers;
-    [SyncVar] private GameObject m_Target;
+    [SyncVar]//Testing if this is necessary or can help with interpolation/lag/etc.
+    private GameObject m_Target;
     private bool m_PlayerInRange;
     private NavMeshAgent m_agent;
+    [SerializeField]
+    private int m_Damage = 15;
+
+    #region AnimatiorVariables
     private NetworkAnimator m_animator;
-    [SerializeField] private float m_hitdistance;
     private int IDliving;
     private int IDmove;
     private int IDattack;
     private int IDdeath;
+    #endregion
+    private Helper helper;
+
+    [SyncVar, SerializeField]
+    private float m_HP = -1;
+
+    private Dictionary<EDamageType, float> DefenseValues = new Dictionary<EDamageType, float>();
 
     [ServerCallback]
     private void Awake()
     {
+        //Add Defense Values for all Types of DamageSources
+#region AddDefenseValues
+        
+        DefenseValues.Add(EDamageType.MELEE,    0);
+        DefenseValues.Add(EDamageType.RANGED,   0);
+        DefenseValues.Add(EDamageType.MAGICAL,  0);
+        DefenseValues.Add(EDamageType.PHYSICAL, 0);
+        DefenseValues.Add(EDamageType.TRUE,     0);
+        #endregion
+
         m_TargetPlayers = new List<GameObject>();
+        //Initialise the NPC
         OnNPCSpawn();
         m_agent = GetComponent<NavMeshAgent>();
         m_animator = GetComponent<NetworkAnimator>();
@@ -45,44 +68,50 @@ public class BansheeAI : AIBase
         IDmove = Animator.StringToHash("ismoving");
         IDattack = Animator.StringToHash("isattacking");
         IDdeath = Animator.StringToHash("isdied");
-        m_hitdistance = 1;
+        helper = new Helper();
 
     }
 
     [ServerCallback]
     void Update()
-    {
-
+    {  
         if (!isLocalPlayer)
             NPCDecision();
 
-        if (CurrentState != previousState)
-            ChangeAnimations();
+        if (m_currentState != previousState)
+            ChangeAnimations(); 
     }
 
-    public override void KillNPC()
+    
+    [Server]
+    protected override void KillNPC()
     {
-
+        //Triggers Death Animation, End of animation calls OnNPCDeath()
+        m_currentState = EAIState.DYING;        
+       
     }
 
 
-    public override void NPCDecision()
+    [Server]
+    protected override void NPCDecision()
     {
-
-        if (CurrentState.HasFlag(AIState.IDLE) && !CurrentState.HasFlag(AIState.DEAD))
+        //If NPC is idle, check for nearby Players
+        if (m_currentState.HasFlag(EAIState.IDLE) && !m_currentState.HasFlag(EAIState.DEAD))
         {
             if (m_PlayerInRange)
             {
                 List<RaycastHit> hits = new List<RaycastHit>();
                 RaycastHit hit;
 
+                //Players get added via OnTriggerEnter
                 foreach (GameObject Player in m_TargetPlayers)
                 {
-
+                    //Check if vision to player is blocked by Walls
                     if (Physics.Raycast(m_head.transform.position, (Player.transform.position - m_head.transform.position).normalized
                         , out hit, m_aggroDistance * m_aggroDistance, LayerMask.GetMask(new string[] { "Walls", "Player" })
                         , QueryTriggerInteraction.Ignore))
                     {
+                        //Checks if enemey can be seen (Eye-angle)
                         Vector3 playerAng = Player.transform.position;
                         playerAng.y = m_head.transform.position.y;
                         float angle = Vector3.SignedAngle((playerAng - m_head.transform.position), m_head.forward, Vector3.up);
@@ -94,6 +123,7 @@ public class BansheeAI : AIBase
                 }
                 if (hits.Count > 0)
                 {
+                    //If target was found, make it the target
                     float distance = m_aggroDistance * m_aggroDistance + 1;
                     foreach (RaycastHit RHit in hits)
                     {
@@ -105,8 +135,8 @@ public class BansheeAI : AIBase
 
                         }
                     }
-                    CurrentState -= AIState.IDLE;
-                    CurrentState = CurrentState | AIState.MOVING;
+                    m_currentState -= EAIState.IDLE;
+                    m_currentState = m_currentState | EAIState.MOVING;
 
                 }
                 else
@@ -116,15 +146,14 @@ public class BansheeAI : AIBase
 
             }
         }
-        if (CurrentState.HasFlag(AIState.MOVING) && !CurrentState.HasFlag(AIState.DEAD))
+        if (m_currentState.HasFlag(EAIState.MOVING) && !m_currentState.HasFlag(EAIState.DEAD))
         {
-
+            //If Banshee is following a target, check if it can be hit or no/if target is lost
             m_agent.destination = m_Target.transform.position;
-
 
             if (m_agent.remainingDistance < m_hitdistance
                 && !m_agent.pathPending)
-            {
+            {                    
                 Attack();
 
                 return;
@@ -134,16 +163,15 @@ public class BansheeAI : AIBase
                 NotAttacking();
             }
 
-
             if ((m_agent.transform.position - m_Target.transform.position).sqrMagnitude >= m_deAggroDistance)
             {
                 m_agent.SetDestination(m_Target.transform.position);
 
-                if (CurrentState.HasFlag(AIState.ATTACKING))
-                    CurrentState -= AIState.ATTACKING;
+                if (m_currentState.HasFlag(EAIState.ATTACKING))
+                    m_currentState -= EAIState.ATTACKING;
 
-                CurrentState -= AIState.MOVING;
-                CurrentState = CurrentState | AIState.IDLE;
+                m_currentState -= EAIState.MOVING;
+                m_currentState = m_currentState | EAIState.IDLE;
                 return;
             }
 
@@ -152,18 +180,26 @@ public class BansheeAI : AIBase
 
     private void NotAttacking()
     {
-        if (CurrentState.HasFlag(AIState.ATTACKING))
-            CurrentState -= AIState.ATTACKING;
+        if (m_currentState.HasFlag(EAIState.ATTACKING))
+            m_currentState -= EAIState.ATTACKING;
     }
 
-    public override void OnNPCDeath()
+    [Server]
+    protected override void OnNPCDeath()
     {
-
+        m_currentState = EAIState.DEAD;
+        helper.SpawnLoot(EDropTable.BANSHEE, transform.position);
+        NetworkServer.Destroy(gameObject);
     }
 
-    public override void OnNPCSpawn()
+    [Server]
+    protected override void OnNPCSpawn()
     {
-        CurrentState = AIState.ALIVE | AIState.IDLE;
+        //Banshee is by default Idlling, moves on agression or sight
+        m_currentState = EAIState.ALIVE | EAIState.IDLE;
+
+        if (m_HP == -1)
+            m_HP = 100;
 
     }
 
@@ -192,32 +228,84 @@ public class BansheeAI : AIBase
         }
     }
 
+    [Server]
     private void Attack()
     {
-        if (!CurrentState.HasFlag(AIState.ATTACKING))
-            CurrentState = CurrentState | AIState.ATTACKING;
+        
+        if (!m_currentState.HasFlag(EAIState.ATTACKING))
+            m_currentState = m_currentState | EAIState.ATTACKING;
+
+        if ( m_hitdistance * m_hitdistance <= (transform.position - m_Target.transform.position).sqrMagnitude)
+        {
+            //ToDo: Wait for Player Damage Calcutaion and implement it here
+        }
     }
 
     private void ChangeAnimations()
     {
-        previousState = CurrentState;
+        //Change animations based on current States
 
-        if (CurrentState.HasFlag(AIState.ALIVE))
+        if (m_currentState.HasFlag(EAIState.ALIVE))
             m_animator.animator.SetBool(IDliving, true);
-        if (CurrentState.HasFlag(AIState.IDLE))
+        if (m_currentState.HasFlag(EAIState.IDLE))
         {
             m_animator.animator.SetBool(IDmove, false);
             m_animator.animator.SetBool(IDattack, false);
             m_animator.animator.SetBool(IDdeath, false);
         }
-        if (CurrentState.HasFlag(AIState.MOVING))
+        if (m_currentState.HasFlag(EAIState.MOVING))
             m_animator.animator.SetBool(IDmove, true);
-        if (CurrentState.HasFlag(AIState.ATTACKING))
+        if (m_currentState.HasFlag(EAIState.ATTACKING))
             m_animator.animator.SetBool(IDattack, true);
-        if (CurrentState.HasFlag(AIState.DYING) || CurrentState.HasFlag(AIState.DEAD))
+        if (!m_currentState.HasFlag(EAIState.ATTACKING) && previousState.HasFlag(EAIState.ATTACKING))
+            m_animator.animator.SetBool(IDattack, false);
+        if (m_currentState.HasFlag(EAIState.DYING))
         {
             m_animator.animator.SetBool(IDliving, false);
+
+            //now called via animation event
+            //KillNPC();
+        }
+        if (m_currentState.HasFlag(EAIState.DEAD))
+        {
             m_animator.animator.SetBool(IDdeath, true);
         }
+
+        previousState = m_currentState;
+        
+    }
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    public override void OnInteraction()
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    /// <param name="_value">Damage/Value received</param>
+    /// <param name="_damageType">Type of Attack (Use NONE if not an attack)</param>
+    public override void OnInteraction(float _value, EDamageType _damageType)
+    {
+        if (!_damageType.HasFlag(EDamageType.NONE))
+        {
+            m_HP -= base.DamageCalculation(_value, _damageType, DefenseValues);
+            if (m_HP <= 0)
+            {
+                KillNPC();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Called from Player when interacting with the NPC for Combat and Quests
+    /// </summary>
+    /// <param name="_obj">(Quest-)object from Player</param>
+    public override void OnInteraction(object _obj)
+    {
+        throw new NotImplementedException();
     }
 }
