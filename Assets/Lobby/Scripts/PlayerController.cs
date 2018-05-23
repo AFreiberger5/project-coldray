@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 //||                                                ||\\
 //||            Script by Gregor Hempel             ||\\
 //||            23.03.2018                          ||\\
-//||            Edits:                              ||\\
+//||            Edits: Alexander Blomenkamp         ||\\
 //||                                                ||\\
 //||||||||||||||||||||||||||||||||||||||||||||||||||||\\
 

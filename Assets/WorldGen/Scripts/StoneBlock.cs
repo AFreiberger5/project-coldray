@@ -8,7 +8,7 @@ public class StoneBlock : Block
     {
         m_BlockType = EBlockType.STONE;
         m_parent = _parent;
-        m_position = _pos;
+        m_Position = _pos;
         m_owner = _owner;
         m_Atlas = _atlas;
         m_HasMesh = true;
