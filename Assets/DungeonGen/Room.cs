@@ -73,7 +73,8 @@ public class Room : NetworkBehaviour
         }
         int spawns = Random.Range(0, Helper.MAX_PLAYERCOUNT);
         //Lowering the chance the room with a lot of mobs
-        spawns = (spawns < Helper.MAX_PLAYERCOUNT / 2) ? spawns : Random.Range(0, spawns);
+        //ToDo: Balance how many spawns
+        spawns = (spawns < Helper.MAX_PLAYERCOUNT / 2) ? spawns : Random.Range(0, Helper.MAX_PLAYERCOUNT);
         for (int i = 0; i < spawns; i++)
         {
             //Spawn Turrets and add it to a list
@@ -90,28 +91,31 @@ public class Room : NetworkBehaviour
     {
         if (other.CompareTag("Player"))
         {
-           foreach (GameObject Turret in m_Turrets)
-           {
-               if (Turret.activeSelf == false)
-                   Turret.SetActive(true);
-           
-               Turret.GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
-           
-           }
+            foreach (GameObject Turret in m_Turrets)
+            {
+                if (Turret.activeSelf == false)
+                    Turret.SetActive(true);
+
+                Turret.GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
+
+            }
             other.GetComponent<PlayerController>().SetCamRedirect(m_RoomCamPos);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if(other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
             foreach (GameObject Turret in m_Turrets)
             {
                 foreach (PlayerController PC in Turret.GetComponent<TurretAI>().m_Players)
                 {
                     // ToDo: remove player from list if Player.id = other.id
-                    //if(PC.)
+                    if (PC.GetComponent<PlayerCharacter>().m_PlayerId == other.GetComponent<PlayerCharacter>().m_PlayerId)
+                        Turret.GetComponent<TurretAI>().m_Players.Remove(PC);
+                    if (Turret.GetComponent<TurretAI>().m_Players.Count <= 0)
+                        Turret.SetActive(false);
                 }
 
             }

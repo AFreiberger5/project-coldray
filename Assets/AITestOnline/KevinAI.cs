@@ -6,6 +6,7 @@
 *                                                 *
 *                                                 *
 ***************************************************/
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,17 +17,19 @@ public class KevinAI : AIBase
 {
 
 
+    [SyncVar]
     private EAIState m_currentState;
-
+    [SyncVar]
+    private EAIState m_previousState;
     private Helper helper;
     private NavMeshAgent m_agent;
     private Vector3[] positions;
     private bool SearchingCoffe;
-    private bool FoundCoffe;
+    private bool SecuredCoffe;
     private int currentCoffePoint;
 
     #region AnimatiorVariables
-    private Animator m_animator;
+    private NetworkAnimator m_animator;
     private int IDLiving;
     private int IDMove;
     private int IDFear;
@@ -37,17 +40,19 @@ public class KevinAI : AIBase
     [SyncVar, SerializeField]
     private float m_HP = -1;
 
+    private System.Timers.Timer Time;
+
     private Dictionary<EDamageType, float> DefenseValues = new Dictionary<EDamageType, float>();
 
     [ServerCallback]
     private void Awake()
     {
+        m_animator = GetComponentInChildren<NetworkAnimator>();
         IDLiving = Animator.StringToHash("IsLiving");
         IDMove = Animator.StringToHash("IsWalking");
-        IDFear = Animator.StringToHash("IsFearing");
+        IDFear = Animator.StringToHash("IsFearing"); //Kevin values his Coffe, so he panicks whenever he thinks someone might steal it
         IDDeath = Animator.StringToHash("IsDying");
         IDRunning = Animator.StringToHash("IsRunning");
-
         //Add Defense Values for all Types of DamageSources
         #region AddDefenseValues
 
@@ -62,9 +67,10 @@ public class KevinAI : AIBase
     [ServerCallback]
     void Start()
     {
+        m_currentState = EAIState.IDLE | EAIState.ALIVE;
         positions = new Vector3[5];
         currentCoffePoint = 1;
-        m_agent = GetComponent<NavMeshAgent>();
+        m_agent = GetComponentInChildren<NavMeshAgent>();
         m_agent.destination = transform.position;
         m_agent.autoBraking = false;
     }
@@ -72,19 +78,71 @@ public class KevinAI : AIBase
     [ServerCallback]
     void Update()
     {
-        if (!isLocalPlayer)
-            NPCDecision();
+        //Testing only
+        if (Input.GetKeyDown(KeyCode.V))
+            RunAway();
+
+
+
+        NPCDecision();
 
         if (SearchingCoffe && m_agent.remainingDistance < 0.1f && !m_agent.pathPending)
         {
             SearchCoffe();
         }
-        if (FoundCoffe)
+        if (SecuredCoffe)
         {
-            //Head in ground
-            m_agent.enabled = false;
-        }
 
+
+            if (Time == null || Time.Enabled == false)
+            {
+                m_currentState = m_currentState & ~EAIState.MOVING;
+                Time = new System.Timers.Timer
+                {
+                    //After a while Coffe is brewed and Kevin is not scared anymore
+                    Interval = 5000
+                };
+                Time.Elapsed += (object sender, System.Timers.ElapsedEventArgs e) =>
+                {
+                    SecuredCoffe = !SecuredCoffe;
+                    Time.Stop();
+                    m_currentState = EAIState.ALIVE | EAIState.IDLE;
+                };
+                Time.Start();
+            }
+        }
+        if (m_currentState != m_previousState)
+            ChangeAnimations();
+
+    }
+
+    private void ChangeAnimations()
+    {
+        //Changes animation based on whats needed in the animator, haven't found a good way to make it clean for all AI's
+        if (m_currentState.HasFlag(EAIState.ALIVE))
+            m_animator.animator.SetBool(IDLiving, true);
+        if (m_currentState.HasFlag(EAIState.IDLE))
+        {
+            m_animator.animator.SetBool(IDMove, false);
+            m_animator.animator.SetBool(IDFear, false);
+            m_animator.animator.SetBool(IDRunning, false);
+        }
+        if (m_currentState.HasFlag(EAIState.MOVING))
+            m_animator.animator.SetBool(IDRunning, true);
+        if (!m_currentState.HasFlag(EAIState.MOVING) && m_previousState.HasFlag(EAIState.MOVING))
+            m_animator.animator.SetBool(IDRunning, false);
+        if (m_currentState.HasFlag(EAIState.ATTACKING))
+            m_animator.animator.SetBool(IDFear, true);
+        if (!m_currentState.HasFlag(EAIState.ATTACKING) && m_previousState.HasFlag(EAIState.ATTACKING))
+            m_animator.animator.SetBool(IDFear, false);
+        if (m_currentState.HasFlag(EAIState.DYING))
+            m_animator.animator.SetBool(IDLiving, false);
+        if (m_currentState.HasFlag(EAIState.DEAD))
+            m_animator.animator.SetBool(IDDeath, true);
+        
+
+
+        m_previousState = m_currentState;
     }
 
     private void SearchCoffe()
@@ -94,30 +152,41 @@ public class KevinAI : AIBase
         if (currentCoffePoint >= positions.Length)
         {
             SearchingCoffe = false;
-            FoundCoffe = true;
+            SecuredCoffe = true;
+            m_agent.isStopped = true;
             return;
         }
-        m_agent.destination = positions[currentCoffePoint];
-        while (m_agent.pathPending)
-        { }
-        if (m_agent.path == null)
-        {
-            NavMeshHit NHit;
-            NavMesh.SamplePosition(positions[currentCoffePoint],out NHit,5,NavMesh.AllAreas); //Get neat point if random point was invalid
-            m_agent.destination = NHit.position;
-        }
+        m_agent.SetDestination(positions[currentCoffePoint]);
+
+        transform.forward = m_agent.destination - transform.position;
+
 
         currentCoffePoint++;
     }
+    // IEnumerator PathCorrection()
+    // {
+    //       //Used for path correction if random points are outside of world or in obstacles
+    //     if (m_agent.pathPending)
+    //         yield return new WaitForEndOfFrame();
+    //
+    //     if (m_agent.pathStatus == NavMeshPathStatus.PathInvalid)
+    //     {
+    //         NavMeshHit NHit;
+    //         NavMesh.SamplePosition(positions[currentCoffePoint], out NHit, 5, NavMesh.AllAreas); //Get neat point if random point was invalid
+    //         m_agent.destination = NHit.position;
+    //     }
+    //
+    // }
     protected override void KillNPC()
     {
-        //DeathLogic not executed directly here, incase Death Animations get added
+        //DeathLogic not executed directly here, incase something like Death Animations get added
         OnNPCDeath();
 
     }
 
     protected override void NPCDecision()
     {
+        //When other bioms get added, Kevins walk around differently 
 
     }
 
@@ -137,18 +206,23 @@ public class KevinAI : AIBase
         NetworkServer.Destroy(gameObject);
     }
 
-    [Server]
     private void RunAway()
-    {
+    {                                       //Attacking = Feared, it's Kevins Battleplan
+        m_currentState = EAIState.ALIVE | EAIState.ATTACKING | EAIState.MOVING;
+        currentCoffePoint = 1;
+        m_agent.isStopped = false;
         // create a path by finding 5 waypoints, taken from current position/direction
         // must get away from local position,
         SearchingCoffe = true;
+        //System Random costs more, but unity random gave bad values for gameplay
+        System.Random RandomCoffeSpots = new System.Random();
         for (int i = 0; i < positions.Length; i++)
         {
             if (i == 0)
-                positions[i] = new Vector3(Random.Range(0f, 5f), 0, Random.Range(0f, 5f));
+                positions[i] = new Vector3((float)(RandomCoffeSpots.NextDouble() % 6), 0, (float)(RandomCoffeSpots.NextDouble() % 6));
             else
-                positions[i] = new Vector3(Random.Range(1f, 5f) + positions[i - 1].x, 0, Random.Range(1f, 5f) + positions[i - 1].z);
+                positions[i] = new Vector3((float)(RandomCoffeSpots.NextDouble() % 6) + positions[i - 1].x,
+                                                    0, (float)(RandomCoffeSpots.NextDouble() % 6) + positions[i - 1].z);
 
         }
 
@@ -161,6 +235,7 @@ public class KevinAI : AIBase
         NavMeshHit NMHit = new NavMeshHit();
         for (int i = 0; i < 3; i++)
         {
+            //To add some randomness and guarantee first point is ON a navmesh
             NavMeshHit NHit;
             if (NavMesh.SamplePosition(transform.TransformPoint(positions[0]), out NHit, 2, NavMesh.AllAreas))
             {
@@ -171,7 +246,9 @@ public class KevinAI : AIBase
         if (NMHit.position == null)
             m_agent.destination = Vector3.zero;
         else
-            m_agent.destination = NMHit.position;
+            m_agent.destination = new Vector3(NMHit.position.x, 0, NMHit.position.z);
+
+        transform.forward = m_agent.destination - transform.position;
     }
 
     /// <summary>
