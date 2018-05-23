@@ -14,7 +14,7 @@ using UnityEngine.Networking;
 public class PlayerController : NetworkBehaviour
 {
     public Camera m_PlayerCamera;
-
+    public Transform m_CamAnchor;
     public Transform m_PlayerBodyT;
 
     private Rigidbody m_playerRigidBody;
@@ -25,6 +25,8 @@ public class PlayerController : NetworkBehaviour
     private void Start()
     {
         m_playerRigidBody = GetComponent<Rigidbody>();
+        m_PlayerCamera = Camera.main;
+        SetCamRedirect(m_CamAnchor);
     }
 
     private void Update()

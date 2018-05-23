@@ -90,21 +90,21 @@ public class Room : NetworkBehaviour
     {
         if (other.CompareTag("Player"))
         {
-           foreach (GameObject Turret in m_Turrets)
-           {
-               if (Turret.activeSelf == false)
-                   Turret.SetActive(true);
-           
-               Turret.GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
-           
-           }
+            foreach (GameObject Turret in m_Turrets)
+            {
+                if (Turret.activeSelf == false)
+                    Turret.SetActive(true);
+
+                Turret.GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
+
+            }
             other.GetComponent<PlayerController>().SetCamRedirect(m_RoomCamPos);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if(other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
             foreach (GameObject Turret in m_Turrets)
             {

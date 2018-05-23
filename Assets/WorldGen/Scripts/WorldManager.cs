@@ -14,6 +14,9 @@ public class WorldManager : NetworkBehaviour
         return INSTANCE;
     }
 
+    [SyncVar]
+    public Vector3 m_WorldPosition = new Vector3(336, 0, 127);
+
     [SyncVar(hook = "OnBuildWorldNow")]
     public bool m_BuildWorldNow = false;
 
@@ -34,7 +37,7 @@ public class WorldManager : NetworkBehaviour
     private Transform m_PortalB;
     private PortalTeleporterA m_overworldTeleporter;
     private bool m_newPortalB = false;
-    private Vector3 m_WorldPosition = new Vector3(336, 0, 127);
+
 
     void Awake()
     {
@@ -54,6 +57,17 @@ public class WorldManager : NetworkBehaviour
     public Vector3 GetWorldPos()
     {
         return m_WorldPosition;
+    }
+
+    public void SetWorldPos(Vector3 _v)
+    {
+        CmdSetWorldPos(_v);
+    }
+
+    [Command]
+    void CmdSetWorldPos(Vector3 _v)
+    {
+        m_WorldPosition = _v;
     }
     public Transform GetPortalA()
     {
@@ -101,6 +115,8 @@ public class WorldManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+        OnBuildWorldNow(m_BuildWorldNow);
+        OnPropsListDone(m_PropsListDone);
         OnDungeonADone(m_DungeonADone);
     }
 

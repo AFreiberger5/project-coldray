@@ -31,7 +31,7 @@ public class World : NetworkBehaviour
     public Material m_TextureAtlas;
     public static int COLUMNHEIGHT = 1;
     public static int CHUNKSIZE = 32;
-    public static int RADIUS = 4;
+    public static int RADIUS = 1;
     public static Dictionary<string, Chunk> CHUNKS;
     public GameObject m_TreePrefab;
     public GameObject m_PortalBPrefab;
@@ -128,12 +128,7 @@ public class World : NetworkBehaviour
             WorldManager.GetInstance().ReportWorldBuilt(true);
         }
 
-    }
-
-    IEnumerator LateBuildWorld()
-    {
-        yield return null;
-    }
+    }   
 
 
     [Command]
@@ -157,7 +152,7 @@ public class World : NetworkBehaviour
 
         SpawnPortal(1, 6);
 
-        StartCoroutine(SpawnProp(2, 0, 5));
+        StartCoroutine(SpawnProp(2, 2, 5));
 
 
     }
@@ -199,7 +194,7 @@ public class World : NetworkBehaviour
         while (b == false)
         {
             Vector3 temp = m_freePropPoints[Random.Range(0, m_freePropPoints.Count + 1)];
-            b = CheckPropSpace(temp, _objRadius);
+            b = CheckPropSpace(temp, _objRadius, true);
             if (b == true)
             {
                 m_propFlushList.Add(new PropInfo(new Vector3(temp.x, temp.y + 1, temp.z), _prefabIndex));
@@ -235,7 +230,7 @@ public class World : NetworkBehaviour
             {
                 if (type == 2)
                 {
-                    b = CheckPropSpace(v, _objRadius);
+                    b = CheckPropSpace(v, _objRadius, false);
                     if (b == true)
                     {
                         int rnd = Random.Range(1, 101);
@@ -282,7 +277,7 @@ public class World : NetworkBehaviour
         yield return null;
     }
 
-    bool CheckPropSpace(Vector3 _propPos, int _radius)
+    bool CheckPropSpace(Vector3 _propPos, int _radius, bool _edgesafe)
     {
 
 
@@ -308,11 +303,25 @@ public class World : NetworkBehaviour
                     Vector3 tmp2 = new Vector3(_propPos.x + x, _propPos.y, _propPos.z + z);
                     Vector3 tmp3 = new Vector3(_propPos.x + x, _propPos.y, _propPos.z - z);
                     Vector3 tmp4 = new Vector3(_propPos.x - x, _propPos.y, _propPos.z - z);
-
-                    if (m_allPropPoints.ContainsKey(tmp1)
-                         && m_allPropPoints.ContainsKey(tmp2)
-                            && m_allPropPoints.ContainsKey(tmp3)
-                                && m_allPropPoints.ContainsKey(tmp4))
+                    if (_edgesafe == true)
+                    {
+                        if (m_freePropPoints.Contains(tmp1)
+                         && m_freePropPoints.Contains(tmp2)
+                            && m_freePropPoints.Contains(tmp3)
+                                && m_freePropPoints.Contains(tmp4))
+                        {
+                            if (!m_occupiedPropPoints.Contains(tmp1)
+                                && !m_occupiedPropPoints.Contains(tmp2)
+                                    && !m_occupiedPropPoints.Contains(tmp3)
+                                        && !m_occupiedPropPoints.Contains(tmp4))
+                            {
+                                check.Add(true);
+                            }
+                            else
+                                check.Add(false);
+                        }
+                    }
+                    else
                     {
                         if (!m_occupiedPropPoints.Contains(tmp1)
                                 && !m_occupiedPropPoints.Contains(tmp2)
@@ -321,15 +330,12 @@ public class World : NetworkBehaviour
                         {
                             check.Add(true);
                         }
-                        // else
-                        // {
-                        //     check.Add(false);
-                        // }
+                        else
+                        {
+                            check.Add(false);
+                        }
                     }
-                    else
-                    {
-                        check.Add(false);
-                    }
+
                 }
             }
             if (!check.Contains(false))
