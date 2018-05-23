@@ -189,7 +189,7 @@ public class Inventory : MonoBehaviour
 
     public ItemManager m_ItemManager;
     public GameObject m_GridPanel;
-    public GameObject m_InventoryObject;
+    //public GameObject m_InventoryObject;
 
     public GameObject m_SlotPrefab;
     public GameObject m_ItemPrefab;
@@ -209,12 +209,16 @@ public class Inventory : MonoBehaviour
 
         // Create the List for the Items in the Inventory.
         m_inventory = new List<Item>();
+        
+        // Finds the InventoryPanel
+        m_GridPanel = GameObject.Find("InventoryPanel");
 
-        // Create the List for the needed Slots.
-        //m_Slots = new List<Slot>();
-
-        // Creates the Inventory's Slot-Grid
+        // Creates te Inventory at Start
         CreateOnStart(m_inventory, m_GridPanel, m_SlotCount, m_SlotsPerRow);
+    }
+
+    private void Start()
+    {
     }
 
     // Update is called once per frame

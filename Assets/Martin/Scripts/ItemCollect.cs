@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class ItemCollect : MonoBehaviour
+public class ItemCollect : NetworkBehaviour
 {
     //	#########################################
     //	O			ItemCollect				    O
@@ -25,28 +26,50 @@ public class ItemCollect : MonoBehaviour
     public int ItemCount;
 
     private ItemManager m_itemManager;
-    private Inventory m_itemInventory;
+    private Inventory[] m_itemInventorys;
+    private Inventory m_localInventory;
 
-    private void Awake()
+    private void Start()
     {
         // Finds the ItemManager in the Scene.
         m_itemManager = FindObjectOfType<ItemManager>();
+
+    }
+
+    public override void OnStartLocalPlayer()
+    {
         // Finds the Inventory in the Scene.
-        m_itemInventory = FindObjectOfType<Inventory>();
+        m_itemInventorys = FindObjectsOfType<Inventory>();
+
+        m_localInventory = GetLocalInventory(m_itemInventorys);
+    }
+
+    private Inventory GetLocalInventory(Inventory[] _Inventorys)
+    {
+        foreach (Inventory inv in _Inventorys)
+        {
+            if (inv.gameObject.transform.parent.name == "Bobby")
+            {
+                return inv;
+            }
+        }
+
+        return null;
     }
 
     private void OnTriggerEnter(Collider _col)
     {
         // If the ItemManager is not null...
-        if (m_itemManager != null && m_itemInventory != null)
+        if (m_itemManager != null && m_localInventory != null)
         {
             // If the Inventory is not null...
             if (_col.gameObject.tag == "Player")
             {
                 // Adds an Item to the Inventory or collects it.
-                m_itemInventory.AddItem(m_itemManager.ItemLists, List_ID, Item_ID, ItemCount);
+                m_localInventory.AddItem(m_itemManager.ItemLists, List_ID, Item_ID, ItemCount);
                 // Destroys the gameObject.
                 Destroy(gameObject);
+                Network.Destroy(gameObject);
             }
         }
     }
