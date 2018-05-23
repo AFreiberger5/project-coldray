@@ -19,12 +19,12 @@ public class World : NetworkBehaviour
     public struct PropInfo
     {
         public Vector3 WorldPosition;
-        public byte PrefabType;
+        public byte PrefabIndex;
 
-        public PropInfo(Vector3 _worldPosition, byte _prefabType)
+        public PropInfo(Vector3 _worldPosition, byte _prefabIndex)
         {
             WorldPosition = _worldPosition;
-            PrefabType = _prefabType;
+            PrefabIndex = _prefabIndex;
         }
     }
 
@@ -36,8 +36,10 @@ public class World : NetworkBehaviour
     public GameObject m_TreePrefab;
     public GameObject m_PortalBPrefab;
     public GameObject m_PortalDungeonIn;
+    public GameObject[] m_PropPrefabs;
     public bool m_newWorld = true;
     private bool m_building = false;
+    public SyncListPropInfo m_WorldProps = new SyncListPropInfo();
     private Dictionary<Vector3, byte> m_allPropPoints = new Dictionary<Vector3, byte>();
     private List<Vector3> m_freePropPoints = new List<Vector3>();
     private List<Vector3> m_occupiedPropPoints = new List<Vector3>();
@@ -109,29 +111,58 @@ public class World : NetworkBehaviour
             yield return null;
         }
 
-        foreach (KeyValuePair<string, Chunk> c in CHUNKS)
+        if (isServer)
         {
-            IsolatePropPoints(c.Value.m_Chunk, c.Value.m_ChunkData);
-            //c.Value.Save();
+            foreach (KeyValuePair<string, Chunk> c in CHUNKS)
+            {
+                IsolatePropPoints(c.Value.m_Chunk, c.Value.m_ChunkData);
+                //c.Value.Save();
+                yield return null;
+                //Instantiate(m_PortalBPrefab, new Vector3(WorldManager.GetInstance().GetWorldPos().x, 1, WorldManager.GetInstance().GetWorldPos().z), Quaternion.identity);
+                //Instantiate(m_PortalDungeonIn, new Vector3(WorldManager.GetInstance().GetWorldPos().x - 10, 1, WorldManager.GetInstance().GetWorldPos().z - 10), Quaternion.identity);
+
+            }
+            SpawnPortal(0, 6);
             yield return null;
+            SpawnPortal(1, 6);
+            yield return null;
+            SpawnProp(2, 1, 5);
+            yield return null;
+            // CmdInstProps();
         }
-
-
-
-        //Instantiate(m_PortalBPrefab, new Vector3(WorldManager.GetInstance().GetWorldPos().x, 1, WorldManager.GetInstance().GetWorldPos().z), Quaternion.identity);
-        //Instantiate(m_PortalDungeonIn, new Vector3(WorldManager.GetInstance().GetWorldPos().x - 10, 1, WorldManager.GetInstance().GetWorldPos().z - 10), Quaternion.identity);
-        SpawnPortal(m_PortalBPrefab, 6);
-        yield return null;
-        SpawnPortal(m_PortalDungeonIn, 6);
-        yield return null;
-        SpawnProp(m_TreePrefab, 0, 7);
-        yield return null;
-
         m_surface = GetComponent<NavMeshSurface>();
         m_surface.BuildNavMesh();
         WorldManager.GetInstance().ReportWorldBuilt(true);
         yield return null;
 
+    }
+
+    [Command]
+    void CmdPopulateSyncList(Vector3 _propPos, byte _prefab)
+    {
+        m_WorldProps.Add(new PropInfo(_propPos, _prefab));
+    }
+
+    [Command]
+    void CmdInstProps()
+    {
+        RpcInstProps();
+        InstantiateProps();
+    }
+
+    [ClientRpc]
+    void RpcInstProps()
+    {
+        InstantiateProps();
+    }
+
+    void InstantiateProps()
+    {
+        foreach (PropInfo p in m_WorldProps)
+        {
+            Instantiate(m_PropPrefabs[p.PrefabIndex], p.WorldPosition, Quaternion.identity);
+
+        }
     }
 
     void IsolatePropPoints(GameObject _c, Block[,,] _b)
@@ -144,9 +175,8 @@ public class World : NetworkBehaviour
             }
     }
 
-    //[Command]
 
-    void SpawnPortal(GameObject _prefab, int _objRadius)
+    void SpawnPortal(byte _prefabIndex, int _objRadius)
     {
         bool b = false;
 
@@ -156,7 +186,7 @@ public class World : NetworkBehaviour
             b = CheckPropSpace(temp, _objRadius);
             if (b == true)
             {
-                Instantiate(_prefab, new Vector3(temp.x, temp.y+1, temp.z), Quaternion.identity);
+                CmdPopulateSyncList(new Vector3(temp.x, temp.y + 1, temp.z), _prefabIndex);
                 for (int x = 0; x < _objRadius; x++)
                 {
                     for (int z = 0; z < _objRadius; z++)
@@ -178,7 +208,7 @@ public class World : NetworkBehaviour
         }
     }
 
-    void SpawnProp(GameObject _prefab, int _objRadius, int _probability)
+    void SpawnProp(byte _prefabIndex, int _objRadius, int _probability)
     {
         bool b = false;
 
@@ -186,6 +216,7 @@ public class World : NetworkBehaviour
         {
             byte type;
             if (m_allPropPoints.TryGetValue(v, out type))
+            {
                 if (type == 2)
                 {
                     b = CheckPropSpace(v, _objRadius);
@@ -194,7 +225,7 @@ public class World : NetworkBehaviour
                         int rnd = Random.Range(1, 101);
                         if (rnd <= _probability)
                         {
-                            Instantiate(_prefab, v, Quaternion.identity);
+                            //CmdPopulateSyncList(v, _prefabIndex);
                             for (int x = 0; x < _objRadius; x++)
                             {
                                 for (int z = 0; z < _objRadius; z++)
@@ -215,6 +246,7 @@ public class World : NetworkBehaviour
                         }
                     }
                 }
+            }
         }
     }
 
@@ -264,10 +296,10 @@ public class World : NetworkBehaviour
                         {
                             check.Add(true);
                         }
-                        else
-                        {
-                            check.Add(false);
-                        }
+                        // else
+                        // {
+                        //     check.Add(false);
+                        // }
                     }
                     else
                     {
