@@ -2,7 +2,7 @@
 *                                         *
 *   Script made by Alexander Bloomenkamp  *
 *                                         *
-*   Edited by:                            *
+*   Edited by:   Alexander Freiberger     *
 *                                         *
 ******************************************/
 using System.Collections;
