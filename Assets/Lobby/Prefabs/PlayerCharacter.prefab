@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4398633096539576}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_L_Underarm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34,7 +34,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4788332634212272}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49,7 +49,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4433199559268862}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_R_Hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -64,7 +64,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4047127574769504}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_R_Underleg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -79,7 +79,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4520789009044080}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_R_Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4332596503231692}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_L_Hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -109,7 +109,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4750594750767586}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_R_Underarm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,7 +124,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4470076567336442}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchorhook
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139,7 +139,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4376385481205286}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -154,7 +154,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4920267053067262}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_R_Arm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4528942903556556}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_L_Foot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -198,7 +198,7 @@ GameObject:
   - component: {fileID: 114121956886532678}
   - component: {fileID: 114991653357721556}
   - component: {fileID: 114638296010409284}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PlayerCharacter
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -213,7 +213,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4187946159242188}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_R_Foot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -228,7 +228,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4617755329501628}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_L_Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -243,7 +243,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4863605150811584}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: CamPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -258,7 +258,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4275274009647012}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_L_Arm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -273,7 +273,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4337869386247242}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Anchor_L_Underleg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
