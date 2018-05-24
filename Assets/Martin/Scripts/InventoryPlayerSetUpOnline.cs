@@ -31,8 +31,8 @@ public class InventoryPlayerSetUpOnline : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         m_InventoryAtPlayer = GetComponent<Inventory>();
-        m_TestSafeLoad = GetComponent<TestSafeLoad>();
         m_InventoryInGameControll = GetComponent<InventoryInGameControll>();
+        m_TestSafeLoad = GetComponent<TestSafeLoad>();
         m_ItemManagerInScene = GameObject.Find("ItemManager").GetComponent<ItemManager>();
 
         m_InventoryAtPlayer.m_ItemManager = m_ItemManagerInScene;
@@ -44,6 +44,9 @@ public class InventoryPlayerSetUpOnline : NetworkBehaviour
         {
             m_workbench = GameObject.Find("WorkbenchObject");
         }
+
+        m_workbench.GetComponent<WorkbenchControl>().m_inventoryAtPlayer = m_InventoryAtPlayer;
+        m_workbench.GetComponent<WorkbenchControl>().m_InventoryControllAtWorkbench = m_InventoryInGameControll;
 
         // Setup of the Player done.
         m_InventoryAtPlayer.DoneSetup = true;
