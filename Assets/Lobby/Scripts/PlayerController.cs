@@ -24,6 +24,8 @@ public class PlayerController : NetworkBehaviour
     [SyncVar]
     public float m_PlayerCurrentHP = 100.0f;
     [SyncVar]
+    public string m_PlayerInventory = "NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|";
+    [SyncVar]
     [HideInInspector]
     public float m_PlayerCurrentDmg = 5.0f;
     [SyncVar]
@@ -95,17 +97,28 @@ public class PlayerController : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
-            if (Input.GetKey(KeyCode.Space) && Time.time > m_PlayerAttRateTimer && m_PlayerAttack.enabled == false)
+            if (Input.GetKeyDown(KeyCode.Space) && Time.time > m_PlayerAttRateTimer && m_PlayerAttack.enabled == false)
             {
+                //m_playerAnimator.SetBool("isAttacking", true);
+                m_playerAnimator.SetTrigger("isAttac");
+
                 m_PlayerAttack.enabled = true;
 
                 m_PlayerAttRateTimer = Time.time + m_PlayerCurrentAttRate;
             }
             else if (Time.time > m_PlayerAttRateTimer && m_PlayerAttack.enabled == true)
             {
+                //m_playerAnimator.SetBool("isAttacking", false);
+                m_playerAnimator.ResetTrigger("isAttac");
+
                 m_PlayerAttack.enabled = false;
             }
         }
+    }
+
+    private void OnTriggerEnter(Collider _other)
+    {
+        print("HIT!!!");
     }
 
     /// <summary>

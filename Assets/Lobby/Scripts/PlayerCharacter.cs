@@ -62,7 +62,8 @@ public class PlayerCharacter : NetworkBehaviour
 
     private void OnIntChanged(SyncListInt.Operation op, int index)
     {
-        Debug.Log("id: " + m_PlayerId + ", sync model count: " + m_SyncModel.Count);
+        //print("id: " + m_PlayerId + ", sync model count: " + m_SyncModel.Count);
+
         if (m_SyncModel.Count == 9)
         {
             BuildEntirePlayer(m_SyncModel);
@@ -184,7 +185,7 @@ public class PlayerCharacter : NetworkBehaviour
 
                 Destroy(dummy.gameObject);
 
-                print("try to load: " + m_PlayerName);
+                //print("try to load: " + m_PlayerName);
 
                 LoadCharacter(m_PlayerName);
 
@@ -216,7 +217,13 @@ public class PlayerCharacter : NetworkBehaviour
         {
             CharacterStats cs = SaveLoadManager.LoadCharacter(_characterName);
             m_PlayerName = cs.m_StatsName;
-            MakeItASyncListInt(cs.m_Model);
+            MakeItASyncListInt(cs.m_StatsModel);
+
+            //---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW
+            GetComponent<PlayerController>().m_PlayerCurrentHP = cs.m_StatsCurrentHP;
+            GetComponent<PlayerController>().m_PlayerInventory = cs.m_StatsInventory;
+            //---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW
+
             gameObject.name = cs.m_StatsName;
         }
     }
@@ -229,7 +236,8 @@ public class PlayerCharacter : NetworkBehaviour
     [Command]
     private void CmdSendArrayData(int _id, int[] _model)
     {
-        Debug.Log("player name: " + m_PlayerName + ", player id: " + m_PlayerId + ", sync model count: " + _model.Length);
+        //print("player name: " + m_PlayerName + ", player id: " + m_PlayerId + ", sync model count: " + _model.Length);
+
         if (_id == m_PlayerId)
         {
             MakeItASyncListInt(_model);

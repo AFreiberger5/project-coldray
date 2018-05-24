@@ -94,7 +94,7 @@ public class CharacterDummy : MonoBehaviour
     /// </summary>
     public void SaveDummy()
     {
-        CharacterStats cs = new CharacterStats(m_DummyName, m_DummyModel);
+        CharacterStats cs = new CharacterStats(m_DummyName, m_DummyModel, 100.0f, "NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|");
         SaveLoadManager.SaveCharacter(cs);
     }
 
@@ -109,8 +109,8 @@ public class CharacterDummy : MonoBehaviour
         string selectedCharacter = _selectedCharacter;
         CharacterStats cs = SaveLoadManager.LoadCharacter(selectedCharacter);
         m_DummyName = cs.m_StatsName;
-        m_DummyModel = cs.m_Model;
-        
+        m_DummyModel = cs.m_StatsModel;
+
         BuildDummyBody();
         BuildEntireDummyCustomisation();
         PaintDummyBody();
@@ -393,7 +393,7 @@ public class CharacterDummy : MonoBehaviour
                 case 5:// accessories
                     tmpPath += "Accessories/materials/";
 
-                    if (m_DummyModel[0]==0)// male
+                    if (m_DummyModel[0] == 0)// male
                     {
                         tmpPath += m_DummyModel[5].ToString() + m_DummyModel[7].ToString();// male accessories use the hair color
                     }
