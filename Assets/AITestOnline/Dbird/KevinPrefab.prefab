@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 114054711587353746}
   m_Layer: 0
   m_Name: KevinPrefab
-  m_TagString: Untagged
+  m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

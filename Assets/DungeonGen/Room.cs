@@ -76,13 +76,15 @@ public class Room : NetworkBehaviour
     public void SpawnEnemies(int _maxX, int _maxY)
     {
         m_Turrets = new GameObject[Helper.MAX_PLAYERCOUNT + 2];
+        if (!isServer)
+            return;
 
         if (_maxX <= 0 || _maxY <= 0)
         {
             Debug.Log("Room way too small???" + gameObject.name + transform.position);
             return;
         }
-        int spawns = Random.Range(0, Helper.MAX_PLAYERCOUNT);
+        int spawns = Random.Range(0, Helper.MAX_PLAYERCOUNT + 2);
         //Lowering the chance the room with a lot of mobs
         //ToDo: Balance how many spawns
         spawns = (spawns < (Helper.MAX_PLAYERCOUNT + 2) / 2) ? spawns : Random.Range(0, Helper.MAX_PLAYERCOUNT + 2);
@@ -90,8 +92,8 @@ public class Room : NetworkBehaviour
         {
             //Spawn Turrets and add it to a list
             m_Turrets[i] = Instantiate(m_Turret, new Vector3(Random.Range(-_maxX, _maxX) + transform.position.x, transform.position.y, Random.Range(-_maxY, _maxY) + transform.position.z), transform.rotation);
+            m_Turrets[i].SetActive(false);
             NetworkServer.Spawn(m_Turrets[i]);
-
 
         }
 
@@ -111,14 +113,14 @@ public class Room : NetworkBehaviour
                     {
                         if (hasAuthority)
                         {
-                            
+
                             CmdActivateTurret(i);
                         }
                         else
                         {
                             m_Turrets[i].GetComponent<TurretAI>().ActivateTurret();
                         }
-                        
+
                     }
 
                     m_Turrets[i].GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
@@ -128,13 +130,11 @@ public class Room : NetworkBehaviour
             // WorldManager.GetInstance().CmdDestroyWorld();
         }
     }
-
     [Command]
     private void CmdActivateTurret(int _index)
     {
         m_Turrets[_index].GetComponent<TurretAI>().ActivateTurret();
     }
-   
 
     private void OnTriggerExit(Collider other)
     {

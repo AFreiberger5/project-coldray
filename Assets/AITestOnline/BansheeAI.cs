@@ -39,6 +39,7 @@ public class BansheeAI : AIBase
     private int IDDeath;
     #endregion
     private Helper helper;
+    public GameObject HitBox;
 
     [SyncVar, SerializeField]
     private float m_HP = -1;
@@ -48,6 +49,7 @@ public class BansheeAI : AIBase
     [ServerCallback]
     private void Awake()
     {
+        
         //Add Defense Values for all Types of DamageSources
         #region AddDefenseValues
 
@@ -236,7 +238,9 @@ public class BansheeAI : AIBase
 
         if (m_hitdistance * m_hitdistance <= (transform.position - m_Target.transform.position).sqrMagnitude)
         {
-            //ToDo: Wait for Player Damage Calcutaion and implement it here
+                //Banshee deals Magical damage and always focuses on the first enemy that faces her wrath
+            m_Target.GetComponent<PlayerController>().OnPlayerTakeDamage(m_Damage, EDamageType.MELEE | EDamageType.MAGICAL);
+            
         }
     }
 

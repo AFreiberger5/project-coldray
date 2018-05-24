@@ -9,7 +9,7 @@ public class DungeonTeleporterIN : MonoBehaviour
 
     void Start()
     {       
-        WorldManager.GetInstance().CallBuildDungeon();
+        
     }
 
     // Update is called once per frame

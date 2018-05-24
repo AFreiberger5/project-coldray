@@ -17,8 +17,7 @@ public class TurretAI : AIBase
 {
 
     public GameObject m_bullet;
-    public List<PlayerController> m_Players;
-    
+    public List<PlayerController> m_Players;   
 
     private NetworkAnimator m_animator;
     private int IDAttack;
