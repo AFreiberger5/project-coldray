@@ -60,12 +60,13 @@ public class Room : NetworkBehaviour
         }
     }
 
+
     public void SpawnEnemies(int _maxX, int _maxY)
     {
         m_Turrets = new GameObject[Helper.MAX_PLAYERCOUNT];
-        if (!isServer)
-            return;
-
+        //if (!isServer)
+        //    return;
+        //
         if (_maxX <= 0 || _maxY <= 0)
         {
             Debug.Log("Room way too small???" + gameObject.name + transform.position);
@@ -78,7 +79,7 @@ public class Room : NetworkBehaviour
         for (int i = 0; i < spawns; i++)
         {
             //Spawn Turrets and add it to a list
-            m_Turrets[i] = Instantiate(m_Turret, new Vector3(Random.Range(-_maxX, _maxX), transform.position.y, Random.Range(-_maxY, _maxY)), transform.rotation);
+            m_Turrets[i] = Instantiate(m_Turret, new Vector3(Random.Range(-_maxX, _maxX) + transform.position.x, transform.position.y, Random.Range(-_maxY, _maxY) + transform.position.z), transform.rotation);
             m_Turrets[i].SetActive(false);
             NetworkServer.Spawn(m_Turrets[i]);
 
@@ -91,34 +92,55 @@ public class Room : NetworkBehaviour
     {
         if (other.CompareTag("Player"))
         {
-           foreach (GameObject Turret in m_Turrets)
-           {
-               if (Turret.activeSelf == false)
-                   Turret.SetActive(true);
-           
-               Turret.GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
-           
-           }
+            if (m_Turrets != null)
+                for (int i = 0; i < m_Turrets.Length; i++)
+                {
+
+                    if (m_Turrets[i] == null)
+                        continue;
+                    if (m_Turrets[i].activeSelf == false)
+                        m_Turrets[i].SetActive(true);
+
+                    m_Turrets[i].GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
+
+                }
+
             other.GetComponent<PlayerController>().SetCamRedirect(m_RoomCamPos);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if(other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            foreach (GameObject Turret in m_Turrets)
-            {
-                foreach (PlayerController PC in Turret.GetComponent<TurretAI>().m_Players)
+            //foreach (GameObject Turret in m_Turrets)
+            //{
+            //      doesnt't work, PCs change
+            //    foreach (PlayerController PC in Turret.GetComponent<TurretAI>().m_Players)
+            //    {
+            //        // ToDo: remove player from list if Player.id = other.id
+            //        if (PC.GetComponent<PlayerCharacter>().m_PlayerId == other.GetComponent<PlayerCharacter>().m_PlayerId)
+            //            Turret.GetComponent<TurretAI>().m_Players.Remove(PC);
+            //        if (Turret.GetComponent<TurretAI>().m_Players.Count <= 0)
+            //            Turret.SetActive(false);
+            //    }
+
+            //}
+            if (m_Turrets != null)
+                for (int f = 0; f < m_Turrets.Length; f++)
                 {
-                    // ToDo: remove player from list if Player.id = other.id
-                    if (PC.GetComponent<PlayerCharacter>().m_PlayerId == other.GetComponent<PlayerCharacter>().m_PlayerId)
-                        Turret.GetComponent<TurretAI>().m_Players.Remove(PC);
-                    if (Turret.GetComponent<TurretAI>().m_Players.Count <= 0)
-                        Turret.SetActive(false);
+                    if (m_Turrets[f] == null)
+                        continue;
+                    for (int i = 0; i < m_Turrets[f].GetComponent<TurretAI>().m_Players.Count; i++)
+                    {
+                        if (m_Turrets[f].GetComponent<TurretAI>().m_Players[i].GetComponent<PlayerCharacter>().m_PlayerId == other.GetComponent<PlayerCharacter>().m_PlayerId)
+                            m_Turrets[f].GetComponent<TurretAI>().m_Players.Remove(m_Turrets[f].GetComponent<TurretAI>().m_Players[i]);
+                        if (m_Turrets[f].GetComponent<TurretAI>().m_Players.Count <= 0)
+                            m_Turrets[f].SetActive(false);
+                    }
+
                 }
 
-            }
         }
     }
 }

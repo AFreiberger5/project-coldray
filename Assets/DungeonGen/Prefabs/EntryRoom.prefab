@@ -1169,4 +1169,4 @@ MonoBehaviour:
   - {fileID: 4640650749095370}
   - {fileID: 4336912309177932}
   m_RoomCamPos: {fileID: 4046416223755246}
-  m_Turret: {fileID: 0}
+  m_Turret: {fileID: 1061507453935134, guid: afa2a1ea60a0a0d4aaa6a558ff66d946, type: 2}
