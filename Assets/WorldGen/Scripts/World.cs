@@ -31,7 +31,7 @@ public class World : NetworkBehaviour
     public Material m_TextureAtlas;
     public static int COLUMNHEIGHT = 1;
     public static int CHUNKSIZE = 32;
-    public static int RADIUS = 1;
+    public static int RADIUS = 4;
     public static Dictionary<string, Chunk> CHUNKS;
     public GameObject m_TreePrefab;
     public GameObject m_PortalBPrefab;
@@ -44,6 +44,7 @@ public class World : NetworkBehaviour
     private Dictionary<Vector3, byte> m_allPropPoints = new Dictionary<Vector3, byte>();
     private List<Vector3> m_freePropPoints = new List<Vector3>();
     private List<Vector3> m_occupiedPropPoints = new List<Vector3>();
+    private List<Transform> m_objToRemove = new List<Transform>();
     private NavMeshSurface m_surface;
     // ToDo: add NavMeshModifier Volumo for Kevin pathfinding
 
@@ -128,7 +129,7 @@ public class World : NetworkBehaviour
             WorldManager.GetInstance().ReportWorldBuilt(true);
         }
 
-    }   
+    }
 
 
     [Command]
@@ -146,13 +147,19 @@ public class World : NetworkBehaviour
         }
     }
 
+    [Command]
+    public void CmdClearSyncList()
+    {
+        m_WorldProps.Clear();
+    }
+
     public void PropSeedController()
     {
         SpawnPortal(0, 6);
 
         SpawnPortal(1, 6);
 
-        StartCoroutine(SpawnProp(2, 2, 5));
+        StartCoroutine(SpawnProp(2, 0, 5));
 
 
     }
@@ -160,9 +167,10 @@ public class World : NetworkBehaviour
     public IEnumerator InstantiateProps()
     {
         int counter = 0;
-        foreach (PropInfo p in m_WorldProps)
+        for (int i = 0; i < m_WorldProps.Count; i++)
         {
-            Instantiate(m_PropPrefabs[p.PrefabIndex], p.WorldPosition, Quaternion.identity);
+            GameObject go = Instantiate(m_PropPrefabs[m_WorldProps[i].PrefabIndex], m_WorldProps[i].WorldPosition, Quaternion.identity);
+            m_objToRemove.Add(go.transform);
             counter++;
             if (counter == 50)
             {
@@ -171,9 +179,10 @@ public class World : NetworkBehaviour
             }
         }
 
+
         m_surface = GetComponent<NavMeshSurface>();
         m_surface.BuildNavMesh();
-        WorldManager.GetInstance().ActivatePortalA();
+        WorldManager.GetInstance().SetPortalAActive(true);
     }
 
     void IsolatePropPoints(GameObject _c, Block[,,] _b)
@@ -223,35 +232,35 @@ public class World : NetworkBehaviour
     {
         bool b = false;
 
-        foreach (Vector3 v in m_freePropPoints)
+        for (int i = 0; i < m_freePropPoints.Count; i++)
         {
             byte type;
-            if (m_allPropPoints.TryGetValue(v, out type))
+            if (m_allPropPoints.TryGetValue(m_freePropPoints[i], out type))
             {
                 if (type == 2)
                 {
-                    b = CheckPropSpace(v, _objRadius, false);
+                    b = CheckPropSpace(m_freePropPoints[i], _objRadius, false);
                     if (b == true)
                     {
                         int rnd = Random.Range(1, 101);
                         if (rnd <= _probability)
                         {
-                            m_propFlushList.Add(new PropInfo(v, _prefabIndex));
+                            m_propFlushList.Add(new PropInfo(m_freePropPoints[i], _prefabIndex));
                             for (int x = 0; x < _objRadius; x++)
                             {
                                 for (int z = 0; z < _objRadius; z++)
                                 {
-                                    if (!m_occupiedPropPoints.Contains(new Vector3(v.x - x, v.y, v.z + z)))
-                                        m_occupiedPropPoints.Add(new Vector3(v.x - x, v.y, v.z + z));
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(m_freePropPoints[i].x - x, m_freePropPoints[i].y, m_freePropPoints[i].z + z)))
+                                        m_occupiedPropPoints.Add(new Vector3(m_freePropPoints[i].x - x, m_freePropPoints[i].y, m_freePropPoints[i].z + z));
 
-                                    if (!m_occupiedPropPoints.Contains(new Vector3(v.x + x, v.y, v.z + z)))
-                                        m_occupiedPropPoints.Add(new Vector3(v.x + x, v.y, v.z + z));
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(m_freePropPoints[i].x + x, m_freePropPoints[i].y, m_freePropPoints[i].z + z)))
+                                        m_occupiedPropPoints.Add(new Vector3(m_freePropPoints[i].x + x, m_freePropPoints[i].y, m_freePropPoints[i].z + z));
 
-                                    if (!m_occupiedPropPoints.Contains(new Vector3(v.x + x, v.y, v.z - z)))
-                                        m_occupiedPropPoints.Add(new Vector3(v.x + x, v.y, v.z - z));
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(m_freePropPoints[i].x + x, m_freePropPoints[i].y, m_freePropPoints[i].z - z)))
+                                        m_occupiedPropPoints.Add(new Vector3(m_freePropPoints[i].x + x, m_freePropPoints[i].y, m_freePropPoints[i].z - z));
 
-                                    if (!m_occupiedPropPoints.Contains(new Vector3(v.x - x, v.y, v.z - z)))
-                                        m_occupiedPropPoints.Add(new Vector3(v.x - x, v.y, v.z - z));
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(m_freePropPoints[i].x - x, m_freePropPoints[i].y, m_freePropPoints[i].z - z)))
+                                        m_occupiedPropPoints.Add(new Vector3(m_freePropPoints[i].x - x, m_freePropPoints[i].y, m_freePropPoints[i].z - z));
                                     yield return null;
                                 }
                             }
@@ -347,5 +356,51 @@ public class World : NetworkBehaviour
                 return false;
             }
         }
+    }
+
+    public IEnumerator DestroyWorld()
+    {
+        StopCoroutine("BuildWorld");
+        StopCoroutine("InstantiateProps");
+        StopCoroutine("SpawnProp");
+        if (isServer)
+        {            
+            WorldManager.GetInstance().ReportBuildWorldNow(false);
+            WorldManager.GetInstance().ReportWorldBuilt(false);
+            WorldManager.GetInstance().ReportPropsDone(false);
+            WorldManager.GetInstance().ReportPropsListDone(false);
+            CmdClearSyncList();
+            StartCoroutine(ClearLists());
+        }
+
+        WorldManager.GetInstance().SetPortalAActive(false);
+        int counter = 0;
+
+        for (int i = 0; i < m_objToRemove.Count; i++)
+        {
+            Destroy(m_objToRemove[i].transform.gameObject);
+            counter++;
+            if (counter == 50)
+            {
+                yield return null;
+            }
+        }
+        m_objToRemove.Clear();
+
+        List<string> temp = new List<string>();
+        temp.AddRange(CHUNKS.Keys);
+
+        for (int i = 0; i < temp.Count; i++)
+        {
+            string s = temp[i];
+            Chunk c;
+            if (CHUNKS.TryGetValue(s, out c))
+            {
+                Destroy(c.m_Chunk);
+                CHUNKS.Remove(s);
+                yield return null;
+            }
+        }
+        WorldManager.GetInstance().m_IsDestroyingWorld = false;
     }
 }
