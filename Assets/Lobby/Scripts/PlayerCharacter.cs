@@ -15,7 +15,9 @@ using UnityEngine.Networking;
 
 public class PlayerCharacter : NetworkBehaviour
 {
-    // NEU ------------------------------------------------------------------------------------------------------------------------------------------ NEU
+    #region Player Anchors
+
+    [Header("Body Part Anchors")]
     public Transform m_PlayerAnchorHead;
     public Transform m_PlayerAnchorBody;
     public Transform m_PlayerAnchorLArm1;
@@ -31,21 +33,17 @@ public class PlayerCharacter : NetworkBehaviour
     public Transform m_PlayerAnchorRLeg2;
     public Transform m_PlayerAnchorRLeg3;
 
-    private GameObject[] m_PlayerCustomisationObjects = new GameObject[8];
-    private GameObject[] m_PlayerBody = new GameObject[13];
-    private Animator m_PlayerAnimator = null;
-    // NEU ------------------------------------------------------------------------------------------------------------------------------------------ NEU
+    #endregion
 
-
-
+    [Header("Player Sync Vars")]
     [SyncVar(hook = "OnChangeName")]
     public string m_PlayerName = "";
+    [SyncVar]
+    public int m_PlayerId = 42;// default, regular ids would be 0,1 ...
 
-    private void OnChangeName(string _s)
-    {
-        m_PlayerName = _s;
-        SingletonPlayers.Instance.RegPlayer(m_PlayerId, m_PlayerName);
-    }
+    public SyncListInt m_SyncModel = new SyncListInt();
+
+    #region Player Hooks
 
     public override void OnStartClient()
     {
@@ -53,24 +51,27 @@ public class PlayerCharacter : NetworkBehaviour
         OnChangeName(m_PlayerName);
 
         m_SyncModel.Callback -= OnIntChanged;
-        m_SyncModel.Callback += OnIntChanged;// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
+        m_SyncModel.Callback += OnIntChanged;
     }
 
-    [SyncVar]
-    public int m_PlayerId = 42;// default, regular ids would be 0,1 ...
-
-
-    public SyncListInt m_SyncModel = new SyncListInt();
-
-    private void OnIntChanged(SyncListInt.Operation op, int index)// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
+    private void OnChangeName(string _s)
     {
-        //Debug.Log("list changed " + op);
+        m_PlayerName = _s;
+        SingletonPlayers.Instance.RegPlayer(m_PlayerId, m_PlayerName);
+    }
+
+    private void OnIntChanged(SyncListInt.Operation op, int index)
+    {
         Debug.Log("id: " + m_PlayerId + " count: " + m_SyncModel.Count);
         if (m_SyncModel.Count == 9)
         {
             BuildEntirePlayer(m_SyncModel);
         }
     }
+
+    #endregion
+
+    #region Player Properties
 
     public bool Gender// index: 0
     {
@@ -140,25 +141,20 @@ public class PlayerCharacter : NetworkBehaviour
         }
     }
 
-    private void MakeItASyncListInt(int[] _intA)// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
+    #endregion
+
+    private GameObject[] m_PlayerCustomisationObjects = new GameObject[8];
+    private GameObject[] m_PlayerBody = new GameObject[13];
+    private Animator m_PlayerAnimator = null;
+
+    private void MakeItASyncListInt(int[] _intA)
     {
         if (m_SyncModel.Count < 9)
             _intA.ToList().ForEach(o => m_SyncModel.Add(o));
     }
 
-    private int[] MakeItAnIntArray(SyncListInt _sli)
-    {
-        if (isLocalPlayer)
-        {
-            return _sli.ToArray();
-        }
-        return new int[9];
-    }
-
     private void Start()
     {
-        Debug.Log("Start Done");
-
         m_PlayerAnimator = GetComponent<Animator>();
 
         if (m_SyncModel.Count >= 9)
@@ -166,8 +162,6 @@ public class PlayerCharacter : NetworkBehaviour
             BuildEntirePlayer(m_SyncModel);
         }
     }
-
-    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
 
     private void FixedUpdate()
     {
@@ -183,12 +177,10 @@ public class PlayerCharacter : NetworkBehaviour
 
                 print("try to load: " + m_PlayerName);
 
-                //LoadCharacter(m_PlayerName);
-                //StartCoroutine(TestWaitForSec());// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
                 LoadCharacter(m_PlayerName);
 
                 Debug.Log("CmdSendArrayData 1");
-                CmdSendArrayData(m_PlayerId, MakeItAnIntArray(m_SyncModel));
+                CmdSendArrayData(m_PlayerId,m_SyncModel.ToArray());
 
                 BuildEntirePlayer(m_SyncModel);
             }
@@ -231,25 +223,6 @@ public class PlayerCharacter : NetworkBehaviour
         }
     }
 
-    // NEU ------------------------------------------------------------------------------------------------------------------------------------------ NEU
-
-    private IEnumerator TestWaitForSec()// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
-    {
-        if (isLocalPlayer)
-        {
-            yield return new WaitForSeconds(3);
-
-            LoadCharacter(m_PlayerName);
-
-            Debug.Log("CmdSendArrayData 1");
-            CmdSendArrayData(m_PlayerId, MakeItAnIntArray(m_SyncModel));
-
-            BuildEntirePlayer(m_SyncModel);
-        }
-    }
-
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
     private void BuildEntirePlayer(SyncListInt _syncModel)
     {
         try
@@ -275,24 +248,28 @@ public class PlayerCharacter : NetworkBehaviour
         if (_syncModel[0] == 0)// male
         {
             bodyPath += "M_Humanoid/Body/BodyI0";
-        
+
+            //--------- CHANGE ANIMATOR HERE ---------
             // gets the male animator
             //m_PlayerAnimator.runtimeAnimatorController =
             //    Resources.Load("Prefabs/M_Humanoid/Female_Human",
             //    typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
             //
             //m_PlayerAnimator.Play("Idle");
+            //--------- CHANGE ANIMATOR HERE ---------
         }
         else// female
         {
             bodyPath += "F_Humanoid/Body/BodyI0";
-        
+
+            //--------- CHANGE ANIMATOR HERE ---------
             // gets the female animator
             //m_PlayerAnimator.runtimeAnimatorController =
             //    Resources.Load("Prefabs/F_Humanoid/Female_Human",
             //    typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
             //
             //m_PlayerAnimator.Play("Idle");
+            //--------- CHANGE ANIMATOR HERE ---------
         }
 
         // iterates the entire body and instantiates bodyparts according to the gender
@@ -383,7 +360,7 @@ public class PlayerCharacter : NetworkBehaviour
     /// </summary>
     public void BuildEntirePlayerCustomisation(SyncListInt _syncModel)
     {
-        for (int i = 1; i < MakeItAnIntArray(m_SyncModel).Length; i++)// excludes gender
+        for (int i = 1; i < m_SyncModel.ToArray().Length; i++)// excludes gender
         {
             BuildPlayerCustomisation(_syncModel[i], _syncModel);
         }

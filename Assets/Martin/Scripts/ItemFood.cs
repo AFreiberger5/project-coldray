@@ -26,8 +26,9 @@ public class ItemFood : Item
     public float m_PositiveValue;
     public float m_NegativeValue;
 
-    public ItemFood(int _FoodID, string _FoodName, string _FoodDescription, int _FoodStackSize, float _PositiveValue, float _NegativeValue) : base(_FoodName, _FoodDescription, _FoodStackSize)
+    public ItemFood(int _FoodID, string _FoodName, string _FoodDescription, int _FoodStackSize, float _PositiveValue, float _NegativeValue, params Recipe[] _Recipes) : base(_FoodName, _FoodDescription, _FoodStackSize, _Recipes)
     {
+        m_ListID = 0;
         m_FoodID = _FoodID;
         m_PositiveValue = _PositiveValue;
         m_NegativeValue = _NegativeValue;
@@ -39,6 +40,18 @@ public class ItemFood : Item
 
     public override void OnMouseMiddleClick()
     {
+    }
+
+    public override string GetSerializable()
+    {
+        string S = "";
+
+        S += this.m_ListID;
+        S += "~";
+        S += this.m_FoodID;
+        S += "~";
+
+        return S;
     }
 
     public override void OnMouseRightClick()
