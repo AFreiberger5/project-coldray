@@ -52,12 +52,12 @@ public class PlayerController : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
-            MovePlayer();
+            //MovePlayer();
 
-            //m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-            //m_playerMovement = m_playerMovement.normalized * m_playerSpeed * Time.deltaTime;
+            m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+            m_playerMovement = m_playerMovement.normalized * m_playerSpeed * Time.deltaTime;
 
-            //m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
+            m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
         }
     }
 
