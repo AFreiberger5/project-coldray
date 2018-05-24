@@ -15,10 +15,22 @@ using UnityEngine.Networking;
 public class PlayerController : NetworkBehaviour
 {
     [Header("Requirements")]
-    public Camera m_PlayerCamera;
     public Transform m_CamAnchor;
     public Transform m_PlayerBodyT;
+    public Collider m_PlayerAttack;
 
+    [SyncVar]
+    public float m_PlayerCurrentHP = 100.0f;
+    [SyncVar]
+    [HideInInspector]
+    public float m_PlayerCurrentDmg = 5.0f;
+    [SyncVar]
+    [HideInInspector]
+    public float m_PlayerCurrentAttRate = 1.0f;
+
+    private float m_PlayerAttRateTimer = 0.0f;
+
+    private Camera m_PlayerCamera;
     private Rigidbody m_playerRigidBody;
     private float m_playerSpeed = 5.0f;
     private float m_playerRotSpeed = 10.0f;
@@ -42,6 +54,51 @@ public class PlayerController : NetworkBehaviour
         if (isLocalPlayer)
         {
             FaceMousePosition();
+
+            PlayerAttacks();
+        }
+    }
+
+    /// <summary>
+    /// rotates the body around the y axis
+    /// </summary>
+    private void FaceMousePosition()
+    {
+        if (isLocalPlayer)
+        {
+            if (m_PlayerCamera == null)
+                m_PlayerCamera = Camera.main;
+
+            Ray ray = m_PlayerCamera.ScreenPointToRay(Input.mousePosition);
+            Plane plane = new Plane(Vector3.up, new Vector3(0, m_PlayerBodyT.position.y, 0));
+            float distance = 0.0f;
+
+            if (plane.Raycast(ray, out distance))
+            {
+                Vector3 dir = ray.GetPoint(distance) - m_PlayerBodyT.position;
+
+                m_PlayerBodyT.rotation = Quaternion.Slerp(m_PlayerBodyT.rotation, Quaternion.LookRotation(dir), m_playerRotSpeed * Time.deltaTime);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void PlayerAttacks()
+    {
+        if (isLocalPlayer)
+        {
+            if (Input.GetKey(KeyCode.Space) && Time.time > m_PlayerAttRateTimer && m_PlayerAttack.enabled == false)
+            {
+                m_PlayerAttack.enabled = true;
+
+                m_PlayerAttRateTimer = Time.time + m_PlayerCurrentAttRate;
+            }
+            else if (Time.time > m_PlayerAttRateTimer && m_PlayerAttack.enabled == true)
+            {
+                m_PlayerAttack.enabled = false;
+            }
         }
     }
 
@@ -70,7 +127,7 @@ public class PlayerController : NetworkBehaviour
         if (isLocalPlayer)
         {
             Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-            targetVelocity = m_PlayerCamera.transform.TransformDirection(targetVelocity).normalized* m_playerSpeed;
+            targetVelocity = m_PlayerCamera.transform.TransformDirection(targetVelocity).normalized * m_playerSpeed;
 
             Vector3 velocity = m_playerRigidBody.velocity;
             Vector3 velocityChange = (targetVelocity - velocity);
@@ -78,29 +135,6 @@ public class PlayerController : NetworkBehaviour
             velocityChange.z = Mathf.Clamp(velocityChange.z, -m_playerSpeed, m_playerSpeed);
             velocityChange.y = 0;
             m_playerRigidBody.AddForce(velocityChange, ForceMode.VelocityChange);
-        }
-    }
-
-    /// <summary>
-    /// rotates the body around the y axis
-    /// </summary>
-    private void FaceMousePosition()
-    {
-        if (isLocalPlayer)
-        {
-            if (m_PlayerCamera == null)
-                m_PlayerCamera = Camera.main;
-
-            Ray ray = m_PlayerCamera.ScreenPointToRay(Input.mousePosition);
-            Plane plane = new Plane(Vector3.up, new Vector3(0, m_PlayerBodyT.position.y, 0));
-            float distance = 0.0f;
-
-            if (plane.Raycast(ray, out distance))
-            {
-                Vector3 dir = ray.GetPoint(distance) - m_PlayerBodyT.position;
-
-                m_PlayerBodyT.rotation = Quaternion.Slerp(m_PlayerBodyT.rotation, Quaternion.LookRotation(dir), m_playerRotSpeed * Time.deltaTime);
-            }
         }
     }
 
