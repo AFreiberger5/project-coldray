@@ -45,6 +45,8 @@ public class InventoryPlayerSetUpOnline : NetworkBehaviour
             m_workbench = GameObject.Find("WorkbenchObject");
         }
 
+        m_workbench.GetComponent<WorkbenchControl>().m_inventoryAtPlayer = m_InventoryAtPlayer;
+
         // Setup of the Player done.
         m_InventoryAtPlayer.DoneSetup = true;
         m_workbench.GetComponent<Workbench>().m_InitDone = true;
