@@ -736,6 +736,7 @@ MonoBehaviour:
   m_PlayerBodyT: {fileID: 4263663560477474}
   m_PlayerAttack: {fileID: 135167956691591788}
   m_PlayerCurrentHP: 100
+  m_PlayerInventory: 
   m_PlayerCurrentDmg: 5
   m_PlayerCurrentAttRate: 0.5
 --- !u!114 &114990500410317802
@@ -775,7 +776,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.45
   m_Center: {x: 0, y: 0.5, z: 0.5}
 --- !u!136 &136470416752274220
 CapsuleCollider:

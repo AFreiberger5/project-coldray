@@ -71,14 +71,14 @@ public static class SaveLoadManager
             stream.Close();
             stream.Dispose();
 
-            CharacterStats cs = new CharacterStats(data.m_StatsName, data.m_Model);
+            CharacterStats cs = new CharacterStats(data.m_StatsName, data.m_StatsModel, data.m_StatsCurrentHP, data.m_StatsInventory);
             return cs;
         }
         else
         {
             Debug.LogError("Character could not be loaded.");
 
-            CharacterStats cs = new CharacterStats("ERROR", new int[9]);
+            CharacterStats cs = new CharacterStats("ERROR", new int[9], 1.0f, "NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|");
             return cs;
         }
     }
