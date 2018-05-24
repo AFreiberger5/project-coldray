@@ -82,7 +82,7 @@ public class KevinAI : AIBase
         if (Input.GetKeyDown(KeyCode.V))
             RunAway();
 
-
+        
 
         NPCDecision();
 
@@ -139,7 +139,7 @@ public class KevinAI : AIBase
             m_animator.animator.SetBool(IDLiving, false);
         if (m_currentState.HasFlag(EAIState.DEAD))
             m_animator.animator.SetBool(IDDeath, true);
-        
+
 
 
         m_previousState = m_currentState;
@@ -243,10 +243,8 @@ public class KevinAI : AIBase
                 i = 3;
             }
         }
-        if (NMHit.position == null)
-            m_agent.destination = Vector3.zero;
-        else
-            m_agent.destination = new Vector3(NMHit.position.x, 0, NMHit.position.z);
+
+        m_agent.destination = new Vector3(NMHit.position.x, 0, NMHit.position.z);
 
         transform.forward = m_agent.destination - transform.position;
     }

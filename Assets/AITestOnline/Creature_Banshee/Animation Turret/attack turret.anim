@@ -3648,17 +3648,25 @@ AnimationClip:
   m_GenerateMotionCurves: 0
   m_Events:
   - time: 0.6333333
-    functionName: Attack
+    functionName: Shoot
     data: 
-    objectReferenceParameter: {fileID: 11500000, guid: 6d30c539225a9f540b346624e24362b9,
+    objectReferenceParameter: {fileID: 11500000, guid: 2314a512a09d3ee42bcfb5e16a66f521,
       type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 1.3166667
-    functionName: Attack
+    functionName: Shoot
     data: 
-    objectReferenceParameter: {fileID: 11500000, guid: 6d30c539225a9f540b346624e24362b9,
+    objectReferenceParameter: {fileID: 11500000, guid: 2314a512a09d3ee42bcfb5e16a66f521,
+      type: 3}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 2
+    functionName: AttackDone
+    data: 
+    objectReferenceParameter: {fileID: 11500000, guid: 2314a512a09d3ee42bcfb5e16a66f521,
       type: 3}
     floatParameter: 0
     intParameter: 0
