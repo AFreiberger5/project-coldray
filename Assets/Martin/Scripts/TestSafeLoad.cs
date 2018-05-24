@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class TestSafeLoad : MonoBehaviour 
+public class TestSafeLoad : NetworkBehaviour 
 {
     //	#########################################
     //	O			TestSafeLoad				O
@@ -26,15 +27,44 @@ public class TestSafeLoad : MonoBehaviour
     private Inventory Inventata;
     private ItemManager ItemManalulu;
 
-    private void Awake()
+    public string NAME = "Bobby";
+    public bool BobbyFound = false;
+    public bool InitDone = false;
+
+    private void Initialize()
     {
-        Inventata = Player.GetComponent<Inventory>();
-        ItemManalulu = GetComponent<ItemManager>();
+        Inventata = GetComponent<Inventory>();
+        ItemManalulu = GameObject.Find("ItemManager").GetComponent<ItemManager>();
+
+        InventoryPanel = Inventata.m_GridPanel;
+    }
+
+    private GameObject GetLocalPlayer(string _LocalPlayerName)
+    {
+        GameObject[] AllPlayers = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject Go in AllPlayers)
+        {
+            if (Go.GetComponent<Inventory>() != null && Go.name == _LocalPlayerName)
+            {
+                Debug.Log("Es ist ein richtiger Bobby /o_o| ... I can't beleve it!");
+                BobbyFound = true;
+                return Go;
+            }
+        }
+        BobbyFound = false;
+        return null;
     }
 
     // Update is called once per frame
     void Update () 
 	{
+        if (InitDone)
+        {
+            Initialize();
+            InitDone = false;
+        }
+
         if (Input.GetKeyDown(KeyCode.T))
         {
             Serialisa = Inventata.MakeSerializible(InventoryPanel);

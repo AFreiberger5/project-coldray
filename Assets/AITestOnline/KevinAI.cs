@@ -139,7 +139,7 @@ public class KevinAI : AIBase
             m_animator.animator.SetBool(IDLiving, false);
         if (m_currentState.HasFlag(EAIState.DEAD))
             m_animator.animator.SetBool(IDDeath, true);
-        
+
 
 
         m_previousState = m_currentState;
@@ -243,10 +243,8 @@ public class KevinAI : AIBase
                 i = 3;
             }
         }
-        if (NMHit.position == null)
-            m_agent.destination = Vector3.zero;
-        else
-            m_agent.destination = new Vector3(NMHit.position.x, 0, NMHit.position.z);
+
+        m_agent.destination = new Vector3(NMHit.position.x, 0, NMHit.position.z);
 
         transform.forward = m_agent.destination - transform.position;
     }
@@ -259,13 +257,38 @@ public class KevinAI : AIBase
         throw new System.NotImplementedException();
     }
 
-    [Server]
+
     /// <summary>
     /// Called from Player when interacting with the NPC for Combat and Quests
     /// </summary>
     /// <param name="_value">Damage/Value received</param>
     /// <param name="_damageType">Type of Attack (Use NONE if not an attack)</param>
     public override void OnInteraction(float _value, EDamageType _damageType)
+    {
+        if (isServer)
+        {
+
+            SearchingCoffe = true;
+
+            if (!_damageType.HasFlag(EDamageType.NONE))
+            {
+                m_HP -= base.DamageCalculation(_value, _damageType, DefenseValues);
+                if (m_HP <= 0)
+                {
+                    OnNPCDeath();
+                }
+            }
+
+        }
+        else if(isClient)
+        {
+            CmdOnInteraction( _value, _damageType);
+        }
+
+    }
+
+    [Command]
+    public void CmdOnInteraction(float _value, EDamageType _damageType)
     {
         SearchingCoffe = true;
 
@@ -277,8 +300,6 @@ public class KevinAI : AIBase
                 OnNPCDeath();
             }
         }
-
-
     }
 
     /// <summary>

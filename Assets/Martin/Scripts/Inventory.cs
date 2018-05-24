@@ -202,65 +202,70 @@ public class Inventory : MonoBehaviour
     public int m_SlotCount = 50;
     public int m_SlotsPerRow = 10;
 
-    void Awake()
-    {
-        // Finds and sets the ItemManager-Script.
-        m_ItemManager = GameObject.Find("ItemManager").GetComponent<ItemManager>();
+    public bool DoneSetup;
 
+    private void InitializeInventory()
+    {
         // Create the List for the Items in the Inventory.
         m_inventory = new List<Item>();
 
-        // Create the List for the needed Slots.
-        //m_Slots = new List<Slot>();
-
         // Creates the Inventory's Slot-Grid
         CreateOnStart(m_inventory, m_GridPanel, m_SlotCount, m_SlotsPerRow);
+
+        // Closes the Inventory after initializing.
+        Close(m_InventoryObject);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (DoneSetup)
         {
-            string S = MakeSerializible(m_GridPanel);
-            Debug.Log(S);
+            InitializeInventory();
+            DoneSetup = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            if (FindSlot(m_GridPanel, "Apfel") != -1)
-            {
-                RemoveItem(m_ItemManager.ItemsFood, 1, 5);
-            }
-            else
-            {
-                Debug.Log("AAHHHHH !!!");
-            }
-        }
+        //if (Input.GetKeyDown(KeyCode.T))
+        //{
+        //    string S = MakeSerializible(m_GridPanel);
+        //    Debug.Log(S);
+        //}
 
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            if (FindSlot(m_GridPanel, "Holzschwert") != -1)
-            {
-                RemoveItem(m_ItemManager.ItemsWeapon, 1, 1);
-            }
-            else
-            {
-                Debug.Log("AAHHHHH !!!");
-            }
-        }
+        //if (Input.GetKeyDown(KeyCode.P))
+        //{
+        //    if (FindSlot(m_GridPanel, "Apfel") != -1)
+        //    {
+        //        RemoveItem(m_ItemManager.ItemsFood, 1, 5);
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("AAHHHHH !!!");
+        //    }
+        //}
 
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            if (FindSlot(m_GridPanel, "Brustplatte") != -1)
-            {
-                RemoveItem(m_ItemManager.ItemsArmor, 1, 5);
-            }
-            else
-            {
-                Debug.Log("AAHHHHH !!!");
-            }
-        }
+        //if (Input.GetKeyDown(KeyCode.L))
+        //{
+        //    if (FindSlot(m_GridPanel, "Holzschwert") != -1)
+        //    {
+        //        RemoveItem(m_ItemManager.ItemsWeapon, 1, 1);
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("AAHHHHH !!!");
+        //    }
+        //}
+
+        //if (Input.GetKeyDown(KeyCode.M))
+        //{
+        //    if (FindSlot(m_GridPanel, "Brustplatte") != -1)
+        //    {
+        //        RemoveItem(m_ItemManager.ItemsArmor, 1, 5);
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("AAHHHHH !!!");
+        //    }
+        //}
     }
 
     /// <summary>

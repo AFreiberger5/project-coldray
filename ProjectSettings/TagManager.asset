@@ -10,6 +10,8 @@ TagManager:
   - TileSpawnPoint
   - Occupied
   - Rooms
+  - NPC
+  - Wall
   layers:
   - Default
   - TransparentFX

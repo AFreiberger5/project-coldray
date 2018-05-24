@@ -15,7 +15,9 @@ using UnityEngine.Networking;
 
 public class PlayerCharacter : NetworkBehaviour
 {
-    // NEU ------------------------------------------------------------------------------------------------------------------------------------------ NEU
+    #region Player Anchors
+
+    [Header("Body Part Anchors")]
     public Transform m_PlayerAnchorHead;
     public Transform m_PlayerAnchorBody;
     public Transform m_PlayerAnchorLArm1;
@@ -31,21 +33,17 @@ public class PlayerCharacter : NetworkBehaviour
     public Transform m_PlayerAnchorRLeg2;
     public Transform m_PlayerAnchorRLeg3;
 
-    private GameObject[] m_PlayerCustomisationObjects = new GameObject[8];
-    private GameObject[] m_PlayerBody = new GameObject[13];
-    private Animator m_PlayerAnimator = null;
-    // NEU ------------------------------------------------------------------------------------------------------------------------------------------ NEU
+    #endregion
 
-
-
+    [Header("Player Sync Vars")]
     [SyncVar(hook = "OnChangeName")]
     public string m_PlayerName = "";
+    [SyncVar]
+    public int m_PlayerId = 42;// default, regular ids would be 0,1 ...
 
-    private void OnChangeName(string _s)
-    {
-        m_PlayerName = _s;
-        SingletonPlayers.Instance.RegPlayer(m_PlayerId, m_PlayerName);
-    }
+    public SyncListInt m_SyncModel = new SyncListInt();
+
+    #region Player Hooks
 
     public override void OnStartClient()
     {
@@ -53,24 +51,27 @@ public class PlayerCharacter : NetworkBehaviour
         OnChangeName(m_PlayerName);
 
         m_SyncModel.Callback -= OnIntChanged;
-        m_SyncModel.Callback += OnIntChanged;// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
+        m_SyncModel.Callback += OnIntChanged;
     }
 
-    [SyncVar]
-    public int m_PlayerId = 42;// default, regular ids would be 0,1 ...
-
-
-    public SyncListInt m_SyncModel = new SyncListInt();
-
-    private void OnIntChanged(SyncListInt.Operation op, int index)// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
+    private void OnChangeName(string _s)
     {
-        //Debug.Log("list changed " + op);
-        Debug.Log("id: " + m_PlayerId + " count: " + m_SyncModel.Count);
+        m_PlayerName = _s;
+        SingletonPlayers.Instance.RegPlayer(m_PlayerId, m_PlayerName);
+    }
+
+    private void OnIntChanged(SyncListInt.Operation op, int index)
+    {
+        Debug.Log("id: " + m_PlayerId + ", sync model count: " + m_SyncModel.Count);
         if (m_SyncModel.Count == 9)
         {
             BuildEntirePlayer(m_SyncModel);
         }
     }
+
+    #endregion
+
+    #region Player Properties
 
     public bool Gender// index: 0
     {
@@ -140,25 +141,26 @@ public class PlayerCharacter : NetworkBehaviour
         }
     }
 
-    private void MakeItASyncListInt(int[] _intA)// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
+    #endregion
+
+    private GameObject[] m_PlayerCustomisationObjects = new GameObject[8];
+    private GameObject[] m_PlayerBody = new GameObject[13];
+#pragma warning disable 0414
+    private Animator m_PlayerAnimator = null;
+#pragma warning restore 0414
+
+    /// <summary>
+    /// converts an int array into an int sync list
+    /// </summary>
+    /// <param name="_intA"></param>
+    private void MakeItASyncListInt(int[] _intA)
     {
         if (m_SyncModel.Count < 9)
             _intA.ToList().ForEach(o => m_SyncModel.Add(o));
     }
 
-    private int[] MakeItAnIntArray(SyncListInt _sli)
-    {
-        if (isLocalPlayer)
-        {
-            return _sli.ToArray();
-        }
-        return new int[9];
-    }
-
     private void Start()
     {
-        Debug.Log("Start Done");
-
         m_PlayerAnimator = GetComponent<Animator>();
 
         if (m_SyncModel.Count >= 9)
@@ -167,13 +169,14 @@ public class PlayerCharacter : NetworkBehaviour
         }
     }
 
-    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- NEU
-
-    private void FixedUpdate()
+    /// <summary>
+    /// builds the player as soon as he got his name from the dummy
+    /// </summary>
+    private void Update()
     {
         if (isLocalPlayer)
         {
-            if (m_PlayerName == "")
+            if (m_PlayerName == "")// gets called when the player spawns for the first time
             {
                 CharacterDummy dummy = FindObjectOfType<CharacterDummy>();
                 CmdNetworkInitialize(dummy.m_DummyName);
@@ -183,18 +186,19 @@ public class PlayerCharacter : NetworkBehaviour
 
                 print("try to load: " + m_PlayerName);
 
-                //LoadCharacter(m_PlayerName);
-                //StartCoroutine(TestWaitForSec());// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
                 LoadCharacter(m_PlayerName);
 
-                Debug.Log("CmdSendArrayData 1");
-                CmdSendArrayData(m_PlayerId, MakeItAnIntArray(m_SyncModel));
+                CmdSendArrayData(m_PlayerId, m_SyncModel.ToArray());
 
                 BuildEntirePlayer(m_SyncModel);
             }
         }
     }
 
+    /// <summary>
+    /// extracts the players name from the dummy
+    /// </summary>
+    /// <param name="_string"></param>
     [Command]
     public void CmdNetworkInitialize(string _string)
     {
@@ -202,6 +206,10 @@ public class PlayerCharacter : NetworkBehaviour
         m_PlayerName = _string;
     }
 
+    /// <summary>
+    /// loads the player file by name and adjusts the players stats according to it
+    /// </summary>
+    /// <param name="_characterName"></param>
     public void LoadCharacter(string _characterName)
     {
         if (isLocalPlayer)
@@ -209,47 +217,29 @@ public class PlayerCharacter : NetworkBehaviour
             CharacterStats cs = SaveLoadManager.LoadCharacter(_characterName);
             m_PlayerName = cs.m_StatsName;
             MakeItASyncListInt(cs.m_Model);
-            RenamePlayerGameObject(cs.m_StatsName);
+            gameObject.name = cs.m_StatsName;
         }
     }
 
+    /// <summary>
+    /// gives the server information about the player
+    /// </summary>
+    /// <param name="_id"></param>
+    /// <param name="_model"></param>
     [Command]
     private void CmdSendArrayData(int _id, int[] _model)
     {
-        Debug.Log("CmdSendArrayData, _id: " + _id + "m_PlayerId: " + m_PlayerId + _model.Length);
+        Debug.Log("player name: " + m_PlayerName + ", player id: " + m_PlayerId + ", sync model count: " + _model.Length);
         if (_id == m_PlayerId)
         {
             MakeItASyncListInt(_model);
         }
     }
 
-    private void RenamePlayerGameObject(string _name)
-    {
-        if (isServer)
-        {
-            gameObject.name = _name;
-        }
-    }
-
-    // NEU ------------------------------------------------------------------------------------------------------------------------------------------ NEU
-
-    private IEnumerator TestWaitForSec()// MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL  MODEL
-    {
-        if (isLocalPlayer)
-        {
-            yield return new WaitForSeconds(3);
-
-            LoadCharacter(m_PlayerName);
-
-            Debug.Log("CmdSendArrayData 1");
-            CmdSendArrayData(m_PlayerId, MakeItAnIntArray(m_SyncModel));
-
-            BuildEntirePlayer(m_SyncModel);
-        }
-    }
-
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+    /// <summary>
+    /// calls every build function to build the entire player
+    /// </summary>
+    /// <param name="_syncModel"></param>
     private void BuildEntirePlayer(SyncListInt _syncModel)
     {
         try
@@ -275,24 +265,28 @@ public class PlayerCharacter : NetworkBehaviour
         if (_syncModel[0] == 0)// male
         {
             bodyPath += "M_Humanoid/Body/BodyI0";
-        
+
+            //--------- CHANGE ANIMATOR HERE ---------
             // gets the male animator
             //m_PlayerAnimator.runtimeAnimatorController =
             //    Resources.Load("Prefabs/M_Humanoid/Female_Human",
             //    typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
             //
             //m_PlayerAnimator.Play("Idle");
+            //--------- CHANGE ANIMATOR HERE ---------
         }
         else// female
         {
             bodyPath += "F_Humanoid/Body/BodyI0";
-        
+
+            //--------- CHANGE ANIMATOR HERE ---------
             // gets the female animator
             //m_PlayerAnimator.runtimeAnimatorController =
             //    Resources.Load("Prefabs/F_Humanoid/Female_Human",
             //    typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
             //
             //m_PlayerAnimator.Play("Idle");
+            //--------- CHANGE ANIMATOR HERE ---------
         }
 
         // iterates the entire body and instantiates bodyparts according to the gender
@@ -383,7 +377,7 @@ public class PlayerCharacter : NetworkBehaviour
     /// </summary>
     public void BuildEntirePlayerCustomisation(SyncListInt _syncModel)
     {
-        for (int i = 1; i < MakeItAnIntArray(m_SyncModel).Length; i++)// excludes gender
+        for (int i = 1; i < m_SyncModel.ToArray().Length; i++)// excludes gender
         {
             BuildPlayerCustomisation(_syncModel[i], _syncModel);
         }

@@ -3953,7 +3953,7 @@ AnimationClip:
   - time: 2
     functionName: OnNPCDeath
     data: 
-    objectReferenceParameter: {fileID: 11500000, guid: 6d30c539225a9f540b346624e24362b9,
+    objectReferenceParameter: {fileID: 11500000, guid: 2314a512a09d3ee42bcfb5e16a66f521,
       type: 3}
     floatParameter: 0
     intParameter: 0
