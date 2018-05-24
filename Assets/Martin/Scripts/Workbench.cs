@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Workbench : MonoBehaviour 
+public class Workbench : MonoBehaviour
 {
     //	#########################################
     //	O			Workbench   				O
@@ -33,30 +33,78 @@ public class Workbench : MonoBehaviour
     public GameObject m_Slot_4;
     public GameObject m_Slot_Output;
 
+    public bool m_InitDone;
+    public bool m_StartAction;
+
+    [HideInInspector]
     public Slot m_VirtualSlot_1;
+    [HideInInspector]
     public Slot m_VirtualSlot_2;
+    [HideInInspector]
     public Slot m_VirtualSlot_3;
+    [HideInInspector]
     public Slot m_VirtualSlot_4;
+    [HideInInspector]
     public Slot m_VirtualSlot_Output;
 
-    private void Awake()
+    private void Initialize()
     {
         // Links the virtual Slots with the physical SLots.
         CreateWorkspace();
+        // Finds the local Player with name "Bobby" for example.
+        m_PlayerObject = GetLocalPlayer("Bobby");
+        // Starts the scripts Actions
+        m_StartAction = true;
+    }
+
+    private GameObject GetLocalPlayer(string _PlayerName)
+    {
+        GameObject[] Players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject Go in Players)
+        {
+            string PlayerName = Go.GetComponent<PlayerCharacter>().m_PlayerName;
+
+            if (PlayerName == _PlayerName)
+            {
+                return Go;
+            }
+        }
+
+        return null;
     }
 
     // Update is called once per frame
-    void Update () 
-	{
-        m_InRange = CheckForPlayers(m_PlayerObject, m_SightDistance);
-        UpdateWorkspace();
-	}
+    void Update()
+    {
+        if (m_PlayerObject == null)
+        {
+            // Finds the local Player with name "Bobby" for example.
+            m_PlayerObject = GetLocalPlayer("Bobby");
+        }
+
+        if (m_InitDone)
+        {
+            Initialize();
+            m_InitDone = false;
+        }
+
+        if (m_StartAction)
+        {
+            m_InRange = CheckForPlayers(m_PlayerObject, m_SightDistance);
+        }
+            UpdateWorkspace();
+    }
 
     private bool CheckForPlayers(GameObject _Player, float _Range)
     {
-        if (GetDistanceTo(_Player.transform.position) <= _Range)
+        if (_Player != null)
         {
-            return true;
+            if (GetDistanceTo(_Player.transform.position) <= _Range)
+            {
+                return true;
+            }
+            return false;
         }
         return false;
     }

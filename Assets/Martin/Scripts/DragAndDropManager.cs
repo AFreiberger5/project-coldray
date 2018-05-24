@@ -25,8 +25,6 @@ public class DragAndDropManager : MonoBehaviour
     //	O										O
     //	#########################################
 
-    public GameObject m_LocalPlayerObject;
-
     private GameObject m_currentDragged;
     private Transform m_originalParent;
     private Vector3 m_originalPosition;
@@ -49,7 +47,8 @@ public class DragAndDropManager : MonoBehaviour
     private void Start()
     {
         // Gets the Inventoryscript.
-        m_inventoryscript = m_LocalPlayerObject.GetComponent<Inventory>();
+        m_inventoryscript = GetComponent<Inventory>();
+        m_PlayerInventoryPanel = m_inventoryscript.m_GridPanel;
     }
 
     /// <summary>

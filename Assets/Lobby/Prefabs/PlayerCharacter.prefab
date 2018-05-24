@@ -118,6 +118,11 @@ GameObject:
   - component: {fileID: 114560652046424898}
   - component: {fileID: 54693548076679718}
   - component: {fileID: 136942501834531956}
+  - component: {fileID: 114413301688663180}
+  - component: {fileID: 114728373415582344}
+  - component: {fileID: 114652956785543390}
+  - component: {fileID: 114432153614680310}
+  - component: {fileID: 114200930539944392}
   m_Layer: 0
   m_Name: PlayerCharacter
   m_TagString: Player
@@ -558,6 +563,44 @@ MonoBehaviour:
   m_PlayerCamera: {fileID: 0}
   m_CamAnchor: {fileID: 4472095696615674}
   m_PlayerBodyT: {fileID: 4930290019003850}
+--- !u!114 &114200930539944392
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1351405308318440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cef066c077793a0408a7dee31bb9364e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_InventoryObject: {fileID: 0}
+  m_WorkbenchObject: {fileID: 0}
+  m_InitDone: 0
+  m_currentInteractingObject: 
+--- !u!114 &114413301688663180
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1351405308318440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45abdacfa9d541a448b24cfdd59bafdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ItemManager: {fileID: 0}
+  m_GridPanel: {fileID: 0}
+  m_InventoryObject: {fileID: 0}
+  m_SlotPrefab: {fileID: 1691245370461480, guid: 71d6395ca2b879a4c956ab886fa1e575,
+    type: 2}
+  m_ItemPrefab: {fileID: 1656648918381208, guid: 5350f5ed6de96074db37e258bf67147d,
+    type: 2}
+  m_ItemToOverwrite: {fileID: 0}
+  m_inventory: []
+  m_SlotCount: 50
+  m_SlotsPerRow: 10
+  DoneSetup: 0
 --- !u!114 &114430680218130572
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -579,6 +622,18 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
+--- !u!114 &114432153614680310
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1351405308318440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 740f6d4e05fc995498f478ea1681f923, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PlayerInventoryPanel: {fileID: 0}
 --- !u!114 &114513138080188784
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -649,6 +704,34 @@ MonoBehaviour:
     i15: 84
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114652956785543390
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1351405308318440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1113901893094e448f6daa333e2e2cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Player: {fileID: 0}
+  InventoryPanel: {fileID: 0}
+  Serialisa: 1~1~1~|20~3~6~|5~3~2~|5~3~4~|20~3~1~|3~0~1~|1~3~3~|80~3~5~|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|NONE|
+  NAME: Bobby
+  BobbyFound: 0
+  InitDone: 0
+--- !u!114 &114728373415582344
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1351405308318440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65ab508f2b3d50f488d55ebebf1ca848, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114887133688162366
 MonoBehaviour:
   m_ObjectHideFlags: 1

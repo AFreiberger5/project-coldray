@@ -33,9 +33,9 @@ public class Button_Create : MonoBehaviour
     {
         m_itemManager = GameObject.Find("ItemManager").GetComponent<ItemManager>();
         m_WorkbenchDropdown = GameObject.Find("Workbench_Dropdown").GetComponent<Dropdown>();
-        m_workbenchFind = GameObject.Find("Workbench").GetComponent<WorkbenchFind>();
+        m_workbenchFind = GameObject.Find("WorkbenchObject").GetComponent<WorkbenchFind>();
         m_workbenchFind.m_PossibleOutputList = m_workbenchFind.FindCraftableItems(m_workbenchFind.m_WorkbenchSlots);
-        m_workbench = GameObject.Find("Workbench").GetComponent<Workbench>();
+        m_workbench = GameObject.Find("WorkbenchObject").GetComponent<Workbench>();
 
         // If there is no Item in the Output-Slot or the Item is the same, that should be created...
         if (m_workbench.m_VirtualSlot_Output.m_Item.m_Name == "Placeholder" ||
