@@ -211,6 +211,9 @@ public class Inventory : MonoBehaviour
 
         // Creates the Inventory's Slot-Grid
         CreateOnStart(m_inventory, m_GridPanel, m_SlotCount, m_SlotsPerRow);
+
+        // Closes the Inventory after initializing.
+        Close(m_InventoryObject);
     }
 
     // Update is called once per frame

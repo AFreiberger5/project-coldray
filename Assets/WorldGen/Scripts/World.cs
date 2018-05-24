@@ -15,6 +15,9 @@ public class World : NetworkBehaviour
     {
 
     }
+	public class SyncListStructVector3 : SyncListStruct<Vector3>
+	{
+	}
 
     public struct PropInfo
     {
@@ -31,7 +34,7 @@ public class World : NetworkBehaviour
     public Material m_TextureAtlas;
     public static int COLUMNHEIGHT = 1;
     public static int CHUNKSIZE = 32;
-    public static int RADIUS = 1;
+    public static int RADIUS = 2;
     public static Dictionary<string, Chunk> CHUNKS;
     public GameObject m_TreePrefab;
     public GameObject m_PortalBPrefab;
@@ -39,7 +42,8 @@ public class World : NetworkBehaviour
     public GameObject[] m_PropPrefabs;
     public bool m_newWorld = true;
     private bool m_building = false;
-    public SyncListPropInfo m_WorldProps = new SyncListPropInfo();
+	public SyncListPropInfo m_WorldProps = new SyncListPropInfo ();
+    public SyncListStructVector3 m_PotentialSpawnpoints = new SyncListStructVector3();
     private List<PropInfo> m_propFlushList = new List<PropInfo>();
     private Dictionary<Vector3, byte> m_allPropPoints = new Dictionary<Vector3, byte>();
     private List<Vector3> m_freePropPoints = new List<Vector3>();
@@ -54,7 +58,7 @@ public class World : NetworkBehaviour
         {
             WorldManager.GetInstance().ReportBuildWorldNow(true);
         }
-        CHUNKS = new Dictionary<string, Chunk>();
+		CHUNKS = new Dictionary<string, Chunk> ();
         this.transform.position = WorldManager.GetInstance().GetWorldPos();
         this.transform.rotation = Quaternion.identity;
         StartCoroutine(BuildWorld());
@@ -134,12 +138,19 @@ public class World : NetworkBehaviour
 
     [Command]
     public void CmdPopulateSyncList()
-    {
+    {		
         foreach (PropInfo p in m_propFlushList)
         {
             m_WorldProps.Add(p);
+        }       
+
+        for (int i = 0; i < m_freePropPoints.Count)
+        {
+            if (!m_occupiedPropPoints.Contains(m_freePropPoints[i]))
+            {
+                m_PotentialSpawnpoints.Add(m_freePropPoints[i]);
+            }
         }
-        StartCoroutine(ClearLists());
         WorldManager.GetInstance().ReportPropsListDone(true);
         if (isServer)
         {
@@ -147,21 +158,32 @@ public class World : NetworkBehaviour
         }
     }
 
-    [Command]
-    public void CmdClearSyncList()
-    {
-        m_WorldProps.Clear();
+	[Command]
+	void CmdClearSyncList()
+	{
+		for (int i = 0; i < m_WorldProps.Count; i++)
+		{
+
+			m_WorldProps.RemoveAt(i);
+		}
+        for (int i = 0; i < m_PotentialSpawnpoints.Count; i++)
+        {
+
+            m_PotentialSpawnpoints.RemoveAt(i);
+        }
     }
 
     public void PropSeedController()
     {
+		Debug.Log ("seedcontroller");
         SpawnPortal(0, 6);
 
         SpawnPortal(1, 6);
 
         StartCoroutine(SpawnProp(2, 0, 5));
 
-
+		Debug.Log ("CmdBuildDungeonA()von world");
+     WorldManager.GetInstance().CmdBuildDungeonA();
     }
 
     public IEnumerator InstantiateProps()
@@ -199,32 +221,41 @@ public class World : NetworkBehaviour
     void SpawnPortal(byte _prefabIndex, int _objRadius)
     {
         bool b = false;
-
+        int counter = 0;
         while (b == false)
         {
-            Vector3 temp = m_freePropPoints[Random.Range(0, m_freePropPoints.Count + 1)];
-            b = CheckPropSpace(temp, _objRadius, true);
-            if (b == true)
+            if (counter == 100)
             {
-                m_propFlushList.Add(new PropInfo(new Vector3(temp.x, temp.y + 1, temp.z), _prefabIndex));
-                for (int x = 0; x < _objRadius; x++)
+                break;
+            }
+            else
+            {
+                Vector3 temp = m_freePropPoints[Random.Range(0, m_freePropPoints.Count + 1)];
+                b = CheckPropSpace(temp, _objRadius, true);
+                if (b == true)
                 {
-                    for (int z = 0; z < _objRadius; z++)
+                    m_propFlushList.Add(new PropInfo(new Vector3(temp.x, temp.y + 1, temp.z), _prefabIndex));
+                    for (int x = 0; x < _objRadius; x++)
                     {
-                        if (!m_occupiedPropPoints.Contains(new Vector3(temp.x - x, temp.y, temp.z + z)))
-                            m_occupiedPropPoints.Add(new Vector3(temp.x - x, temp.y, temp.z + z));
+                        for (int z = 0; z < _objRadius; z++)
+                        {
+                            if (!m_occupiedPropPoints.Contains(new Vector3(temp.x - x, temp.y, temp.z + z)))
+                                m_occupiedPropPoints.Add(new Vector3(temp.x - x, temp.y, temp.z + z));
 
-                        if (!m_occupiedPropPoints.Contains(new Vector3(temp.x + x, temp.y, temp.z + z)))
-                            m_occupiedPropPoints.Add(new Vector3(temp.x + x, temp.y, temp.z + z));
+                            if (!m_occupiedPropPoints.Contains(new Vector3(temp.x + x, temp.y, temp.z + z)))
+                                m_occupiedPropPoints.Add(new Vector3(temp.x + x, temp.y, temp.z + z));
 
-                        if (!m_occupiedPropPoints.Contains(new Vector3(temp.x + x, temp.y, temp.z - z)))
-                            m_occupiedPropPoints.Add(new Vector3(temp.x + x, temp.y, temp.z - z));
+                            if (!m_occupiedPropPoints.Contains(new Vector3(temp.x + x, temp.y, temp.z - z)))
+                                m_occupiedPropPoints.Add(new Vector3(temp.x + x, temp.y, temp.z - z));
 
-                        if (!m_occupiedPropPoints.Contains(new Vector3(temp.x - x, temp.y, temp.z - z)))
-                            m_occupiedPropPoints.Add(new Vector3(temp.x - x, temp.y, temp.z - z));
+                            if (!m_occupiedPropPoints.Contains(new Vector3(temp.x - x, temp.y, temp.z - z)))
+                                m_occupiedPropPoints.Add(new Vector3(temp.x - x, temp.y, temp.z - z));
+                        }
                     }
                 }
             }
+            
+            counter++;
         }
     }
 
@@ -272,19 +303,7 @@ public class World : NetworkBehaviour
         }
         yield return null;
         WorldManager.GetInstance().ReportPropsDone(true);
-    }
-
-    IEnumerator ClearLists()
-    {
-        m_freePropPoints.Clear();
-        yield return null;
-        m_occupiedPropPoints.Clear();
-        yield return null;
-        m_allPropPoints.Clear();
-        yield return null;
-        m_propFlushList.Clear();
-        yield return null;
-    }
+    }    
 
     bool CheckPropSpace(Vector3 _propPos, int _radius, bool _edgesafe)
     {
@@ -358,7 +377,7 @@ public class World : NetworkBehaviour
         }
     }
 
-    public IEnumerator DestroyWorld()
+    public void DestroyWorld()
     {
         StopCoroutine("BuildWorld");
         StopCoroutine("InstantiateProps");
@@ -369,10 +388,12 @@ public class World : NetworkBehaviour
             WorldManager.GetInstance().ReportWorldBuilt(false);
             WorldManager.GetInstance().ReportPropsDone(false);
             WorldManager.GetInstance().ReportPropsListDone(false);
-            CmdClearSyncList();
-            StartCoroutine(ClearLists());
         }
-
+        m_freePropPoints.Clear();       
+        m_occupiedPropPoints.Clear();      
+        m_allPropPoints.Clear();       
+        m_propFlushList.Clear();
+        
         WorldManager.GetInstance().SetPortalAActive(false);
         int counter = 0;
 
@@ -382,7 +403,7 @@ public class World : NetworkBehaviour
             counter++;
             if (counter == 50)
             {
-                yield return null;
+                //yield return null;
             }
         }
         m_objToRemove.Clear();
@@ -397,10 +418,10 @@ public class World : NetworkBehaviour
             if (CHUNKS.TryGetValue(s, out c))
             {
                 Destroy(c.m_Chunk);
-                CHUNKS.Remove(s);
-                yield return null;
+                CHUNKS.Remove(s);                
             }
         }
+		CmdClearSyncList ();
         WorldManager.GetInstance().m_IsDestroyingWorld = false;
     }
 }

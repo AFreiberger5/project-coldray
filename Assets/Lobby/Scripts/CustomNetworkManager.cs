@@ -109,7 +109,6 @@ public class CustomNetworkManager : NetworkManager
     {
         base.OnServerConnect(_conn);
 
-        print("Player ID: " + _conn.connectionId + "\n");
         playerPrefab.GetComponent<PlayerCharacter>().m_PlayerId = _conn.connectionId;// passes the network connection on to the player character
     }
 
