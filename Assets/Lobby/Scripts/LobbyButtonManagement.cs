@@ -131,14 +131,14 @@ public class LobbyButtonManagement : MonoBehaviour
 
         if (m_awake
             &&
-            EventSystem.current.currentSelectedGameObject != null
+            csg != null
             &&
-            EventSystem.current.currentSelectedGameObject != m_SelectedLast)// spam prevention
+            csg != m_SelectedLast)// spam prevention
         {
-            m_SelectedLast = EventSystem.current.currentSelectedGameObject;// spam prevention
+            m_SelectedLast = csg;// spam prevention
 
             // executes functions when a button is pressed
-            switch (EventSystem.current.currentSelectedGameObject.name)
+            switch (csg.name)
             {
                 // GENERAL BUTTONS -----------------------------------------------------------------------------------------------------------------------------
                 case "Delete Button":
@@ -225,9 +225,9 @@ public class LobbyButtonManagement : MonoBehaviour
             }
 
             // changes ids at the proper position
-            if (m_SlotsAlive.Contains(EventSystem.current.currentSelectedGameObject))// checks if any customisation button was clicked
+            if (m_SlotsAlive.Contains(csg))// checks if any customisation button was clicked
             {
-                int slotIndex = System.Array.IndexOf(m_SlotsAlive, EventSystem.current.currentSelectedGameObject);// returns the index of the clicked button
+                int slotIndex = System.Array.IndexOf(m_SlotsAlive, csg);// returns the index of the clicked button
 
                 int selectedId = int.Parse(m_SlotsAlive[slotIndex].name);// every button has his id stored as its name
                 int customisationIndex = int.Parse(selectedId.ToString().Substring(0, 1));// the index is the first digit of the id

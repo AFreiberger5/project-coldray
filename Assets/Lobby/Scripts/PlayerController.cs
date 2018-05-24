@@ -11,8 +11,10 @@ using UnityEngine.Networking;
 //||                                                ||\\
 //||||||||||||||||||||||||||||||||||||||||||||||||||||\\
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : NetworkBehaviour
 {
+    [Header("Requirements")]
     public Camera m_PlayerCamera;
     public Transform m_CamAnchor;
     public Transform m_PlayerBodyT;
@@ -22,6 +24,9 @@ public class PlayerController : NetworkBehaviour
     private float m_playerRotSpeed = 10.0f;
     private Vector3 m_playerMovement;
 
+    /// <summary>
+    /// basic setup of the player
+    /// </summary>
     private void Start()
     {
         m_playerRigidBody = GetComponent<Rigidbody>();
@@ -29,6 +34,9 @@ public class PlayerController : NetworkBehaviour
         SetCamRedirect(m_CamAnchor);
     }
 
+    /// <summary>
+    /// player rotation
+    /// </summary>
     private void Update()
     {
         if (isLocalPlayer)
@@ -37,52 +45,52 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// player movement
+    /// </summary>
     private void FixedUpdate()
     {
         if (isLocalPlayer)
         {
-            //MovePlayer();
+            MovePlayer();
 
             //m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
             //m_playerMovement = m_playerMovement.normalized * m_playerSpeed * Time.deltaTime;
 
             //m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
-
-            m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-            m_playerMovement = m_PlayerCamera.transform.TransformDirection(m_playerMovement).normalized * m_playerSpeed * Time.deltaTime;
-
-            m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
-
-            //Vector3 tv = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-            ////m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-            //m_playerMovement = m_PlayerCamera.transform.TransformDirection(tv).normalized * m_playerSpeed/* * Time.deltaTime*/;
-            //
-            ////m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
-            //m_playerRigidBody.AddForce(m_playerMovement-m_playerRigidBody.velocity, ForceMode.VelocityChange);
         }
     }
 
+    /// <summary>
+    /// applies a force onto the players rigidbody
+    /// uses the cameras transform instead of the players
+    /// </summary>
     private void MovePlayer()
     {
         if (isLocalPlayer)
         {
             Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-            targetVelocity = m_PlayerCamera.transform.TransformDirection(targetVelocity).normalized;
-            targetVelocity *= m_playerSpeed;
+            targetVelocity = m_PlayerCamera.transform.TransformDirection(targetVelocity).normalized* m_playerSpeed;
 
             Vector3 velocity = m_playerRigidBody.velocity;
             Vector3 velocityChange = (targetVelocity - velocity);
-            velocityChange.x = Mathf.Clamp(velocityChange.x, -m_playerSpeed/2, m_playerSpeed/2);
-            velocityChange.z = Mathf.Clamp(velocityChange.z, -m_playerSpeed/2, m_playerSpeed/2);
+            velocityChange.x = Mathf.Clamp(velocityChange.x, -m_playerSpeed, m_playerSpeed);
+            velocityChange.z = Mathf.Clamp(velocityChange.z, -m_playerSpeed, m_playerSpeed);
             velocityChange.y = 0;
             m_playerRigidBody.AddForce(velocityChange, ForceMode.VelocityChange);
         }
     }
 
+    /// <summary>
+    /// rotates the body around the y axis
+    /// </summary>
     private void FaceMousePosition()
     {
         if (isLocalPlayer)
         {
+            if (m_PlayerCamera == null)
+                m_PlayerCamera = Camera.main;
+
             Ray ray = m_PlayerCamera.ScreenPointToRay(Input.mousePosition);
             Plane plane = new Plane(Vector3.up, new Vector3(0, m_PlayerBodyT.position.y, 0));
             float distance = 0.0f;
@@ -96,6 +104,10 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_trf"></param>
     public void SetCamRedirect(Transform _trf)
     {
         if (isLocalPlayer)
@@ -104,6 +116,11 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_damage"></param>
+    /// <param name="_dmgType"></param>
     public void OnPlayerTakeDamage(float _damage, EDamageType _dmgType)
     {
 
