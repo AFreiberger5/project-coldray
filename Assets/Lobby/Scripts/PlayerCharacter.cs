@@ -145,7 +145,9 @@ public class PlayerCharacter : NetworkBehaviour
 
     private GameObject[] m_PlayerCustomisationObjects = new GameObject[8];
     private GameObject[] m_PlayerBody = new GameObject[13];
+#pragma warning disable 0414
     private Animator m_PlayerAnimator = null;
+#pragma warning restore 0414
 
     private void MakeItASyncListInt(int[] _intA)
     {
