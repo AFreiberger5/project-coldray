@@ -62,7 +62,7 @@ public class PlayerCharacter : NetworkBehaviour
 
     private void OnIntChanged(SyncListInt.Operation op, int index)
     {
-        Debug.Log("id: " + m_PlayerId + " count: " + m_SyncModel.Count);
+        Debug.Log("id: " + m_PlayerId + ", sync model count: " + m_SyncModel.Count);
         if (m_SyncModel.Count == 9)
         {
             BuildEntirePlayer(m_SyncModel);
@@ -149,6 +149,10 @@ public class PlayerCharacter : NetworkBehaviour
     private Animator m_PlayerAnimator = null;
 #pragma warning restore 0414
 
+    /// <summary>
+    /// converts an int array into an int sync list
+    /// </summary>
+    /// <param name="_intA"></param>
     private void MakeItASyncListInt(int[] _intA)
     {
         if (m_SyncModel.Count < 9)
@@ -165,11 +169,14 @@ public class PlayerCharacter : NetworkBehaviour
         }
     }
 
-    private void FixedUpdate()
+    /// <summary>
+    /// builds the player as soon as he got his name from the dummy
+    /// </summary>
+    private void Update()
     {
         if (isLocalPlayer)
         {
-            if (m_PlayerName == "")
+            if (m_PlayerName == "")// gets called when the player spawns for the first time
             {
                 CharacterDummy dummy = FindObjectOfType<CharacterDummy>();
                 CmdNetworkInitialize(dummy.m_DummyName);
@@ -181,14 +188,17 @@ public class PlayerCharacter : NetworkBehaviour
 
                 LoadCharacter(m_PlayerName);
 
-                Debug.Log("CmdSendArrayData 1");
-                CmdSendArrayData(m_PlayerId,m_SyncModel.ToArray());
+                CmdSendArrayData(m_PlayerId, m_SyncModel.ToArray());
 
                 BuildEntirePlayer(m_SyncModel);
             }
         }
     }
 
+    /// <summary>
+    /// extracts the players name from the dummy
+    /// </summary>
+    /// <param name="_string"></param>
     [Command]
     public void CmdNetworkInitialize(string _string)
     {
@@ -196,6 +206,10 @@ public class PlayerCharacter : NetworkBehaviour
         m_PlayerName = _string;
     }
 
+    /// <summary>
+    /// loads the player file by name and adjusts the players stats according to it
+    /// </summary>
+    /// <param name="_characterName"></param>
     public void LoadCharacter(string _characterName)
     {
         if (isLocalPlayer)
@@ -203,28 +217,29 @@ public class PlayerCharacter : NetworkBehaviour
             CharacterStats cs = SaveLoadManager.LoadCharacter(_characterName);
             m_PlayerName = cs.m_StatsName;
             MakeItASyncListInt(cs.m_Model);
-            RenamePlayerGameObject(cs.m_StatsName);
+            gameObject.name = cs.m_StatsName;
         }
     }
 
+    /// <summary>
+    /// gives the server information about the player
+    /// </summary>
+    /// <param name="_id"></param>
+    /// <param name="_model"></param>
     [Command]
     private void CmdSendArrayData(int _id, int[] _model)
     {
-        Debug.Log("CmdSendArrayData, _id: " + _id + "m_PlayerId: " + m_PlayerId + _model.Length);
+        Debug.Log("player name: " + m_PlayerName + ", player id: " + m_PlayerId + ", sync model count: " + _model.Length);
         if (_id == m_PlayerId)
         {
             MakeItASyncListInt(_model);
         }
     }
 
-    private void RenamePlayerGameObject(string _name)
-    {
-        if (isServer)
-        {
-            gameObject.name = _name;
-        }
-    }
-
+    /// <summary>
+    /// calls every build function to build the entire player
+    /// </summary>
+    /// <param name="_syncModel"></param>
     private void BuildEntirePlayer(SyncListInt _syncModel)
     {
         try
