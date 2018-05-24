@@ -36,6 +36,7 @@ public class WorkbenchControl : NetworkBehaviour
         m_workbenchFind = GetComponent<WorkbenchFind>();
         m_WorkbenchDropdown = GameObject.Find("Workbench_Dropdown").GetComponent<Dropdown>();
         m_WorkbenchMain = GetComponent<Workbench>();
+        Close(m_WorkBenchPanel);
     }
 
     // Update is called once per frame

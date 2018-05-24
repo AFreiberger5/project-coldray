@@ -63,6 +63,7 @@ public class Workbench : NetworkBehaviour
 
         // Finds the local Player with name "Bobby" for example.
         m_PlayerObject = GetLocalPlayer(m_NameOfLocalPlayer);
+        
         // Starts the scripts Actions
         m_StartAction = true;
     }
