@@ -12,6 +12,8 @@ using UnityEngine.Networking;
 //||||||||||||||||||||||||||||||||||||||||||||||||||||\\
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(NetworkAnimator))]
 public class PlayerController : NetworkBehaviour
 {
     [Header("Requirements")]
@@ -32,6 +34,7 @@ public class PlayerController : NetworkBehaviour
 
     private Camera m_PlayerCamera;
     private Rigidbody m_playerRigidBody;
+    private Animator m_playerAnimator;
     private float m_playerSpeed = 5.0f;
     private float m_playerRotSpeed = 10.0f;
     private Vector3 m_playerMovement;
@@ -42,6 +45,9 @@ public class PlayerController : NetworkBehaviour
     private void Start()
     {
         m_playerRigidBody = GetComponent<Rigidbody>();
+
+        m_playerAnimator = GetComponent<Animator>();
+
         m_PlayerCamera = Camera.main;
         SetCamRedirect(m_CamAnchor);
     }
@@ -109,6 +115,11 @@ public class PlayerController : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
+            if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+                m_playerAnimator.SetBool("isRunning", true);
+            else
+                m_playerAnimator.SetBool("isRunning", false);
+
             //MovePlayer();
 
             m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
@@ -127,6 +138,7 @@ public class PlayerController : NetworkBehaviour
         if (isLocalPlayer)
         {
             Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+
             targetVelocity = m_PlayerCamera.transform.TransformDirection(targetVelocity).normalized * m_playerSpeed;
 
             Vector3 velocity = m_playerRigidBody.velocity;
