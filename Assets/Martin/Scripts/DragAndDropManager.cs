@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class DragAndDropManager : MonoBehaviour
+public class DragAndDropManager : NetworkBehaviour
 {
     //	#########################################
     //	O			DragAndDropManager			O
@@ -44,11 +45,17 @@ public class DragAndDropManager : MonoBehaviour
     private Item m_draggedItem;
     private Item m_droppedItem;
 
-    private void Start()
+    public bool m_InitDone;
+    public bool m_Ready;
+
+    // Initializes the Drag and Drop Manager.
+    private void Initialize()
     {
-        // Gets the Inventoryscript.
+        // Gets the Inventory-Script from the Player.
         m_inventoryscript = GetComponent<Inventory>();
+        // Sets the Inventory-Panel to the original Panel in the Inventory-Script.
         m_PlayerInventoryPanel = m_inventoryscript.m_GridPanel;
+
     }
 
     /// <summary>
@@ -108,7 +115,7 @@ public class DragAndDropManager : MonoBehaviour
             ITargetDrop Target = Container.GetComponent<ITargetDrop>();
 
             // Checks witch Condition prevails on the DroppedSlot.
-            switch(CheckIfOutput(m_currentDragged, Container, m_originalParent.gameObject, m_splitObject))
+            switch (CheckIfOutput(m_currentDragged, Container, m_originalParent.gameObject, m_splitObject))
             {
                 // Just go ahead.
                 case 0:
@@ -130,7 +137,7 @@ public class DragAndDropManager : MonoBehaviour
                     m_currentDragged = null;
                     return;
             }
-            
+
             // If a Merge is possible.
             if (CheckForMerge(m_currentDragged, Container))
             {
@@ -143,7 +150,7 @@ public class DragAndDropManager : MonoBehaviour
             }
 
             // If the Currentdragged goes to hell...
-            if ((RaycastHits[0].name == "Panel_Inventory" || RaycastHits[1].name == "Panel_Inventory" && 
+            if ((RaycastHits[0].name == "Panel_Inventory" || RaycastHits[1].name == "Panel_Inventory" &&
                 m_splitObject != null))
             {
                 // Bringt it back, for grace and redemption!
@@ -247,111 +254,121 @@ public class DragAndDropManager : MonoBehaviour
 
     void Update()
     {
-        // If there is something dragged...
-        if (m_currentDragged != null)
+        if (m_InitDone)
         {
-            // If the MouseButton was released...
-            if (Input.GetMouseButtonUp(0))
+            Initialize();
+            m_InitDone = false;
+            m_Ready = true;
+        }
+
+        if (m_Ready)
+        {
+            // If there is something dragged...
+            if (m_currentDragged != null)
             {
-                // Than drop it!
-                Drop();
-                // Jumps back.
-                return;
+                // If the MouseButton was released...
+                if (Input.GetMouseButtonUp(0))
+                {
+                    // Than drop it!
+                    Drop();
+                    // Jumps back.
+                    return;
+                }
+                else
+                {
+                    // Calculate the Offset.
+                    Vector2 Offset = (Vector2)Input.mousePosition - m_lastMousePosition;
+
+                    // Sets the last Mouse-Position to the current Mouse-Position.
+                    m_lastMousePosition = Input.mousePosition;
+
+                    // Gets the Recttransform of the current Dragged.
+                    RectTransform rect = m_currentDragged.GetComponent<RectTransform>();
+
+                    // Translates the Object by X,Y
+                    rect.position += (Vector3)Offset;
+                }
             }
             else
             {
-                // Calculate the Offset.
-                Vector2 Offset = (Vector2)Input.mousePosition - m_lastMousePosition;
-
-                // Sets the last Mouse-Position to the current Mouse-Position.
-                m_lastMousePosition = Input.mousePosition;
-
-                // Gets the Recttransform of the current Dragged.
-                RectTransform rect = m_currentDragged.GetComponent<RectTransform>();
-
-                // Translates the Object by X,Y
-                rect.position += (Vector3)Offset;
-            }
-        }
-        else
-        {
-            // If the Mouse was pressed...
-            if (Input.GetMouseButtonDown(0))
-            {
-
-                // Gets all the GameObjects that got hit again.
-                GameObject[] hits = RaycastAtMousePosition();
-
-                // If there are no Objects hit...
-                if (hits.Length == 0)
-                    return;
-
-                // Gets the Object on the Top.
-                GameObject UpperObject = hits[0];
-
-                // Sets the selected-Slot to null.
-                GameObject SelectedSlot = null;
-
-                // If there more than One Object below the Mouse.
-                if (hits.Length > 1)
+                // If the Mouse was pressed...
+                if (Input.GetMouseButtonDown(0))
                 {
-                    // Gets the Selected Slot
-                    if (hits[1].GetComponent<IDP>() != null)
+
+                    // Gets all the GameObjects that got hit again.
+                    GameObject[] hits = RaycastAtMousePosition();
+
+                    // If there are no Objects hit...
+                    if (hits.Length == 0)
+                        return;
+
+                    // Gets the Object on the Top.
+                    GameObject UpperObject = hits[0];
+
+                    // Sets the selected-Slot to null.
+                    GameObject SelectedSlot = null;
+
+                    // If there more than One Object below the Mouse.
+                    if (hits.Length > 1)
                     {
-                        // Sets the Selected-Slot to the second Object under the Mouse.
-                        SelectedSlot = hits[1];
+                        // Gets the Selected Slot
+                        if (hits[1].GetComponent<IDP>() != null)
+                        {
+                            // Sets the Selected-Slot to the second Object under the Mouse.
+                            SelectedSlot = hits[1];
+                        }
+                        else
+                        {
+                            // Sets the selected-Slot to null.
+                            SelectedSlot = null;
+                        }
+
                     }
-                    else
+
+                    // If the UpperObject has Idragable on it...
+                    if (UpperObject.GetComponent<IDragable>() != null)
                     {
-                        // Sets the selected-Slot to null.
-                        SelectedSlot = null;
+                        // Save the Original Parent
+                        m_originalParent = UpperObject.transform.parent;
+
+                        // Save the Original Position
+                        m_originalPosition = UpperObject.transform.position;
+
+                        // Sets the UpperObjects Parent to the transform.
+                        UpperObject.transform.parent = FindObjectOfType<Canvas>().transform;
+
+                        // Sets the current Dragged to the Object on the Top.
+                        m_currentDragged = UpperObject;
+
+                        // Sets the LastMousePosition to the current Mouse Pos.
+                        m_lastMousePosition = Input.mousePosition;
+
+                        // Get the Slot from the dragged Object. (virtuell)
+                        m_originalParent.GetComponent<Slot>().DragItemContainer(m_currentDragged.GetComponent<ItemContainer>());
+
+                        // Clears the Slot at the OriginalParent.
+                        m_originalParent.GetComponent<Slot>().Clear();
                     }
+
+                    // Sets the dragged Slot Index to the correct number.
+                    m_draggedSlotIndex = GetSlotIndex(m_PlayerInventoryPanel, SelectedSlot);
+
+                    // At this Point, a Change will be needed.
+                    m_changeNeeded = true;
+
+                    // If the Current-Dragged is null
+                    if (m_currentDragged != null)
+                        // Sets the dragged-Slot to the Current-Dragged.
+                        m_DraggedSlot = m_currentDragged.gameObject;
 
                 }
 
-                // If the UpperObject has Idragable on it...
-                if (UpperObject.GetComponent<IDragable>() != null)
+                // If the Left Mouse-Button is pressed down.
+                if (Input.GetMouseButtonDown(1))
                 {
-                    // Save the Original Parent
-                    m_originalParent = UpperObject.transform.parent;
-
-                    // Save the Original Position
-                    m_originalPosition = UpperObject.transform.position;
-
-                    // Sets the UpperObjects Parent to the transform.
-                    UpperObject.transform.parent = FindObjectOfType<Canvas>().transform;
-
-                    // Sets the current Dragged to the Object on the Top.
-                    m_currentDragged = UpperObject;
-
-                    // Sets the LastMousePosition to the current Mouse Pos.
-                    m_lastMousePosition = Input.mousePosition;
-
-                    // Get the Slot from the dragged Object. (virtuell)
-                    m_originalParent.GetComponent<Slot>().DragItemContainer(m_currentDragged.GetComponent<ItemContainer>());
-
-                    // Clears the Slot at the OriginalParent.
-                    m_originalParent.GetComponent<Slot>().Clear();
+                    // SPlit the Current-Slot.
+                    Split();
                 }
-
-                // Sets the dragged Slot Index to the correct number.
-                m_draggedSlotIndex = GetSlotIndex(m_PlayerInventoryPanel, SelectedSlot);
-
-                // At this Point, a Change will be needed.
-                m_changeNeeded = true;
-
-                // If the Current-Dragged is null
-                if (m_currentDragged != null)
-                // Sets the dragged-Slot to the Current-Dragged.
-                    m_DraggedSlot = m_currentDragged.gameObject;
-
-            }
-
-            // If the Left Mouse-Button is pressed down.
-            if (Input.GetMouseButtonDown(1))
-            {
-                // SPlit the Current-Slot.
-                Split();
             }
         }
     }
@@ -461,7 +478,7 @@ public class DragAndDropManager : MonoBehaviour
                     RE2.anchorMax = new Vector2(1.0f, 0.5f);
                     // Resets the Size of the Icon.
                     RE2.sizeDelta = Vector2.zero;
-                    
+
                     // Sets the Parent of the OriginalParent to the Split-Object.  
                     m_originalParent = SplitSlot.gameObject.transform;
                     // Sets Current-Dragged to the Item.
@@ -490,7 +507,7 @@ public class DragAndDropManager : MonoBehaviour
             // If the Dragged-Slot-Object has an ItemContainer-Component on it...
             _Dragged.GetComponent<ItemContainer>() != null &&
             // If the name of the Item in the Container equals to the name of the Item in the Slot...
-            _Dragged.GetComponent<ItemContainer>().m_Item.m_Name == _Dropped.GetComponent<Slot>().m_Item.m_Name &&
+            _Dragged.GetComponent<ItemContainer>().m_Item.m_IName == _Dropped.GetComponent<Slot>().m_Item.m_IName &&
             // If the Dropped-Slot is not the OriginalParent
             _Dropped != m_originalParent &&
             // If the Split-Object is not the Original-Parent.

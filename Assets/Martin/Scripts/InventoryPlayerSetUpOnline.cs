@@ -26,6 +26,7 @@ public class InventoryPlayerSetUpOnline : NetworkBehaviour
     private TestSafeLoad m_TestSafeLoad;
     private GameObject m_workbench;
     private InventoryInGameControll m_InventoryInGameControll;
+    private DragAndDropManager m_DragAndDropManagerAtPlayer;
 
     public override void OnStartLocalPlayer()
     {
@@ -37,6 +38,7 @@ public class InventoryPlayerSetUpOnline : NetworkBehaviour
         m_InventoryAtPlayer.m_ItemManager = m_ItemManagerInScene;
         m_InventoryAtPlayer.m_GridPanel = GameObject.Find("InventoryPanel");
         m_InventoryAtPlayer.m_InventoryObject = GameObject.Find("Panel_Inventory");
+        m_DragAndDropManagerAtPlayer = m_InventoryAtPlayer.gameObject.GetComponent<DragAndDropManager>();
 
         if (GameObject.Find("WorkbenchObject") != null)
         {
@@ -45,8 +47,9 @@ public class InventoryPlayerSetUpOnline : NetworkBehaviour
 
         // Setup of the Player done.
         m_InventoryAtPlayer.DoneSetup = true;
-        m_TestSafeLoad.InitDone = true;
         m_workbench.GetComponent<Workbench>().m_InitDone = true;
+        m_TestSafeLoad.InitDone = true;
         m_InventoryInGameControll.m_InitDone = true;
+        m_DragAndDropManagerAtPlayer.m_InitDone = true;
     }
 }

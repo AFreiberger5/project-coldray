@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Workbench : MonoBehaviour
+public class Workbench : NetworkBehaviour
 {
     //	#########################################
     //	O			Workbench   				O
@@ -19,7 +20,7 @@ public class Workbench : MonoBehaviour
     //	O										O
     //	#########################################
 
-    public string m_Identification;
+    public string m_NameOfLocalPlayer;
 
     public bool m_InRange;
     public GameObject m_PlayerObject;
@@ -49,10 +50,19 @@ public class Workbench : MonoBehaviour
 
     private void Initialize()
     {
+
         // Links the virtual Slots with the physical SLots.
         CreateWorkspace();
+
+        // If this is the local Player Object...
+        if (isLocalPlayer)
+        {
+            // Get the Name of the Current Player.
+            m_NameOfLocalPlayer = gameObject.GetComponent<PlayerCharacter>().m_PlayerName;
+        }
+
         // Finds the local Player with name "Bobby" for example.
-        m_PlayerObject = GetLocalPlayer("Bobby");
+        m_PlayerObject = GetLocalPlayer(m_NameOfLocalPlayer);
         // Starts the scripts Actions
         m_StartAction = true;
     }
@@ -80,7 +90,7 @@ public class Workbench : MonoBehaviour
         if (m_PlayerObject == null)
         {
             // Finds the local Player with name "Bobby" for example.
-            m_PlayerObject = GetLocalPlayer("Bobby");
+            m_PlayerObject = GetLocalPlayer(m_NameOfLocalPlayer);
         }
 
         if (m_InitDone)
@@ -93,7 +103,7 @@ public class Workbench : MonoBehaviour
         {
             m_InRange = CheckForPlayers(m_PlayerObject, m_SightDistance);
         }
-            UpdateWorkspace();
+        UpdateWorkspace();
     }
 
     private bool CheckForPlayers(GameObject _Player, float _Range)

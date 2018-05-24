@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class InventoryInGameControll : MonoBehaviour 
+public class InventoryInGameControll : NetworkBehaviour
 {
     //	#########################################
     //	O			InventoryInGameControll	    O
@@ -32,29 +33,32 @@ public class InventoryInGameControll : MonoBehaviour
 
     private void Initialize()
     {
-        PlayerInventory = FindObjectOfType<Inventory>();
+        PlayerInventory = GetComponent<Inventory>();
         m_WorkbenchObject = GameObject.Find("WorkbenchObject");
         m_InventoryObject = PlayerInventory.m_InventoryObject;
         m_Workbench = m_WorkbenchObject.GetComponent<WorkbenchControl>();
     }
 
     // Update is called once per frame
-    void Update () 
-	{
+    void Update()
+    {
         if (m_InitDone)
         {
             Initialize();
             m_InitDone = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.O))
+        if (isLocalPlayer)
         {
-            PlayerInventory.Open(m_InventoryObject);
-        }
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                PlayerInventory.Open(m_InventoryObject);
+            }
 
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            PlayerInventory.Close(m_InventoryObject);
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                PlayerInventory.Close(m_InventoryObject);
+            }
         }
     }
 }

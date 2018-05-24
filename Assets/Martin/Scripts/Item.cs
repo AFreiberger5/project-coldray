@@ -23,7 +23,7 @@ public abstract class Item : MonoBehaviour
     //	#########################################
 
     public int m_ListID;
-    public string m_Name;
+    public string m_IName;
     public string m_Description;
     public Sprite m_Icon;
     public List<Recipe> m_Recipes;
@@ -41,7 +41,7 @@ public abstract class Item : MonoBehaviour
     /// <param name="_Recipes"></param>
     public Item(string _Name, string _Description, int _StackSize, params Recipe[] _Recipes)
     {
-        m_Name = _Name;
+        m_IName = _Name;
         m_Description = _Description;
         m_StackSize = _StackSize;
         m_AssetLoader = GameObject.Find("ItemManager").GetComponent<AssetLoader>();

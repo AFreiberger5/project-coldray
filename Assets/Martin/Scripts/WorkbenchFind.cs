@@ -115,9 +115,9 @@ public class WorkbenchFind : MonoBehaviour
                         }
                         else
                         {
-                            if (!tmp.Contains(item.m_Name))
+                            if (!tmp.Contains(item.m_IName))
                             {
-                                tmp.Add(item.m_Name);
+                                tmp.Add(item.m_IName);
                                 m_RecipeData.AddRecipe(R);
                             }
                         }
