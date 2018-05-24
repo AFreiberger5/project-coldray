@@ -68,8 +68,8 @@ public class WorldManager : NetworkBehaviour
     {
         if (!isServer)
         {
-            StartCoroutine(FindObjectOfType<DunGen>().DestroyDungeon());
-            StartCoroutine(FindObjectOfType<World>().DestroyWorld());
+            FindObjectOfType<DunGen>().DestroyDungeon();
+            FindObjectOfType<World>().DestroyWorld();
         }
     }
 
@@ -163,8 +163,8 @@ public class WorldManager : NetworkBehaviour
     #endregion
 
     #region Commands
-    [Command]
-    void CmdSetWorldPos()
+    
+    void SetWorldPos()
     {
         int x = Random.Range(-3000, 3000);
         if (x > -100 && x < 100)
@@ -177,17 +177,17 @@ public class WorldManager : NetworkBehaviour
             z -= 200;
         }
         int y = 0;
-        m_WorldPosition = new Vector3(x,y,z);
+        m_WorldPosition = new Vector3(x, y, z);
     }
 
     [Command]
     public void CmdStartNewWorld()
     {
-        if(m_IsDestroyingDungeonA || m_IsDestroyingWorld)
+        if (m_IsDestroyingDungeonA || m_IsDestroyingWorld || m_BuildWorldNow || m_DungeonADone || m_OverworldBuilt)
         {
             return;
         }
-        CmdSetWorldPos();
+		SetWorldPos();
         FindObjectOfType<World>().StartBuild();
     }
 
@@ -224,17 +224,25 @@ public class WorldManager : NetworkBehaviour
     [Command]
     public void CmdBuildDungeonA()
     {
+		Debug.Log ("server-pregen");
         GameObject.FindObjectOfType<DunGen>().PreGen();
     }
 
     [Command]
     public void CmdDestroyWorld()
     {
-        m_IsDestroyingDungeonA = true;
-        m_IsDestroyingWorld = true;
-        RpcDestroyWorld();
-        StartCoroutine(FindObjectOfType<DunGen>().DestroyDungeon());
-        StartCoroutine(FindObjectOfType<World>().DestroyWorld());
+        if (m_IsDestroyingDungeonA || m_IsDestroyingWorld)
+        {
+            return;
+        }
+        else if (m_DungeonADone && m_OverworldBuilt)
+        {
+            m_IsDestroyingDungeonA = true;
+            m_IsDestroyingWorld = true;
+            RpcDestroyWorld();
+            FindObjectOfType<DunGen>().DestroyDungeon();
+            FindObjectOfType<World>().DestroyWorld();
+        }
     }
 
     #endregion
@@ -262,6 +270,7 @@ public class WorldManager : NetworkBehaviour
 
     void OnWorldDone(bool _b)
     {
+		Debug.Log ("generiere props");
         if (isServer)
         {
             if (_b == true)
