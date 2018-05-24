@@ -27,8 +27,6 @@ public class TestSafeLoad : NetworkBehaviour
     private Inventory Inventata;
     private ItemManager ItemManalulu;
 
-    public string NAME = "Bobby";
-    public bool BobbyFound = false;
     public bool InitDone = false;
 
     private void Initialize()
@@ -48,11 +46,9 @@ public class TestSafeLoad : NetworkBehaviour
             if (Go.GetComponent<Inventory>() != null && Go.name == _LocalPlayerName)
             {
                 Debug.Log("Es ist ein richtiger Bobby /o_o| ... I can't beleve it!");
-                BobbyFound = true;
                 return Go;
             }
         }
-        BobbyFound = false;
         return null;
     }
 

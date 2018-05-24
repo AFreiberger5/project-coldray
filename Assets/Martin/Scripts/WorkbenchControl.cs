@@ -28,6 +28,7 @@ public class WorkbenchControl : NetworkBehaviour
     private Dropdown m_WorkbenchDropdown;
     private WorkbenchFind m_workbenchFind;
     private Workbench m_WorkbenchMain;
+    public InventoryInGameControll m_InventoryControllAtWorkbench;
     public Inventory m_inventoryAtPlayer;
 
     // Use this for initialization
@@ -48,7 +49,6 @@ public class WorkbenchControl : NetworkBehaviour
             if (Input.GetMouseButtonDown(0) && !m_WorkBenchPanel.activeInHierarchy)
             {
                 Open(m_WorkBenchPanel);
-                m_inventoryAtPlayer.Open(m_inventoryAtPlayer.m_InventoryObject);
             }
         }
         else
