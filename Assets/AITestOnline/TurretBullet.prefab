@@ -145,6 +145,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cefe422845c9ad0428726a9df9e57d07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AClip: {fileID: 8300000, guid: 54bbf0491f150924d9d7f3ace28b5578, type: 3}
 --- !u!114 &114893932670851632
 MonoBehaviour:
   m_ObjectHideFlags: 1

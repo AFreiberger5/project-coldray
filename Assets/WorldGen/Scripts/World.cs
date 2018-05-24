@@ -144,7 +144,7 @@ public class World : NetworkBehaviour
             m_WorldProps.Add(p);
         }       
 
-        for (int i = 0; i < m_freePropPoints.Count)
+        for (int i = 0; i < m_freePropPoints.Count; i++)
         {
             if (!m_occupiedPropPoints.Contains(m_freePropPoints[i]))
             {
