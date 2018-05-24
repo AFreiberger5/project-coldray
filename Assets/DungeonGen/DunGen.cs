@@ -5,6 +5,7 @@
 *   Edited by:  Alexander Freiberger      *
 *                                         *
 ******************************************/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -25,6 +26,7 @@ public class DunGen : NetworkBehaviour
     private Dictionary<Vector3, byte[]> m_toProcess = new Dictionary<Vector3, byte[]>();
     private Dictionary<Vector3, byte[]> m_toAdd = new Dictionary<Vector3, byte[]>();
     private List<Vector3> m_occupiedPos = new List<Vector3>();
+    private List<Transform> m_roomsToRemove = new List<Transform>();
 
 
     public struct Tile
@@ -77,7 +79,7 @@ public class DunGen : NetworkBehaviour
             else
             {
                 CmdGenerateSyncList();
-                WorldManager.GetInstance().m_DungeonADone = true;
+                WorldManager.GetInstance().ReportDungeonADone(true);
                 CmdBuild();
 
             }
@@ -237,6 +239,7 @@ public class DunGen : NetworkBehaviour
                 GameObject dummy = Instantiate(m_EntryRoom, m_DungeonATiles[i].pos, Quaternion.identity);
                 Room dummyroom = dummy.GetComponent<Room>();
                 dummyroom.CloseWalls(m_DungeonATiles[i].doors);
+                m_roomsToRemove.Add(dummy.transform);
             }
         }
 
@@ -251,9 +254,25 @@ public class DunGen : NetworkBehaviour
             GameObject dummy = Instantiate(m_EntryRoom, m_DungeonATiles[i].pos, Quaternion.identity);
             Room dummyroom = dummy.GetComponent<Room>();
             dummyroom.CloseWalls(m_DungeonATiles[i].doors);
+            m_roomsToRemove.Add(dummy.transform);
             //Don't spawn enemies in Startroom or Bossroom
             if (i > 0 && i < m_DungeonATiles.Count - 1)
                 dummyroom.SpawnEnemies((m_RoomSizeX / 2) - 2, (m_RoomSizeZ / 2) - 2);
         }
+    }
+
+    public IEnumerator DestroyDungeon()
+    {
+        if (isServer)
+        {
+            WorldManager.GetInstance().ReportDungeonADone(false);
+        }
+        for (int i = 0; i < m_roomsToRemove.Count; i++)
+        {
+            Destroy(m_roomsToRemove[i].transform.gameObject);
+            yield return null;
+        }
+        m_roomsToRemove.Clear();
+        WorldManager.GetInstance().m_IsDestroyingDungeonA = false;
     }
 }
