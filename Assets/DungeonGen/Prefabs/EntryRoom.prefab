@@ -466,7 +466,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1995092972647798}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.3756628, y: 149.26181, z: -31.036087}
+  m_LocalPosition: {x: 275.34317, y: 28.755733, z: 182.96362}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4738597666527970}
@@ -1169,4 +1169,4 @@ MonoBehaviour:
   - {fileID: 4640650749095370}
   - {fileID: 4336912309177932}
   m_RoomCamPos: {fileID: 4046416223755246}
-  m_Turret: {fileID: 0}
+  m_Turret: {fileID: 1061507453935134, guid: afa2a1ea60a0a0d4aaa6a558ff66d946, type: 2}

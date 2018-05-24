@@ -5,7 +5,10 @@ licenseType: Free
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_WallPrefab: {instanceID: 0}
+  - m_RoomCamPos: {instanceID: 0}
+  - m_Turret: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
