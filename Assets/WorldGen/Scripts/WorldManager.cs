@@ -1,5 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿/******************************************
+*                                         *
+*   Script made by Alexander Bloomenkamp  *
+*                                         *
+*   Edited by:                            *
+*                                         *
+******************************************/
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -61,7 +66,21 @@ public class WorldManager : NetworkBehaviour
         OnPropsListDone(m_PropsListDone);
         OnDungeonADone(m_DungeonADone);
     }
-
+    void SetWorldPos()
+    {
+        int x = Random.Range(-3000, 3000);
+        if (x > -100 && x < 100)
+        {
+            x += 200;
+        }
+        int z = Random.Range(-3000, 3000);
+        if (z > -100 && z < 100)
+        {
+            z -= 200;
+        }
+        int y = 0;
+        m_WorldPosition = new Vector3(x, y, z);
+    }
 
     [ClientRpc]
     void RpcDestroyWorld()
@@ -164,21 +183,7 @@ public class WorldManager : NetworkBehaviour
 
     #region Commands
     
-    void SetWorldPos()
-    {
-        int x = Random.Range(-3000, 3000);
-        if (x > -100 && x < 100)
-        {
-            x += 200;
-        }
-        int z = Random.Range(-3000, 3000);
-        if (z > -100 && z < 100)
-        {
-            z -= 200;
-        }
-        int y = 0;
-        m_WorldPosition = new Vector3(x, y, z);
-    }
+   
 
     [Command]
     public void CmdStartNewWorld()
@@ -224,7 +229,7 @@ public class WorldManager : NetworkBehaviour
     [Command]
     public void CmdBuildDungeonA()
     {
-		Debug.Log ("server-pregen");
+
         GameObject.FindObjectOfType<DunGen>().PreGen();
     }
 
@@ -270,12 +275,13 @@ public class WorldManager : NetworkBehaviour
 
     void OnWorldDone(bool _b)
     {
-		Debug.Log ("generiere props");
         if (isServer)
         {
             if (_b == true)
             {
+                CmdBuildDungeonA();
                 GameObject.FindObjectOfType<World>().PropSeedController();
+
             }
         }
     }
