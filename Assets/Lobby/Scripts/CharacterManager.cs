@@ -99,6 +99,7 @@ public class CharacterManager : MonoBehaviour
             slot.name = "Slot: " + characterName;
             slot.transform.SetParent(m_CharacterSelectionScroller.transform);
             slot.GetComponentInChildren<Text>().text = characterName;
+            slot.transform.localScale = Vector3.one;
         }
     }
 }

@@ -289,6 +289,26 @@ public class BansheeAI : AIBase
     /// <param name="_damageType">Type of Attack (Use NONE if not an attack)</param>
     public override void OnInteraction(float _value, EDamageType _damageType)
     {
+        if (isServer)
+        {
+            if (!_damageType.HasFlag(EDamageType.NONE))
+            {
+                m_HP -= base.DamageCalculation(_value, _damageType, DefenseValues);
+                if (m_HP <= 0)
+                {
+                    KillNPC();
+                }
+            }
+        }
+        else if(isClient)
+        {
+            CmdOnInteraction(_value, _damageType);
+        }
+    }
+
+    [Command]
+    public void CmdOnInteraction(float _value, EDamageType _damageType)
+    {
         if (!_damageType.HasFlag(EDamageType.NONE))
         {
             m_HP -= base.DamageCalculation(_value, _damageType, DefenseValues);

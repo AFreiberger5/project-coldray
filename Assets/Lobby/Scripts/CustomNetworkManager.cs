@@ -23,7 +23,9 @@ public class CustomNetworkManager : NetworkManager
     private InputField m_HostIPInputField;
     private InputField m_JoinIPInputField;
     private Text m_JoinColorfulText;
+#pragma warning disable 0414
     private bool m_gotTheInformation = false;
+#pragma warning restore 0414
 
     /// <summary>
     /// procures much needed informations

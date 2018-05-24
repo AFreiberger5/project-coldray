@@ -23,7 +23,7 @@ public class Room : NetworkBehaviour
     private GameObject[] m_Turrets;
 
     public void CloseWalls(byte[] _DoorInfo)
-    {        
+    {
         for (int i = 0; i < _DoorInfo.Length; i++)
         {
             switch (i)
@@ -33,7 +33,7 @@ public class Room : NetworkBehaviour
                     {
                         foreach (Transform t in m_TopWallPoints)
                         {
-                           GameObject go = Instantiate(m_WallPrefab, t.position, Quaternion.identity);
+                            GameObject go = Instantiate(m_WallPrefab, t.position, Quaternion.identity);
                             m_blocksToRemove.Add(go.transform);
                         }
                     }
@@ -46,7 +46,7 @@ public class Room : NetworkBehaviour
                             GameObject go = Instantiate(m_WallPrefab, t.position, Quaternion.identity);
                             m_blocksToRemove.Add(go.transform);
                         }
-                    }   
+                    }
                     break;
                 case 2:
                     if (_DoorInfo[i] == 0)
@@ -75,9 +75,7 @@ public class Room : NetworkBehaviour
 
     public void SpawnEnemies(int _maxX, int _maxY)
     {
-        m_Turrets = new GameObject[Helper.MAX_PLAYERCOUNT];
-        if (!isServer)
-            return;
+        m_Turrets = new GameObject[Helper.MAX_PLAYERCOUNT + 2];
 
         if (_maxX <= 0 || _maxY <= 0)
         {
@@ -87,13 +85,13 @@ public class Room : NetworkBehaviour
         int spawns = Random.Range(0, Helper.MAX_PLAYERCOUNT);
         //Lowering the chance the room with a lot of mobs
         //ToDo: Balance how many spawns
-        spawns = (spawns < Helper.MAX_PLAYERCOUNT / 2) ? spawns : Random.Range(0, Helper.MAX_PLAYERCOUNT);
+        spawns = (spawns < (Helper.MAX_PLAYERCOUNT + 2) / 2) ? spawns : Random.Range(0, Helper.MAX_PLAYERCOUNT + 2);
         for (int i = 0; i < spawns; i++)
         {
             //Spawn Turrets and add it to a list
-            m_Turrets[i] = Instantiate(m_Turret, new Vector3(Random.Range(-_maxX, _maxX), transform.position.y, Random.Range(-_maxY, _maxY)), transform.rotation);
-            m_Turrets[i].SetActive(false);
+            m_Turrets[i] = Instantiate(m_Turret, new Vector3(Random.Range(-_maxX, _maxX) + transform.position.x, transform.position.y, Random.Range(-_maxY, _maxY) + transform.position.z), transform.rotation);
             NetworkServer.Spawn(m_Turrets[i]);
+
 
         }
 
@@ -104,35 +102,58 @@ public class Room : NetworkBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            //foreach (GameObject Turret in m_Turrets)
-            //{
-            //    if (Turret.activeSelf == false)
-            //        Turret.SetActive(true);
-            //
-            //    Turret.GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
-            //
-            //}     
+            if (m_Turrets != null)
+                for (int i = 0; i < m_Turrets.Length; i++)
+                {
+                    if (m_Turrets[i] == null)
+                        continue;
+                    if (!m_Turrets[i].GetComponent<TurretAI>().Activated)
+                    {
+                        if (hasAuthority)
+                        {
+                            
+                            CmdActivateTurret(i);
+                        }
+                        else
+                        {
+                            m_Turrets[i].GetComponent<TurretAI>().ActivateTurret();
+                        }
+                        
+                    }
+
+                    m_Turrets[i].GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
+
+                }
             other.GetComponent<PlayerController>().SetCamRedirect(m_RoomCamPos);
-            WorldManager.GetInstance().CmdDestroyWorld();
+            // WorldManager.GetInstance().CmdDestroyWorld();
         }
     }
+
+    [Command]
+    private void CmdActivateTurret(int _index)
+    {
+        m_Turrets[_index].GetComponent<TurretAI>().ActivateTurret();
+    }
+   
 
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            foreach (GameObject Turret in m_Turrets)
-            {
-                foreach (PlayerController PC in Turret.GetComponent<TurretAI>().m_Players)
+            if (m_Turrets != null)
+                for (int f = 0; f < m_Turrets.Length; f++)
                 {
-                    // ToDo: remove player from list if Player.id = other.id
-                    if (PC.GetComponent<PlayerCharacter>().m_PlayerId == other.GetComponent<PlayerCharacter>().m_PlayerId)
-                        Turret.GetComponent<TurretAI>().m_Players.Remove(PC);
-                    if (Turret.GetComponent<TurretAI>().m_Players.Count <= 0)
-                        Turret.SetActive(false);
-                }
+                    if (m_Turrets[f] == null)
+                        continue;
+                    for (int i = 0; i < m_Turrets[f].GetComponent<TurretAI>().m_Players.Count; i++)
+                    {
+                        if (m_Turrets[f].GetComponent<TurretAI>().m_Players[i].GetComponent<PlayerCharacter>().m_PlayerId == other.GetComponent<PlayerCharacter>().m_PlayerId)
+                            m_Turrets[f].GetComponent<TurretAI>().m_Players.Remove(m_Turrets[f].GetComponent<TurretAI>().m_Players[i]);
+                        if (m_Turrets[f].GetComponent<TurretAI>().m_Players.Count <= 0)
+                            m_Turrets[f].GetComponent<TurretAI>().DeactivateTurret();
+                    }
 
-            }
+                }
         }
     }
 

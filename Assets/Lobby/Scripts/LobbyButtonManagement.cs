@@ -326,6 +326,7 @@ public class LobbyButtonManagement : MonoBehaviour
             m_SlotsAlive[i].transform.SetParent(m_ContentToFill.transform);
             m_SlotsAlive[i].name = _idArray[i].ToString();// the slot name stores the id for later use
             m_SlotsAlive[i].GetComponentInChildren<Text>().text = _idArray[i].ToString();// USE ENUM HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            m_SlotsAlive[i].transform.localScale = Vector3.one;
         }
     }
 
