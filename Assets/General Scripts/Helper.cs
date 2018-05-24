@@ -57,6 +57,7 @@ public enum EDropTable
     NONE = 0,
     BANSHEE = 1,
     KEVIN = 2,
+    TURRET = 4,
 }
 [Flags]
 public enum EDamageType
@@ -93,6 +94,8 @@ public class Helper : MonoBehaviour
             case EDropTable.BANSHEE:
                 break;
             case EDropTable.KEVIN:
+                break;
+            case EDropTable.TURRET:
                 break;
             default:
                 break;
