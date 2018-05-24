@@ -1,0 +1,10 @@
+UI - Alle Grafiken von Gregor
+Minecraft Texturen von google,
+NPC && Player (model, parts, mesh etc.)assets: von Marcel aus dem 2. Semester
+
+How to play(bei standard einstellungen):
+WASD Steuerung, rotation in mausrichtung, Angriff auf Space,
+Ein Character kann beliebig erstellt, gespeichert und geladen werden. 
+Im Spiel kann im Starthub eine Welt erstellt werden, diese hat gegner und ängstliche Vögel die Materialien droppen
+Items können auf der Werkbank im Hub verwendet werden. In der WElt ist immer ein dungeon zu finden, dieser kann erkundet werden, 
+beinhalte mehr gegne (und einen boss im letzen raum wenn ich das noch schaffe)
