@@ -36,7 +36,7 @@ public class ItemContainer : MonoBehaviour
     {
         this.m_Amount = _SlotToDrag.m_Amount;
         this.m_Item = _SlotToDrag.m_Item;
-        this.m_ContainedName = m_Item.m_Name;
+        this.m_ContainedName = m_Item.m_IName;
         this.m_Parent = _SlotToDrag.gameObject;
     }
 }

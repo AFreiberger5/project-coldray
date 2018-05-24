@@ -98,7 +98,7 @@ public class Slot : MonoBehaviour
     /// </summary>
     public void ChangeItemName()
     {
-        m_ItemName = m_Item.m_Name;
+        m_ItemName = m_Item.m_IName;
     }
 
     /// <summary>
@@ -127,7 +127,7 @@ public class Slot : MonoBehaviour
     {
         this.m_Amount = _ItemContainer.m_Amount;
         this.m_Item = _ItemContainer.m_Item;
-        this.m_ItemName = _ItemContainer.m_Item.m_Name;
+        this.m_ItemName = _ItemContainer.m_Item.m_IName;
         this.m_ItemPrefab = _ItemContainer.gameObject;
 
         this.m_textAmount = GetComponentInChildren<Text>();
@@ -162,7 +162,7 @@ public class Slot : MonoBehaviour
 
         this.m_Amount = System.Convert.ToInt32(SerializedSlot[0]);
         this.m_Item = _ItemManager.ItemLists[System.Convert.ToInt32(SerializedSlot[1])][System.Convert.ToInt32(SerializedSlot[2]) - 1];
-        this.m_ItemName = m_Item.m_Name;
+        this.m_ItemName = m_Item.m_IName;
         //Eventuell hier noch fehlende daten nachtragen!!!!!!!!!!!!!!!!!!!!
     }
 
