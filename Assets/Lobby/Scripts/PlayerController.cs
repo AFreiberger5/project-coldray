@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 //||||||||||||||||||||||||||||||||||||||||||||||||||||\\
 //||                                                ||\\
 //||            Script by Gregor Hempel             ||\\
-//||            23.03.2018                          ||\\
+//||            16.05.2018                          ||\\
 //||            Edits: Alexander Blomenkamp         ||\\
 //||                                                ||\\
 //||||||||||||||||||||||||||||||||||||||||||||||||||||\\
@@ -41,10 +41,41 @@ public class PlayerController : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
+            //MovePlayer();
+
+            //m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+            //m_playerMovement = m_playerMovement.normalized * m_playerSpeed * Time.deltaTime;
+
+            //m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
+
             m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-            m_playerMovement = m_playerMovement.normalized * m_playerSpeed * Time.deltaTime;
+            m_playerMovement = m_PlayerCamera.transform.TransformDirection(m_playerMovement).normalized * m_playerSpeed * Time.deltaTime;
 
             m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
+
+            //Vector3 tv = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            ////m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+            //m_playerMovement = m_PlayerCamera.transform.TransformDirection(tv).normalized * m_playerSpeed/* * Time.deltaTime*/;
+            //
+            ////m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
+            //m_playerRigidBody.AddForce(m_playerMovement-m_playerRigidBody.velocity, ForceMode.VelocityChange);
+        }
+    }
+
+    private void MovePlayer()
+    {
+        if (isLocalPlayer)
+        {
+            Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            targetVelocity = m_PlayerCamera.transform.TransformDirection(targetVelocity).normalized;
+            targetVelocity *= m_playerSpeed;
+
+            Vector3 velocity = m_playerRigidBody.velocity;
+            Vector3 velocityChange = (targetVelocity - velocity);
+            velocityChange.x = Mathf.Clamp(velocityChange.x, -m_playerSpeed/2, m_playerSpeed/2);
+            velocityChange.z = Mathf.Clamp(velocityChange.z, -m_playerSpeed/2, m_playerSpeed/2);
+            velocityChange.y = 0;
+            m_playerRigidBody.AddForce(velocityChange, ForceMode.VelocityChange);
         }
     }
 
