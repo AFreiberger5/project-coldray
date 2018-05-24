@@ -28,6 +28,8 @@ public class InventoryInGameControll : NetworkBehaviour
     private WorkbenchControl m_Workbench;
 
     public bool m_InitDone;
+    public bool m_InventoryToggle;
+    public bool m_InventoryToggleState;
 
     public string m_currentInteractingObject;
 
@@ -37,6 +39,7 @@ public class InventoryInGameControll : NetworkBehaviour
         m_WorkbenchObject = GameObject.Find("WorkbenchObject");
         m_InventoryObject = PlayerInventory.m_InventoryObject;
         m_Workbench = m_WorkbenchObject.GetComponent<WorkbenchControl>();
+
     }
 
     // Update is called once per frame
@@ -50,15 +53,27 @@ public class InventoryInGameControll : NetworkBehaviour
 
         if (isLocalPlayer)
         {
-            if (Input.GetKeyDown(KeyCode.O))
+            if (Input.GetKeyDown(KeyCode.I))
             {
-                PlayerInventory.Open(m_InventoryObject);
+                m_InventoryToggleState = !m_InventoryToggleState;
+                m_InventoryToggle = true;
             }
+        }
 
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                PlayerInventory.Close(m_InventoryObject);
-            }
+        ToggleInventory(m_InventoryToggle);
+    }
+
+    private void ToggleInventory(bool _B)
+    {
+        if (m_InventoryToggleState)
+        {
+            PlayerInventory.Open(m_InventoryObject);
+            _B = false;
+        }
+        else
+        {
+            PlayerInventory.Close(m_InventoryObject);
+            _B = false;
         }
     }
 }

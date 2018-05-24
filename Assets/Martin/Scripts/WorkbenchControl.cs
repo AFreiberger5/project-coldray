@@ -28,6 +28,8 @@ public class WorkbenchControl : NetworkBehaviour
     private Dropdown m_WorkbenchDropdown;
     private WorkbenchFind m_workbenchFind;
     private Workbench m_WorkbenchMain;
+    public InventoryInGameControll m_InventoryControllAtWorkbench;
+    public Inventory m_inventoryAtPlayer;
 
     // Use this for initialization
     void Awake()

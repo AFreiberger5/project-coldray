@@ -992,6 +992,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114926010800240530, guid: da5e1cf84c9c8fc4998d834fa4cb0e28,
+        type: 2}
+      propertyPath: m_WorkBenchPanel
+      value: 
+      objectReference: {fileID: 1756618526}
     - target: {fileID: 114125893884252764, guid: da5e1cf84c9c8fc4998d834fa4cb0e28,
         type: 2}
       propertyPath: m_Panel
@@ -1022,11 +1027,6 @@ Prefab:
       propertyPath: m_Slot_Output
       value: 
       objectReference: {fileID: 877581523}
-    - target: {fileID: 114926010800240530, guid: da5e1cf84c9c8fc4998d834fa4cb0e28,
-        type: 2}
-      propertyPath: m_WorkBenchPanel
-      value: 
-      objectReference: {fileID: 1756618526}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: da5e1cf84c9c8fc4998d834fa4cb0e28, type: 2}
   m_IsPrefabParent: 0

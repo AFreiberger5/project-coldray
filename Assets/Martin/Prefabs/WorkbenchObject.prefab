@@ -110,10 +110,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9e76a6bbd9bd544fb749247170a2c25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Identification: Work_01
+  m_NameOfLocalPlayer: 
   m_InRange: 0
   m_PlayerObject: {fileID: 0}
-  m_SightDistance: 5
+  m_SightDistance: 2
   m_Panel: {fileID: 0}
   m_Slot_1: {fileID: 0}
   m_Slot_2: {fileID: 0}
