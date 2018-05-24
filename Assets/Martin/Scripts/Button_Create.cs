@@ -38,8 +38,8 @@ public class Button_Create : MonoBehaviour
         m_workbench = GameObject.Find("Workbench").GetComponent<Workbench>();
 
         // If there is no Item in the Output-Slot or the Item is the same, that should be created...
-        if (m_workbench.m_VirtualSlot_Output.m_Item.m_Name == "Placeholder" ||
-            m_WorkbenchDropdown.options[m_WorkbenchDropdown.value].text == m_workbench.m_VirtualSlot_Output.m_Item.m_Name)
+        if (m_workbench.m_VirtualSlot_Output.m_Item.m_IName == "Placeholder" ||
+            m_WorkbenchDropdown.options[m_WorkbenchDropdown.value].text == m_workbench.m_VirtualSlot_Output.m_Item.m_IName)
         {
             // if the Script for the WorkbenchFind is not null and the Count of the list with the names of the Items that can be created,
             // is greather than 0 and the Options of the Dropdown are also more than 0...
@@ -72,7 +72,7 @@ public class Button_Create : MonoBehaviour
 
                     // If the Itemname of the Outputslot matches the name of the current selected Option in the Dropdown and the Amount is high
                     // enough to add another Item...
-                    if (m_workbench.m_Slot_Output.GetComponent<Slot>().m_Item.m_Name == m_WorkbenchDropdown.options[m_WorkbenchDropdown.value].text &&
+                    if (m_workbench.m_Slot_Output.GetComponent<Slot>().m_Item.m_IName == m_WorkbenchDropdown.options[m_WorkbenchDropdown.value].text &&
                         m_workbench.m_Slot_Output.GetComponent<Slot>().m_Amount + 1 < m_workbench.m_Slot_Output.GetComponent<Slot>().m_Item.m_StackSize)
                     {
                         // Enough Space to Merge the new Item, but there is no need to create a new item.
@@ -97,7 +97,7 @@ public class Button_Create : MonoBehaviour
                         // Sets the Parent of the new Item.
                         IC.m_Parent = m_workbench.m_Slot_Output;
                         // Changes the name of the new Item.
-                        IC.m_ContainedName = IC.m_Item.m_Name;
+                        IC.m_ContainedName = IC.m_Item.m_IName;
                         // Changes the Icon-Sprite to the Icon that comes along with the specific Item.
                         GO.GetComponent<Image>().sprite = IC.m_Item.m_Icon;
                         // Fixes the Icons Position and makes it fitting.

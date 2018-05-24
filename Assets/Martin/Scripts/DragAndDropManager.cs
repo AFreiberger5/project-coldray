@@ -491,7 +491,7 @@ public class DragAndDropManager : MonoBehaviour
             // If the Dragged-Slot-Object has an ItemContainer-Component on it...
             _Dragged.GetComponent<ItemContainer>() != null &&
             // If the name of the Item in the Container equals to the name of the Item in the Slot...
-            _Dragged.GetComponent<ItemContainer>().m_Item.m_Name == _Dropped.GetComponent<Slot>().m_Item.m_Name &&
+            _Dragged.GetComponent<ItemContainer>().m_Item.m_IName == _Dropped.GetComponent<Slot>().m_Item.m_IName &&
             // If the Dropped-Slot is not the OriginalParent
             _Dropped != m_originalParent &&
             // If the Split-Object is not the Original-Parent.

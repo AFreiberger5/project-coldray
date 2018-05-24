@@ -166,7 +166,7 @@ public class Inventory : MonoBehaviour
             for (int slot = 0; slot < _SlotList.Count; slot++)
             {
                 // If the name of the Item in the Slot at Position slot equals to the desired name. 
-                if (_SlotList[slot].m_Item.m_Name == _ItemToCheckName)
+                if (_SlotList[slot].m_Item.m_IName == _ItemToCheckName)
                 {
                     // Add the Amount to the total-Amount
                     TotalItemCount += _SlotList[slot].m_Amount;
@@ -605,7 +605,7 @@ public class Inventory : MonoBehaviour
             if (_Index <= (m_GridPanel.transform.childCount - 1) && _Index >= 0)
             {
                 // If the Itemname at the Slot with the Index of _Index is "Placeholder", which means that the slot is "Empty"
-                if (m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item.m_Name == "Placeholder")
+                if (m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item.m_IName == "Placeholder")
                 {
                     // Sets the Item of the specific Slot to the Item that should be placed.
                     m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item = _ItemToAdd;
@@ -620,7 +620,7 @@ public class Inventory : MonoBehaviour
                     // Changes the Itemprefab of that specific Slot to the ItemPrefab ob the Item To Overwrite.
                     m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_ItemPrefab = m_ItemToOverwrite;
                     // Changes the ItemName of that specific Slot to the ItemName ob the Item To Overwrite.
-                    m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_ItemName = _ItemToAdd.m_Name;
+                    m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_ItemName = _ItemToAdd.m_IName;
                     // Changes the Parent of that specific Slot to the Parent ob the Item To Overwrite.
                     m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Parent = m_GridPanel;
                     // Changes the Text-Object of that specific Slot to the Text-Object ob the Item To Overwrite.
@@ -644,7 +644,7 @@ public class Inventory : MonoBehaviour
                     // Changes the Amount og the ItemContainer to the Amount of the Slot.
                     ItemCon.m_Amount = m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Amount;
                     // Changes the name in the ItemContainer to the name of the ItemName inside the Slot.
-                    ItemCon.m_ContainedName = m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item.m_Name;
+                    ItemCon.m_ContainedName = m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item.m_IName;
                     // Changes the Item in the ItemContainer to the Item inside the Slot.
                     ItemCon.m_Item = m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item;
                     // Sets the Parent of the ItemContainer... Well. To it's Parent.
@@ -655,7 +655,7 @@ public class Inventory : MonoBehaviour
                 else
                 {
                     // If the Slots Amount of items is at the limit, seach for another Slot
-                    if (m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Amount < m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item.m_StackSize && m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item.m_Name == _ItemToAdd.m_Name)
+                    if (m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Amount < m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item.m_StackSize && m_GridPanel.transform.GetChild(_Index).GetComponent<Slot>().m_Item.m_IName == _ItemToAdd.m_IName)
                     {
                         // Sets the ItemCon to the ItemCOntainer of the specific Slot.
                         ItemCon = m_GridPanel.transform.GetChild(_Index).GetChild(0).GetComponent<ItemContainer>();
@@ -742,7 +742,7 @@ public class Inventory : MonoBehaviour
         for (int slot = 0; slot <= m_GridPanel.transform.childCount - 1; slot++)
         {
             // If the slots item is the item we want to add...
-            if (m_GridPanel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_Name == _ItemToAdd.m_Name)
+            if (m_GridPanel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_IName == _ItemToAdd.m_IName)
             {
                 // Adds the Existing slots to the List of slots.
                 ItemsInInventory.Add(new ItemIndexIdentifier(slot, m_GridPanel.transform.GetChild(slot).GetComponent<Slot>()));
@@ -791,7 +791,7 @@ public class Inventory : MonoBehaviour
         {
             // No items are matching.
             // Take the first slot that is empty.
-            if (m_GridPanel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_Name == "Placeholder")
+            if (m_GridPanel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_IName == "Placeholder")
             {
                 // Return the Slot.
                 return slot;
@@ -799,7 +799,7 @@ public class Inventory : MonoBehaviour
             else
             {
                 // If the itemName in the Slot matches the ItemName of the Item yout want to add and...
-                if (m_GridPanel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_Name == _ItemToAdd.m_Name && 
+                if (m_GridPanel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_IName == _ItemToAdd.m_IName && 
                     // If the Amount of the Item is smaller than the Stacksize...
                     m_GridPanel.transform.GetChild(slot).GetComponent<Slot>().m_Amount < m_GridPanel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_StackSize)
                 {
@@ -860,7 +860,7 @@ public class Inventory : MonoBehaviour
             for (int i = 0; i < _Panel.transform.childCount; i++)
             {
                 // If the ItemName of the Item in the Slot is the ItemName of the Item you are looking for...
-                if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_Name == _Name)
+                if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_IName == _Name)
                 {
                     // Print stuff.
                     Debug.Log("SlotIndex = " + i);
@@ -1013,7 +1013,7 @@ public class Inventory : MonoBehaviour
         for (int i = 0; i < _Panel.transform.childCount; i++)
         {
             // If the ItemName of the item in the Slot matches the ItemName of the _ItemToRemove.
-            if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_Name == _ItemToRemove.m_Name)
+            if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_IName == _ItemToRemove.m_IName)
             {
                 // Add the ItemIndexIdentifier to the List.
                 ListTargets.Add(new ItemIndexIdentifier(i, _Panel.transform.GetChild(i).GetComponent<Slot>()));
@@ -1096,7 +1096,7 @@ public class Inventory : MonoBehaviour
         for (int slot = 0; slot < _Panel.transform.childCount; slot++)
         {
             // If the name of the Item at the Current Slot matches the ItemName of the _ItemToCheck.
-            if (_Panel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_Name == _ItemToCheck.m_Name)
+            if (_Panel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_IName == _ItemToCheck.m_IName)
             {
                 // Add the Amount of the Slot to the total Count.
                 TotalItemCount += _Panel.transform.GetChild(slot).GetComponent<Slot>().m_Amount;
@@ -1185,7 +1185,7 @@ public class Inventory : MonoBehaviour
         for (int i = 0; i < _Panel.transform.childCount; i++)
         {
             // If the ItemName in the Current Slot is not "Placeholder"...
-            if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_Name != "Placeholder")
+            if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_IName != "Placeholder")
             {
                 // Creates a new gameObject as an ItemPrefab for the Slot.
                 GameObject GO = _Panel.transform.GetChild(i).GetComponent<Slot>().CreateItemPrefab(_Panel.transform.GetChild(i).gameObject);

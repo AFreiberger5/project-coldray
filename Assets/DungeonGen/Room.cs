@@ -5,6 +5,7 @@
 *   Edited by:  Alexander Freiberger      *
 *                                         *
 ******************************************/
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -18,11 +19,11 @@ public class Room : NetworkBehaviour
     public Transform m_RoomCamPos;
     public GameObject m_Turret;
 
+    private List<Transform> m_blocksToRemove = new List<Transform>();
     private GameObject[] m_Turrets;
 
-
     public void CloseWalls(byte[] _DoorInfo)
-    {
+    {        
         for (int i = 0; i < _DoorInfo.Length; i++)
         {
             switch (i)
@@ -31,28 +32,40 @@ public class Room : NetworkBehaviour
                     if (_DoorInfo[i] == 0)
                     {
                         foreach (Transform t in m_TopWallPoints)
-                            Instantiate(m_WallPrefab, t.position, Quaternion.identity);
+                        {
+                           GameObject go = Instantiate(m_WallPrefab, t.position, Quaternion.identity);
+                            m_blocksToRemove.Add(go.transform);
+                        }
                     }
                     break;
                 case 1:
                     if (_DoorInfo[i] == 0)
                     {
                         foreach (Transform t in m_RightWallPoints)
-                            Instantiate(m_WallPrefab, t.position, Quaternion.identity);
-                    }
+                        {
+                            GameObject go = Instantiate(m_WallPrefab, t.position, Quaternion.identity);
+                            m_blocksToRemove.Add(go.transform);
+                        }
+                    }   
                     break;
                 case 2:
                     if (_DoorInfo[i] == 0)
                     {
                         foreach (Transform t in m_BotWallPoints)
-                            Instantiate(m_WallPrefab, t.position, Quaternion.identity);
+                        {
+                            GameObject go = Instantiate(m_WallPrefab, t.position, Quaternion.identity);
+                            m_blocksToRemove.Add(go.transform);
+                        }
                     }
                     break;
                 case 3:
                     if (_DoorInfo[i] == 0)
                     {
                         foreach (Transform t in m_LeftWallPoints)
-                            Instantiate(m_WallPrefab, t.position, Quaternion.identity);
+                        {
+                            GameObject go = Instantiate(m_WallPrefab, t.position, Quaternion.identity);
+                            m_blocksToRemove.Add(go.transform);
+                        }
                     }
                     break;
             }
@@ -91,15 +104,16 @@ public class Room : NetworkBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            foreach (GameObject Turret in m_Turrets)
-            {
-                if (Turret.activeSelf == false)
-                    Turret.SetActive(true);
-
-                Turret.GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
-
-            }
+            //foreach (GameObject Turret in m_Turrets)
+            //{
+            //    if (Turret.activeSelf == false)
+            //        Turret.SetActive(true);
+            //
+            //    Turret.GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
+            //
+            //}     
             other.GetComponent<PlayerController>().SetCamRedirect(m_RoomCamPos);
+            WorldManager.GetInstance().CmdDestroyWorld();
         }
     }
 
@@ -119,6 +133,15 @@ public class Room : NetworkBehaviour
                 }
 
             }
+        }
+    }
+
+    private void OnDestroy()
+    {
+
+        for (int i = 0; i < m_blocksToRemove.Count; i++)
+        {
+            Destroy(m_blocksToRemove[i].transform.gameObject);
         }
     }
 }

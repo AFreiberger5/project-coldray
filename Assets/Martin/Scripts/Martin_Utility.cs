@@ -106,7 +106,7 @@ public static class Martin_Utility
         {
             foreach (Item item in itemList)
             {
-                if (item.m_Name == _ItemName)
+                if (item.m_IName == _ItemName)
                 {
                     return item;
                 }
@@ -171,7 +171,7 @@ public static class Martin_Utility
         {
             for (int i = 0; i < list.Count; i++)
             {
-                if (list[i].m_Name == _ItemName)
+                if (list[i].m_IName == _ItemName)
                 {
                     return i;
                 }
@@ -189,7 +189,7 @@ public static class Martin_Utility
         {
             for (int j = 0; j < _ItemLists[i].Count; j++)
             {
-                if (_ItemLists[i][j].m_Name == _ItemName)
+                if (_ItemLists[i][j].m_IName == _ItemName)
                 {
                     return i;
                 }
@@ -206,7 +206,7 @@ public static class Martin_Utility
         {
             foreach (Item item in list)
             {
-                if (item.m_Name == _ItemName)
+                if (item.m_IName == _ItemName)
                 {
                     return list;
                 }
@@ -351,7 +351,7 @@ public static class Martin_Utility
         {
             for (int i = 0; i < _Panel.transform.childCount; i++)
             {
-                if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_Name == _Name)
+                if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_IName == _Name)
                 {
                     Debug.Log("SlotIndex = " + i);
                     return i;
@@ -368,7 +368,7 @@ public static class Martin_Utility
 
         for (int slot = 0; slot < _Panel.transform.childCount; slot++)
         {
-            if (_Panel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_Name == _ItemToCheck.m_Name)
+            if (_Panel.transform.GetChild(slot).GetComponent<Slot>().m_Item.m_IName == _ItemToCheck.m_IName)
             {
                 TotalItemCount += _Panel.transform.GetChild(slot).GetComponent<Slot>().m_Amount;
             }
@@ -450,7 +450,7 @@ public static class Martin_Utility
 
         for (int i = 0; i < _Panel.transform.childCount; i++)
         {
-            if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_Name == _ItemToRemove.m_Name)
+            if (_Panel.transform.GetChild(i).GetComponent<Slot>().m_Item.m_IName == _ItemToRemove.m_IName)
             {
                 ListTargets.Add(new ItemIndexIdentifier(i, _Panel.transform.GetChild(i).GetComponent<Slot>()));
             }
