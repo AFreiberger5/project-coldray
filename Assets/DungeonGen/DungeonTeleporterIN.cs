@@ -1,5 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿/******************************************
+*                                         *
+*   Script made by Alexander Bloomenkamp  *
+*                                         *
+*   Edited by:                            *
+*                                         *
+******************************************/
+
 using UnityEngine;
 
 public class DungeonTeleporterIN : MonoBehaviour

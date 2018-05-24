@@ -1,4 +1,11 @@
-﻿using System.Collections;
+﻿/******************************************
+*                                         *
+*   Script made by Alexander Bloomenkamp  *
+*                                         *
+*   Edited by:                            *
+*                                         *
+******************************************/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -62,6 +69,7 @@ public class World : NetworkBehaviour
         this.transform.position = WorldManager.GetInstance().GetWorldPos();
         this.transform.rotation = Quaternion.identity;
         StartCoroutine(BuildWorld());
+
     }
 
     /// <summary>
@@ -175,15 +183,14 @@ public class World : NetworkBehaviour
 
     public void PropSeedController()
     {
-		Debug.Log ("seedcontroller");
+
         SpawnPortal(0, 6);
 
         SpawnPortal(1, 6);
 
         StartCoroutine(SpawnProp(2, 0, 5));
 
-		Debug.Log ("CmdBuildDungeonA()von world");
-     WorldManager.GetInstance().CmdBuildDungeonA();
+
     }
 
     public IEnumerator InstantiateProps()

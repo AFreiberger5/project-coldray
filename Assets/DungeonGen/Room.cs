@@ -138,7 +138,7 @@ public class Room : NetworkBehaviour
 
     private void OnDestroy()
     {
-
+   
         for (int i = 0; i < m_blocksToRemove.Count; i++)
         {
             Destroy(m_blocksToRemove[i].transform.gameObject);
