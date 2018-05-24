@@ -131,6 +131,7 @@ public class World : NetworkBehaviour
                 yield return null;
             }
             WorldManager.GetInstance().ReportWorldBuilt(true);
+            
         }
 
     }
@@ -149,6 +150,19 @@ public class World : NetworkBehaviour
             if (!m_occupiedPropPoints.Contains(m_freePropPoints[i]))
             {
                 m_PotentialSpawnpoints.Add(m_freePropPoints[i]);
+            }
+        }
+        for (int i = 0; i < m_PotentialSpawnpoints.Count; i++)
+        {
+            int chance = Random.Range(0, 300);
+            
+            if (chance < 1)
+            {
+
+                int enemy = Random.Range(3, 5);
+                GameObject Go = Instantiate(m_PropPrefabs[enemy], m_PotentialSpawnpoints[i], Quaternion.identity);
+                NetworkServer.Spawn(Go);
+
             }
         }
         WorldManager.GetInstance().ReportPropsListDone(true);
@@ -192,6 +206,7 @@ public class World : NetworkBehaviour
         for (int i = 0; i < m_WorldProps.Count; i++)
         {
             GameObject go = Instantiate(m_PropPrefabs[m_WorldProps[i].PrefabIndex], m_WorldProps[i].WorldPosition, Quaternion.identity);
+            go.transform.SetParent(this.gameObject.transform, true);
             m_objToRemove.Add(go.transform);
             counter++;
             if (counter == 50)
@@ -303,7 +318,53 @@ public class World : NetworkBehaviour
         }
         yield return null;
         WorldManager.GetInstance().ReportPropsDone(true);
-    }    
+    }
+
+    public IEnumerator SpawnKevinAndBanshee(byte _prefabIndex, int _objRadius, int _probability)
+    {
+        bool b = false;
+
+        for (int i = 0; i < m_freePropPoints.Count; i++)
+        {
+            byte type;
+            if (m_allPropPoints.TryGetValue(m_freePropPoints[i], out type))
+            {
+                if (type != 2)
+                {
+                    b = CheckPropSpace(m_freePropPoints[i], _objRadius, false);
+                    if (b == true)
+                    {
+                        int rnd = Random.Range(1, 101);
+                        if (rnd <= _probability)
+                        {
+                            m_propFlushList.Add(new PropInfo(m_freePropPoints[i], _prefabIndex));
+                            for (int x = 0; x < _objRadius; x++)
+                            {
+                                for (int z = 0; z < _objRadius; z++)
+                                {
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(m_freePropPoints[i].x - x, m_freePropPoints[i].y, m_freePropPoints[i].z + z)))
+                                        m_occupiedPropPoints.Add(new Vector3(m_freePropPoints[i].x - x, m_freePropPoints[i].y, m_freePropPoints[i].z + z));
+
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(m_freePropPoints[i].x + x, m_freePropPoints[i].y, m_freePropPoints[i].z + z)))
+                                        m_occupiedPropPoints.Add(new Vector3(m_freePropPoints[i].x + x, m_freePropPoints[i].y, m_freePropPoints[i].z + z));
+
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(m_freePropPoints[i].x + x, m_freePropPoints[i].y, m_freePropPoints[i].z - z)))
+                                        m_occupiedPropPoints.Add(new Vector3(m_freePropPoints[i].x + x, m_freePropPoints[i].y, m_freePropPoints[i].z - z));
+
+                                    if (!m_occupiedPropPoints.Contains(new Vector3(m_freePropPoints[i].x - x, m_freePropPoints[i].y, m_freePropPoints[i].z - z)))
+                                        m_occupiedPropPoints.Add(new Vector3(m_freePropPoints[i].x - x, m_freePropPoints[i].y, m_freePropPoints[i].z - z));
+                                    yield return null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            //yield return null;
+        }
+        yield return null;
+        WorldManager.GetInstance().ReportPropsDone(true);
+    }
 
     bool CheckPropSpace(Vector3 _propPos, int _radius, bool _edgesafe)
     {

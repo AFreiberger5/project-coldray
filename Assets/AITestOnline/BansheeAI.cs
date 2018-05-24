@@ -16,7 +16,7 @@ public class BansheeAI : AIBase
     //public variables for debug/testing/design access
     public float m_aggroDistance;
     public float m_deAggroDistance;
-    public float m_hitdistance;
+    public float m_hitdistance = 1;
     public Transform m_head;
 
     [SyncVar]
@@ -39,7 +39,7 @@ public class BansheeAI : AIBase
     private int IDDeath;
     #endregion
     private Helper helper;
-    public GameObject HitBox;
+
 
     [SyncVar, SerializeField]
     private float m_HP = -1;
@@ -49,7 +49,7 @@ public class BansheeAI : AIBase
     [ServerCallback]
     private void Awake()
     {
-        
+
         //Add Defense Values for all Types of DamageSources
         #region AddDefenseValues
 
@@ -71,12 +71,13 @@ public class BansheeAI : AIBase
         IDAttack = Animator.StringToHash("isattacking");
         IDDeath = Animator.StringToHash("isdied");
         helper = new Helper();
-
+        
     }
 
     [ServerCallback]
     void Update()
-    {
+    {  
+
         NPCDecision();
 
         if (m_currentState != m_previousState)
@@ -136,7 +137,7 @@ public class BansheeAI : AIBase
 
                         }
                     }
-                    m_currentState -= EAIState.IDLE;
+                    m_currentState = m_currentState & ~EAIState.IDLE;
                     m_currentState = m_currentState | EAIState.MOVING;
 
                 }
@@ -238,9 +239,9 @@ public class BansheeAI : AIBase
 
         if (m_hitdistance * m_hitdistance <= (transform.position - m_Target.transform.position).sqrMagnitude)
         {
-                //Banshee deals Magical damage and always focuses on the first enemy that faces her wrath
+            //Banshee deals Magical damage and always focuses on the first enemy that faces her wrath
             m_Target.GetComponent<PlayerController>().OnPlayerTakeDamage(m_Damage, EDamageType.MELEE | EDamageType.MAGICAL);
-            
+
         }
     }
 
@@ -304,7 +305,7 @@ public class BansheeAI : AIBase
                 }
             }
         }
-        else if(isClient)
+        else if (isClient)
         {
             CmdOnInteraction(_value, _damageType);
         }

@@ -49,14 +49,14 @@ public class DunGen : NetworkBehaviour
     public void PreGen()
     {
         if (isServer)
-        {			
+        {
             m_startPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
             m_occupiedPos.Add(m_startPos);
             m_toProcess.Add(m_startPos, new byte[] { 1, 1, 1, 1 });
             DunGenController();
-			Debug.Log ("pregen done");
-			CmdBuild();
-			WorldManager.GetInstance().ReportDungeonADone(true);
+            Debug.Log("pregen done");
+            CmdBuild();
+            WorldManager.GetInstance().ReportDungeonADone(true);
         }
 
     }
@@ -225,7 +225,7 @@ public class DunGen : NetworkBehaviour
     [Command]
     void CmdGenerateSyncList()
     {
-		Debug.Log ("generiere synclist");
+        Debug.Log("generiere synclist");
         foreach (KeyValuePair<Vector3, byte[]> c in m_rooms)
         {
             m_DungeonATiles.Add(new Tile(c.Key, c.Value));
@@ -235,17 +235,17 @@ public class DunGen : NetworkBehaviour
     [Command]
     void CmdClearSyncList()
     {
-		Debug.Log ("cleare synclist");
-		for (int i = 0; i < m_DungeonATiles.Count; i++)
-		{
-			
-			m_DungeonATiles.RemoveAt(i);
-    	}
-	}
+        Debug.Log("cleare synclist");
+        for (int i = 0; i < m_DungeonATiles.Count; i++)
+        {
+
+            m_DungeonATiles.RemoveAt(i);
+        }
+    }
 
     public void Build()
     {
-		Debug.Log ("client build");
+        Debug.Log("client build");
         if (!isServer)
         {
             for (int i = 0; i < m_DungeonATiles.Count; i++)
@@ -262,16 +262,16 @@ public class DunGen : NetworkBehaviour
     [Command]
     public void CmdBuild()
     {
-		Debug.Log ("cmdbuilde gerade");
+        Debug.Log("cmdbuilde gerade");
         for (int i = 0; i < m_DungeonATiles.Count; i++)
         {                                               //bossraum == letzer eintrag in synchlist
             GameObject dummy = Instantiate(m_EntryRoom, m_DungeonATiles[i].pos, Quaternion.identity);
             Room dummyroom = dummy.GetComponent<Room>();
             dummyroom.CloseWalls(m_DungeonATiles[i].doors);
             m_roomsToRemove.Add(dummy.transform);
-           //Don't spawn enemies in Startroom or Bossroom
-           //if (i > 0 && i < m_DungeonATiles.Count - 1)
-           //    dummyroom.SpawnEnemies((m_RoomSizeX / 2) - 2, (m_RoomSizeZ / 2) - 2);
+            //Don't spawn enemies in Startroom or Bossroom
+            if (i > 0 && i < m_DungeonATiles.Count - 1)
+                dummyroom.SpawnEnemies((m_RoomSizeX / 2) - 2, (m_RoomSizeZ / 2) - 2);
         }
     }
 
@@ -293,6 +293,6 @@ public class DunGen : NetworkBehaviour
         m_toAdd.Clear();
         m_occupiedPos.Clear();
         WorldManager.GetInstance().m_IsDestroyingDungeonA = false;
-		Debug.Log ("zerstört");
+        Debug.Log("zerstört");
     }
 }

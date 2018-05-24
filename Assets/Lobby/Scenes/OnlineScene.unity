@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -637,6 +637,8 @@ MonoBehaviour:
   - {fileID: 1519280447558174, guid: 2959c2bcb4f58534fb57c14c29646419, type: 2}
   - {fileID: 1730430161023572, guid: a4ef24ed6f07fac479519f66f2beda12, type: 2}
   - {fileID: 1389371529969874, guid: 7006e09f72281ed4fb73707b305a5078, type: 2}
+  - {fileID: 1061507453935134, guid: 9501c8ee6a433a94f827fcfd16ce8cbf, type: 2}
+  - {fileID: 1113844823655684, guid: a19e1b0b91f551e4481568329502c3b4, type: 2}
   m_newWorld: 1
 --- !u!114 &855722366
 MonoBehaviour:
@@ -650,7 +652,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AgentTypeID: 0
-  m_CollectObjects: 0
+  m_CollectObjects: 2
   m_Size: {x: 10, y: 10, z: 10}
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
