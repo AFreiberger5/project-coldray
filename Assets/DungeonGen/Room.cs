@@ -126,7 +126,13 @@ public class Room : NetworkBehaviour
                     m_Turrets[i].GetComponent<TurretAI>().m_Players.Add(other.GetComponent<PlayerController>());
 
                 }
+
+            other.GetComponent<PlayerController>().m_PlayerInDungeon = true;
+
             other.GetComponent<PlayerController>().SetCamRedirect(m_RoomCamPos);
+
+            Camera.main.orthographicSize = 9;
+
             // WorldManager.GetInstance().CmdDestroyWorld();
         }
     }
@@ -154,6 +160,12 @@ public class Room : NetworkBehaviour
                     }
 
                 }
+
+            other.GetComponent<PlayerController>().SetCamRedirect(other.GetComponent<PlayerController>().m_CamAnchor);
+
+            other.GetComponent<PlayerController>().m_PlayerInDungeon = false;
+
+            Camera.main.orthographicSize = 3;
         }
     }
 

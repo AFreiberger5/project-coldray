@@ -41,6 +41,8 @@ public class PlayerController : NetworkBehaviour
     private float m_playerRotSpeed = 10.0f;
     private Vector3 m_playerMovement;
 
+    public bool m_PlayerInDungeon = false;
+
     /// <summary>
     /// basic setup of the player
     /// </summary>
@@ -138,12 +140,23 @@ public class PlayerController : NetworkBehaviour
             else
                 m_playerAnimator.SetBool("isRunning", false);
 
+            if (m_PlayerInDungeon)
+            {
+                m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+                m_playerMovement = m_playerMovement.normalized * m_playerSpeed * Time.deltaTime;
+
+                m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
+            }
+            else
+            {
+                MovePlayer();
+            }
             //MovePlayer();
 
-            m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-            m_playerMovement = m_playerMovement.normalized * m_playerSpeed * Time.deltaTime;
-
-            m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
+            //m_playerMovement.Set(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+            //m_playerMovement = m_playerMovement.normalized * m_playerSpeed * Time.deltaTime;
+            //
+            //m_playerRigidBody.MovePosition(transform.position + m_playerMovement);
         }
     }
 
@@ -155,6 +168,9 @@ public class PlayerController : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
+            if (m_PlayerCamera == null)
+                m_PlayerCamera = Camera.main;
+
             Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
             targetVelocity = m_PlayerCamera.transform.TransformDirection(targetVelocity).normalized * m_playerSpeed;
