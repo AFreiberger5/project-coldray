@@ -64,6 +64,11 @@ public class PlayerController : NetworkBehaviour
             FaceMousePosition();
 
             PlayerAttacks();
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                GetComponent<PlayerCharacter>().SavePlayerCharacter();
+            }
         }
     }
 

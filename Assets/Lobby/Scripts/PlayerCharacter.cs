@@ -150,6 +150,8 @@ public class PlayerCharacter : NetworkBehaviour
     private Animator m_PlayerAnimator = null;
 #pragma warning restore 0414
 
+    private Inventory m_playerInventoryScript;
+
     /// <summary>
     /// converts an int array into an int sync list
     /// </summary>
@@ -163,6 +165,8 @@ public class PlayerCharacter : NetworkBehaviour
     private void Start()
     {
         m_PlayerAnimator = GetComponent<Animator>();
+
+        m_playerInventoryScript = GetComponent<Inventory>();
 
         if (m_SyncModel.Count >= 9)
         {
@@ -222,10 +226,25 @@ public class PlayerCharacter : NetworkBehaviour
             //---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW
             GetComponent<PlayerController>().m_PlayerCurrentHP = cs.m_StatsCurrentHP;
             GetComponent<PlayerController>().m_PlayerInventory = cs.m_StatsInventory;
+
+            m_playerInventoryScript.Deserialize(GetComponent<PlayerController>().m_PlayerInventory, m_playerInventoryScript.m_GridPanel, GameObject.Find("ItemManager").GetComponent<ItemManager>());
+            m_playerInventoryScript.BuildInventory(m_playerInventoryScript.m_GridPanel);
+            
+            Debug.Log(m_playerInventoryScript.MakeSerializible(m_playerInventoryScript.m_GridPanel));
             //---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW---NEW
 
             gameObject.name = cs.m_StatsName;
         }
+    }
+
+    public void SavePlayerCharacter()
+    {
+        CharacterStats cs = new CharacterStats(m_PlayerName, m_SyncModel.ToArray(), GetComponent<PlayerController>().m_PlayerCurrentHP, m_playerInventoryScript.MakeSerializible(m_playerInventoryScript.m_GridPanel));
+        Debug.Log(m_playerInventoryScript.MakeSerializible(m_playerInventoryScript.m_GridPanel));
+
+        SaveLoadManager.SaveCharacter(cs);
+
+        Debug.Log("saved inventory");
     }
 
     /// <summary>
